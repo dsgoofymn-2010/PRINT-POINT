@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  PrintPoint tokens.
+  Page direction "Sentence is the layout" (seed 1497690328): newsprint paper, toner ink, one brass accent.
+  App style "Achromatic ledger" (seed 1499594586): ink chrome, brass only on the main data element.
+  Values are RGB triplets so Tailwind can apply opacity.
+*/
+:root {
+  --paper: 232 232 227;      /* #e8e8e3 newsprint, marketing page ground */
+  --ground: 244 243 239;     /* #f4f3ef app ground, one step off white, from the paper */
+  --surface: 255 255 255;
+  --raised: 249 249 247;
+  --active: 233 233 229;     /* nav pill, selected row */
+  --border: 232 232 228;
+  --rule: 241 241 238;
+  --control: 207 207 202;
+  --ink: 24 23 21;           /* #181715 toner */
+  --muted: 92 91 85;         /* #5c5b55, 6.4:1 on white */
+  --primary: 24 23 21;
+  --on-primary: 232 232 227;
+  --brass: 191 178 26;       /* #bfb21a, the action on the page */
+  --brass-ink: 24 23 21;
+  --data: 128 117 8;         /* #807508, brass deepened to 4.6:1 on white for chart marks */
+  --field: 24 23 21;
+  --field-ink: 232 232 227;
+  --positive: 36 123 80;
+  --negative: 196 36 42;
+  color-scheme: light;
+}
+
+.dark {
+  --paper: 17 17 16;
+  --ground: 10 10 9;
+  --surface: 20 20 19;
+  --raised: 30 30 28;
+  --active: 38 38 36;
+  --border: 40 40 38;
+  --rule: 30 30 28;
+  --control: 74 74 70;
+  --ink: 238 238 235;
+  --muted: 180 179 172;
+  --primary: 238 238 235;
+  --on-primary: 17 17 16;
+  --brass: 214 200 48;
+  --brass-ink: 17 17 16;
+  --data: 214 200 48;
+  --field: 232 232 227;
+  --field-ink: 24 23 21;
+  --positive: 63 192 122;
+  --negative: 229 86 111;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-ground font-sans text-base leading-6 text-ink antialiased;
+    font-variant-numeric: tabular-nums;
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--ink));
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: rgb(var(--brass));
+    color: rgb(var(--brass-ink));
+  }
+}
+
+@layer components {
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Display type for the marketing page and the wordmark */
+  .display {
+    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 0.88;
+  }
+  .page-gutter {
+    padding-left: clamp(16px, 2.4vw, 32px);
+    padding-right: clamp(16px, 2.4vw, 32px);
+  }
+}
+
+/* Entrance used on the marketing page only; content stays visible without script. */
+@media (prefers-reduced-motion: no-preference) {
+  .js .rise {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 600ms cubic-bezier(0.2, 0.7, 0.2, 1), transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: var(--d, 0ms);
+  }
+  .js .rise.in {
+    opacity: 1;
+    transform: none;
+  }
+  .drift {
+    animation: drift 18s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    from { transform: scale(1.04) translate3d(-1%, 0, 0); }
+    to { transform: scale(1.1) translate3d(1%, -1%, 0); }
+  }
+}
+
+@media print {
+  header,
+  footer,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  main {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+}

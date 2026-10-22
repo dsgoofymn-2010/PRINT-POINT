@@ -1,0 +1,537 @@
+// PrintPoint data model. All money values are stored in paise (integer).
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  SHOP_OWNER
+  ADMIN
+}
+
+enum ShopStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum ServiceType {
+  XEROX_BW
+  COLOR_PRINT
+  PROJECT_REPORT
+  SPIRAL_BINDING
+  SOFT_BINDING
+  HARD_BINDING
+  LAMINATION
+  SCANNING
+  PASSPORT_PHOTO
+}
+
+enum OrderStatus {
+  DRAFT
+  PENDING_PAYMENT
+  PAID
+  PRINTING
+  READY
+  OUT_FOR_DELIVERY
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  CREATED
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum RefundStatus {
+  PENDING
+  PROCESSED
+  FAILED
+}
+
+enum FulfillmentType {
+  PICKUP
+  DELIVERY
+}
+
+enum PrintColor {
+  BW
+  COLOR
+}
+
+enum PaperSize {
+  A4
+  A3
+  LEGAL
+}
+
+enum PrintSides {
+  SINGLE
+  DOUBLE
+}
+
+enum PaperQuality {
+  NORMAL_70
+  BOND_80
+  GLOSSY
+}
+
+enum Orientation {
+  PORTRAIT
+  LANDSCAPE
+}
+
+enum FitMode {
+  FIT
+  ACTUAL
+}
+
+enum BindingType {
+  NONE
+  SPIRAL
+  SOFT
+  HARD
+}
+
+enum LaminationType {
+  NONE
+  SINGLE
+  DOUBLE
+}
+
+enum DeliveryStatus {
+  PENDING
+  ASSIGNED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+}
+
+enum DiscountType {
+  PERCENT
+  FLAT
+}
+
+enum NotificationChannel {
+  WHATSAPP_LINK
+  SMS
+  EMAIL
+  IN_APP
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String?   @unique
+  mobile       String?   @unique
+  passwordHash String?
+  role         Role      @default(CUSTOMER)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  shops         Shop[]
+  addresses     CustomerAddress[]
+  files         UploadedFile[]
+  orders        PrintOrder[]
+  reviews       Review[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  refreshTokens RefreshToken[]
+  refunds       Refund[]          @relation("RefundInitiator")
+
+  @@index([role])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  userAgent String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model OtpCode {
+  id        String   @id @default(uuid())
+  mobile    String
+  codeHash  String
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  consumed  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([mobile, createdAt])
+}
+
+model Shop {
+  id                  String     @id @default(uuid())
+  ownerId             String
+  name                String
+  slug                String     @unique
+  ownerName           String
+  mobile              String
+  email               String?
+  address             String
+  area                String
+  city                String
+  pincode             String
+  mapsUrl             String?
+  latitude            Float?
+  longitude           Float?
+  openTime            String     @default("09:00") // HH:mm, IST
+  closeTime           String     @default("21:00")
+  holidays            String[]   @default([]) // weekday names, e.g. "SUNDAY"
+  status              ShopStatus @default(PENDING)
+  deliveryAvailable   Boolean    @default(false)
+  deliveryRadiusKm    Float      @default(0)
+  estimatedPickupMins Int        @default(30)
+  rating              Float      @default(0)
+  ratingCount         Int        @default(0)
+  payoutUpiMasked     String? // masked reference only, never full details
+  payoutAccountMasked String?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  deletedAt           DateTime?
+
+  owner        User          @relation(fields: [ownerId], references: [id])
+  services     ShopService[]
+  pricingRules PricingRule[]
+  orders       PrintOrder[]
+  reviews      Review[]
+  coupons      Coupon[]
+
+  @@index([city, area])
+  @@index([status])
+  @@index([ownerId])
+}
+
+model ShopService {
+  id     String      @id @default(uuid())
+  shopId String
+  type   ServiceType
+  note   String?
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([shopId, type])
+}
+
+/// A shop can keep several rule sets; exactly one is active at a time.
+model PricingRule {
+  id                String   @id @default(uuid())
+  shopId            String
+  name              String   @default("Standard")
+  isActive          Boolean  @default(true)
+  bwSingle          Int // paise per printed page
+  bwDouble          Int
+  colorSingle       Int
+  colorDouble       Int
+  a3Multiplier      Float    @default(2)
+  legalMultiplier   Float    @default(1.2)
+  bondExtra         Int      @default(0) // paise per sheet
+  glossyExtra       Int      @default(0)
+  spiralBinding     Int      @default(0) // paise per copy
+  softBinding       Int      @default(0)
+  hardBinding       Int      @default(0)
+  laminationSingle  Int      @default(0) // paise per sheet
+  laminationDouble  Int      @default(0)
+  deliveryFee       Int      @default(0)
+  freeDeliveryAbove Int?
+  minOrderAmount    Int      @default(0)
+  taxPercent        Float    @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId, isActive])
+}
+
+model CustomerAddress {
+  id        String    @id @default(uuid())
+  userId    String
+  label     String    @default("Home")
+  name      String
+  mobile    String
+  line1     String
+  landmark  String?
+  area      String
+  city      String
+  pincode   String
+  isDefault Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model UploadedFile {
+  id           String    @id @default(uuid())
+  ownerId      String
+  storageKey   String    @unique // random UUID-based key, never the original name
+  originalName String
+  mimeType     String
+  sizeBytes    Int
+  pageCount    Int?
+  createdAt    DateTime  @default(now())
+  deletedAt    DateTime?
+
+  owner      User        @relation(fields: [ownerId], references: [id])
+  orderItems OrderItem[]
+
+  @@index([ownerId, createdAt])
+  @@index([deletedAt, createdAt])
+}
+
+model OrderCounter {
+  year  Int @id
+  value Int @default(0)
+}
+
+model PrintOrder {
+  id                  String          @id @default(uuid())
+  orderNumber         String?         @unique // PP-2026-000123, assigned on payment
+  customerId          String
+  shopId              String
+  status              OrderStatus     @default(DRAFT)
+  fulfillment         FulfillmentType @default(PICKUP)
+  subtotal            Int
+  deliveryFee         Int             @default(0)
+  discount            Int             @default(0)
+  tax                 Int             @default(0)
+  total               Int
+  commissionPercent   Float           @default(0)
+  commissionAmount    Int             @default(0)
+  priceSnapshot       Json // pricing rule + breakdown at order time
+  couponId            String?
+  specialInstructions String?
+  pickupOtp           String?
+  estimatedReadyAt    DateTime?
+  paidAt              DateTime?
+  completedAt         DateTime?
+  cancelledAt         DateTime?
+  filesPurgedAt       DateTime?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  customer User         @relation(fields: [customerId], references: [id])
+  shop     Shop         @relation(fields: [shopId], references: [id])
+  coupon   Coupon?      @relation(fields: [couponId], references: [id])
+  items    OrderItem[]
+  payments Payment[]
+  refunds  Refund[]
+  delivery Delivery?
+  review   Review?
+  events   OrderEvent[]
+
+  @@index([customerId, createdAt])
+  @@index([shopId, status, createdAt])
+  @@index([status, updatedAt])
+}
+
+model OrderEvent {
+  id        String      @id @default(uuid())
+  orderId   String
+  status    OrderStatus
+  note      String?
+  actorId   String?
+  createdAt DateTime    @default(now())
+
+  order PrintOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+}
+
+model OrderItem {
+  id           String         @id @default(uuid())
+  orderId      String
+  fileId       String
+  fileName     String
+  totalPages   Int
+  pageRange    String?
+  printedPages Int
+  copies       Int
+  color        PrintColor
+  paperSize    PaperSize
+  sides        PrintSides
+  paperQuality PaperQuality
+  orientation  Orientation
+  fitMode      FitMode
+  binding      BindingType
+  lamination   LaminationType
+  lineTotal    Int
+  breakdown    Json
+
+  order PrintOrder   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  file  UploadedFile @relation(fields: [fileId], references: [id])
+
+  @@index([orderId])
+  @@index([fileId])
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  orderId           String
+  razorpayOrderId   String        @unique
+  razorpayPaymentId String?       @unique
+  razorpaySignature String?
+  amount            Int
+  currency          String        @default("INR")
+  status            PaymentStatus @default(CREATED)
+  method            String?
+  failureReason     String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  order   PrintOrder @relation(fields: [orderId], references: [id])
+  refunds Refund[]
+
+  @@index([orderId])
+  @@index([status, createdAt])
+}
+
+model Refund {
+  id               String       @id @default(uuid())
+  paymentId        String
+  orderId          String
+  razorpayRefundId String?      @unique
+  amount           Int
+  status           RefundStatus @default(PENDING)
+  reason           String?
+  initiatedById    String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  payment     Payment    @relation(fields: [paymentId], references: [id])
+  order       PrintOrder @relation(fields: [orderId], references: [id])
+  initiatedBy User?      @relation("RefundInitiator", fields: [initiatedById], references: [id])
+
+  @@index([orderId])
+}
+
+model Delivery {
+  id            String         @id @default(uuid())
+  orderId       String         @unique
+  name          String
+  mobile        String
+  address       String
+  landmark      String?
+  pincode       String?
+  preferredTime String?
+  status        DeliveryStatus @default(PENDING)
+  partnerName   String?
+  partnerMobile String?
+  deliveredAt   DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  order PrintOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id         String    @id @default(uuid())
+  orderId    String    @unique
+  shopId     String
+  customerId String
+  rating     Int // 1..5 (also enforced by a CHECK constraint)
+  comment    String?
+  createdAt  DateTime  @default(now())
+  deletedAt  DateTime?
+
+  order    PrintOrder @relation(fields: [orderId], references: [id])
+  shop     Shop       @relation(fields: [shopId], references: [id])
+  customer User       @relation(fields: [customerId], references: [id])
+
+  @@index([shopId, createdAt])
+}
+
+model Coupon {
+  id           String       @id @default(uuid())
+  code         String       @unique
+  shopId       String? // null = platform-wide
+  discountType DiscountType
+  value        Int // percent (0-100) or paise
+  maxDiscount  Int?
+  minOrder     Int          @default(0)
+  validFrom    DateTime     @default(now())
+  validTo      DateTime?
+  usageLimit   Int?
+  usedCount    Int          @default(0)
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+
+  shop   Shop?        @relation(fields: [shopId], references: [id])
+  orders PrintOrder[]
+}
+
+model Notification {
+  id        String              @id @default(uuid())
+  userId    String?
+  orderId   String?
+  channel   NotificationChannel
+  recipient String
+  message   String
+  link      String?
+  status    NotificationStatus  @default(PENDING)
+  readAt    DateTime?
+  createdAt DateTime            @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+model WebhookEvent {
+  id         String   @id // x-razorpay-event-id, used to drop duplicates
+  event      String
+  receivedAt DateTime @default(now())
+}
+
+model PlatformSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
