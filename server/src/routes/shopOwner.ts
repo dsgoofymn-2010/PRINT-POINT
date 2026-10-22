@@ -1,6 +1,7 @@
 import { Router, type Request } from 'express';
 import { z } from 'zod';
 import type { OrderStatus, Prisma, ServiceType, Shop } from '@prisma/client';
+import { razorpayConfigured } from '../config/env';
 import { ah, badRequest, conflict, forbidden, notFound } from '../lib/errors';
 import { prisma } from '../lib/prisma';
 import { authenticate, currentUser, requireRole } from '../middleware/auth';
@@ -8,7 +9,9 @@ import { addEvent, orderDetailInclude, SHOP_TRANSITIONS } from '../services/orde
 import { initiateRefund } from '../services/payments';
 import { calculateQuote, ruleSnapshot } from '../services/pricing';
 import { printSettingsSchema } from '../services/orders';
-import { safeEqual } from '../lib/tokens';
+import { pickupLimiter } from '../middleware/rateLimit';
+import { broadcastOrder, emitShopChanged, joinOwnerToShop } from '../services/realtime';
+import { acceptRequest, collectWithCode, denyRequest, markPrinting, markReady, maskMobile, queueInfo } from '../services/requests';
 
 export const shopOwnerRouter = Router();
 shopOwnerRouter.use(authenticate, requireRole('SHOP_OWNER', 'ADMIN'));
@@ -110,6 +113,7 @@ shopOwnerRouter.post(
       },
       include: { services: true, pricingRules: true },
     });
+    joinOwnerToShop(user.id, shop.id);
     res.status(201).json({ shop });
   }),
 );
@@ -141,6 +145,7 @@ shopOwnerRouter.put(
       await tx.shopService.createMany({ data: body.services.map((type) => ({ shopId: shop.id, type })) });
       return tx.shop.update({ where: { id: shop.id }, data: shopData(body) });
     });
+    emitShopChanged(shop.id);
     res.json({ shop: updated });
   }),
 );
@@ -152,7 +157,7 @@ shopOwnerRouter.get(
     const start = startOfDayIST();
     const [today, pending, completedToday, recent] = await Promise.all([
       prisma.printOrder.aggregate({ where: { shopId: shop.id, paidAt: { gte: start } }, _sum: { total: true }, _count: true }),
-      prisma.printOrder.count({ where: { shopId: shop.id, status: { in: ['PAID', 'PRINTING', 'READY', 'OUT_FOR_DELIVERY'] } } }),
+      prisma.printOrder.count({ where: { shopId: shop.id, status: { in: ['REQUESTED', 'ACCEPTED', 'PAID', 'PRINTING', 'READY', 'OUT_FOR_DELIVERY'] } } }),
       prisma.printOrder.count({ where: { shopId: shop.id, status: 'COMPLETED', completedAt: { gte: start } } }),
       prisma.printOrder.findMany({
         where: { shopId: shop.id, status: { notIn: ['DRAFT', 'PENDING_PAYMENT'] } },
@@ -209,7 +214,9 @@ shopOwnerRouter.put(
     const { rule } = await ownedRule(req);
     const data = pricingSchema.parse(req.body);
     // Existing orders keep their own price snapshot, so editing is safe.
-    res.json({ rule: await prisma.pricingRule.update({ where: { id: rule.id }, data }) });
+    const updated = await prisma.pricingRule.update({ where: { id: rule.id }, data });
+    emitShopChanged(rule.shopId);
+    res.json({ rule: updated });
   }),
 );
 
@@ -221,6 +228,7 @@ shopOwnerRouter.post(
       prisma.pricingRule.updateMany({ where: { shopId: shop.id }, data: { isActive: false } }),
       prisma.pricingRule.update({ where: { id: rule.id }, data: { isActive: true } }),
     ]);
+    emitShopChanged(shop.id);
     res.json({ ok: true });
   }),
 );
@@ -250,7 +258,9 @@ shopOwnerRouter.post(
       hardBinding: f(rule.hardBinding), laminationSingle: f(rule.laminationSingle), laminationDouble: f(rule.laminationDouble),
     };
     const data = scope === 'PER_PAGE' ? perPage : scope === 'ADDONS' ? addons : { ...perPage, ...addons };
-    res.json({ rule: await prisma.pricingRule.update({ where: { id: rule.id }, data }) });
+    const updated = await prisma.pricingRule.update({ where: { id: rule.id }, data });
+    emitShopChanged(rule.shopId);
+    res.json({ rule: updated });
   }),
 );
 
@@ -290,7 +300,7 @@ shopOwnerRouter.get(
       take: 200,
       include: { customer: { select: { name: true, mobile: true } }, items: { select: { fileName: true, printedPages: true, copies: true, color: true } }, delivery: true },
     });
-    res.json({ orders });
+    res.json({ orders: orders.map(({ pickupOtp, ...o }) => (void pickupOtp, { ...o, customer: { ...o.customer, mobile: maskMobile(o.customer.mobile) } })) });
   }),
 );
 
@@ -338,7 +348,7 @@ shopOwnerRouter.get(
   ah(async (req, res) => {
     const order = await shopOrder(req);
     // The pickup OTP is the customer's proof of collection; never reveal it to the shop.
-    res.json({ order: { ...order, pickupOtp: undefined } });
+    res.json({ order: forShop(order) });
   }),
 );
 
@@ -357,6 +367,9 @@ shopOwnerRouter.patch(
       })
       .parse(req.body);
 
+    if (order.fulfillment === 'PICKUP' && body.status !== 'CANCELLED') {
+      throw badRequest('Use the request actions (accept, printing, ready, verify code) for pickup orders');
+    }
     const allowed = SHOP_TRANSITIONS[order.status] ?? [];
     if (!allowed.includes(body.status)) throw conflict(`Cannot move an order from ${order.status} to ${body.status}`);
     if (body.status === 'READY' && order.fulfillment !== 'PICKUP') throw badRequest('Use "Out for delivery" for delivery orders');
@@ -366,9 +379,6 @@ shopOwnerRouter.patch(
       // Paid orders cancelled by the shop are always refunded in full.
       await initiateRefund(order.id, null, body.note ?? 'Cancelled by shop', user.id);
     } else {
-      if (body.status === 'COMPLETED' && order.fulfillment === 'PICKUP') {
-        if (!body.pickupOtp || !order.pickupOtp || !safeEqual(body.pickupOtp, order.pickupOtp)) throw badRequest('Enter the correct 6-digit pickup OTP from the customer');
-      }
       await prisma.$transaction(async (tx) => {
         await tx.printOrder.update({
           where: { id: order.id },
@@ -383,8 +393,9 @@ shopOwnerRouter.patch(
         await addEvent(tx, order.id, body.status as OrderStatus, user.id, body.note);
       });
     }
+    await broadcastOrder(order.id);
     const updated = await prisma.printOrder.findUniqueOrThrow({ where: { id: order.id }, include: orderDetailInclude });
-    res.json({ order: { ...updated, pickupOtp: undefined } });
+    res.json({ order: forShop(updated) });
   }),
 );
 
@@ -397,6 +408,159 @@ shopOwnerRouter.post(
     const body = z.object({ amount: z.number().int().positive().optional(), reason: z.string().trim().min(3).max(300) }).parse(req.body);
     const refund = await initiateRefund(order.id, body.amount ?? null, body.reason, user.id);
     res.status(201).json({ refund });
+  }),
+);
+
+// ---------- Incoming requests (chat flow) ----------
+
+type ShopOrder = Awaited<ReturnType<typeof shopOrder>>;
+
+/** What a shop may see of an order: masked phone, no pickup code. */
+function forShop(o: ShopOrder) {
+  const { pickupOtp, ...rest } = o;
+  void pickupOtp;
+  return { ...rest, customer: { ...o.customer, mobile: maskMobile(o.customer.mobile), email: null } };
+}
+
+const requestListInclude = {
+  customer: { select: { name: true, mobile: true } },
+  items: {
+    select: {
+      id: true, fileId: true, fileName: true, totalPages: true, printedPages: true, copies: true, color: true, sides: true, binding: true, lineTotal: true,
+      file: { select: { deletedAt: true, mimeType: true, sizeBytes: true } },
+    },
+  },
+} satisfies Prisma.PrintOrderInclude;
+
+type RequestRow = Prisma.PrintOrderGetPayload<{ include: typeof requestListInclude }>;
+
+/** List/card view for owners: masked phone, never the pickup code. */
+function requestForShop(o: RequestRow) {
+  const { pickupOtp, ...rest } = o;
+  void pickupOtp;
+  return { ...rest, customer: { name: o.customer.name, mobile: maskMobile(o.customer.mobile) } };
+}
+
+const LIVE: OrderStatus[] = ['REQUESTED', 'ACCEPTED', 'PAID', 'PRINTING', 'READY'];
+const DONE: OrderStatus[] = ['COMPLETED', 'DENIED', 'CANCELLED', 'REFUNDED'];
+
+shopOwnerRouter.get(
+  '/requests',
+  ah(async (req, res) => {
+    const shop = await myShop(req);
+    const { scope } = z.object({ scope: z.enum(['active', 'done']).default('active') }).parse(req.query);
+    const start = startOfDayIST();
+    const [orders, grouped, completedToday, queue] = await Promise.all([
+      prisma.printOrder.findMany({
+        where:
+          scope === 'active'
+            ? { shopId: shop.id, status: { in: LIVE } }
+            : { shopId: shop.id, status: { in: DONE }, updatedAt: { gte: new Date(Date.now() - 7 * 86_400_000) } },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+        include: requestListInclude,
+      }),
+      prisma.printOrder.groupBy({ by: ['status'], where: { shopId: shop.id, status: { in: LIVE } }, _count: true }),
+      prisma.printOrder.count({ where: { shopId: shop.id, status: 'COMPLETED', completedAt: { gte: start } } }),
+      queueInfo(shop.id).catch(() => null),
+    ]);
+    const n = (st: OrderStatus) => grouped.find((g) => g.status === st)?._count ?? 0;
+    res.json({
+      shop: {
+        id: shop.id,
+        name: shop.name,
+        status: shop.status,
+        acceptingRequests: shop.acceptingRequests,
+        openTime: shop.openTime,
+        closeTime: shop.closeTime,
+        estimatedPickupMins: shop.estimatedPickupMins,
+        isOpen: queue?.isOpen ?? false,
+        withinHours: queue?.withinHours ?? false,
+      },
+      counts: { pending: n('REQUESTED'), accepted: n('ACCEPTED') + n('PAID'), printing: n('PRINTING'), ready: n('READY'), completedToday },
+      onlinePayment: razorpayConfigured,
+      orders: orders.map(requestForShop),
+    });
+  }),
+);
+
+/** Resolves an order of the caller's own shop; anything else is a 404. */
+async function ownRequest(req: Request) {
+  const user = currentUser(req);
+  const id = z.string().uuid().parse(req.params.id);
+  // Any of the caller's own shops; admins may act on any shop.
+  const order = await prisma.printOrder.findFirst({
+    where: { id, shop: { deletedAt: null, ...(user.role === 'ADMIN' ? {} : { ownerId: user.id }) } },
+    select: { id: true, shop: { select: { id: true, estimatedPickupMins: true } } },
+  });
+  if (!order) throw notFound('Request not found');
+  return { id: order.id, shop: order.shop };
+}
+
+const reply = async (id: string) => ({
+  order: requestForShop(await prisma.printOrder.findUniqueOrThrow({ where: { id }, include: requestListInclude })),
+});
+
+shopOwnerRouter.post(
+  '/requests/:id/accept',
+  ah(async (req, res) => {
+    const { id, shop } = await ownRequest(req);
+    const { readyInMinutes } = z.object({ readyInMinutes: z.number().int().min(5).max(24 * 60).optional() }).parse(req.body ?? {});
+    await acceptRequest(id, currentUser(req).id, readyInMinutes ?? shop.estimatedPickupMins);
+    res.json(await reply(id));
+  }),
+);
+
+shopOwnerRouter.post(
+  '/requests/:id/deny',
+  ah(async (req, res) => {
+    const { id } = await ownRequest(req);
+    const { reason } = z
+      .object({ reason: z.string().trim().min(3, 'Tell the customer why (at least 3 characters)').max(200) })
+      .parse(req.body ?? {});
+    await denyRequest(id, currentUser(req).id, reason);
+    res.json(await reply(id));
+  }),
+);
+
+shopOwnerRouter.post(
+  '/requests/:id/printing',
+  ah(async (req, res) => {
+    const { id } = await ownRequest(req);
+    await markPrinting(id, currentUser(req).id);
+    res.json(await reply(id));
+  }),
+);
+
+shopOwnerRouter.post(
+  '/requests/:id/ready',
+  ah(async (req, res) => {
+    const { id } = await ownRequest(req);
+    await markReady(id, currentUser(req).id);
+    res.json(await reply(id));
+  }),
+);
+
+shopOwnerRouter.post(
+  '/requests/:id/collect',
+  pickupLimiter,
+  ah(async (req, res) => {
+    const { id } = await ownRequest(req);
+    const { code } = z.object({ code: z.string().trim().regex(/^\d{6}$/, 'Enter the 6-digit pickup code') }).parse(req.body ?? {});
+    await collectWithCode(id, currentUser(req).id, code);
+    res.json(await reply(id));
+  }),
+);
+
+/** Owner's manual open/closed switch (opening hours still apply on top). */
+shopOwnerRouter.post(
+  '/open',
+  ah(async (req, res) => {
+    const shop = await myShop(req);
+    const { open } = z.object({ open: z.boolean() }).parse(req.body);
+    await prisma.shop.update({ where: { id: shop.id }, data: { acceptingRequests: open } });
+    emitShopChanged(shop.id);
+    res.json({ acceptingRequests: open, queue: await queueInfo(shop.id).catch(() => null) });
   }),
 );
 

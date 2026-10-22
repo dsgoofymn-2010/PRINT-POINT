@@ -17,7 +17,11 @@ const schema = z.object({
   UPLOAD_DIR: z.string().default('./uploads'),
   MAX_FILE_SIZE_MB: z.coerce.number().positive().default(25),
   FILE_RETENTION_HOURS: z.coerce.number().positive().default(24),
-  ORPHAN_FILE_RETENTION_HOURS: z.coerce.number().positive().default(72),
+  ORPHAN_FILE_RETENTION_HOURS: z.coerce.number().positive().default(24),
+  // File download links expire after this many seconds
+  SIGNED_URL_TTL_SECONDS: z.coerce.number().int().min(30).max(3600).default(300),
+  // Max print requests one customer can send per 10 minutes
+  REQUEST_RATE_LIMIT: z.coerce.number().int().min(1).max(1000).default(10),
   SMS_PROVIDER: z.enum(['console']).default('console'),
   DEV_OTP: z.string().regex(/^\d{6}$/).default('123456'),
   DEFAULT_COMMISSION_PERCENT: z.coerce.number().min(0).max(100).default(5),
@@ -32,4 +36,6 @@ if (!parsed.success) {
 export const env = parsed.data;
 export const isProd = env.NODE_ENV === 'production';
 export const corsOrigins = env.CORS_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean);
-export const razorpayConfigured = Boolean(env.RAZORPAY_KEY_ID && env.RAZORPAY_KEY_SECRET);
+// The .env.example placeholders ("rzp_test_xxxx…") count as "not configured".
+const realKey = (v: string) => Boolean(v) && !/x{6,}/i.test(v);
+export const razorpayConfigured = realKey(env.RAZORPAY_KEY_ID) && realKey(env.RAZORPAY_KEY_SECRET);

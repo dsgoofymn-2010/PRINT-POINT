@@ -11,12 +11,13 @@ import { errorHandler, notFoundHandler } from './middleware/error';
 import { apiLimiter } from './middleware/rateLimit';
 import { authRouter } from './routes/auth';
 import { shopsRouter } from './routes/shops';
-import { uploadsRouter } from './routes/uploads';
+import { filesRouter, uploadsRouter } from './routes/uploads';
 import { ordersRouter } from './routes/orders';
 import { paymentsRouter } from './routes/payments';
 import { shopOwnerRouter } from './routes/shopOwner';
 import { adminRouter } from './routes/admin';
 import { meRouter } from './routes/me';
+import { requestsRouter } from './routes/requests';
 
 export function createApp() {
   const app = express();
@@ -30,7 +31,7 @@ export function createApp() {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'", 'https://checkout.razorpay.com'],
           frameSrc: ["'self'", 'https://api.razorpay.com', 'https://checkout.razorpay.com'],
-          connectSrc: ["'self'", 'https://lumberjack.razorpay.com', 'https://api.razorpay.com'],
+          connectSrc: ["'self'", 'ws:', 'wss:', 'https://lumberjack.razorpay.com', 'https://api.razorpay.com'],
           imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
           styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
           fontSrc: ["'self'", 'https://fonts.gstatic.com'],
@@ -63,6 +64,8 @@ export function createApp() {
   api.use('/auth', authRouter);
   api.use('/shops', shopsRouter);
   api.use('/uploads', uploadsRouter);
+  api.use('/files', filesRouter);
+  api.use('/requests', requestsRouter);
   api.use('/orders', ordersRouter);
   api.use('/payments', paymentsRouter);
   api.use('/shop', shopOwnerRouter);

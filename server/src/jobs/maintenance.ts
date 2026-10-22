@@ -1,8 +1,10 @@
-import { env } from '../config/env';
+import { env, razorpayConfigured } from '../config/env';
 import { logger } from '../lib/logger';
 import { prisma } from '../lib/prisma';
 import { storage } from '../services/storage';
 import { addEvent } from '../services/orders';
+import { broadcastOrder } from '../services/realtime';
+import { purgeOrderFiles } from '../services/requests';
 
 const HOUR = 3_600_000;
 
@@ -16,19 +18,19 @@ export async function purgeExpiredFiles(now = new Date()) {
       filesPurgedAt: null,
       OR: [
         { status: 'COMPLETED', completedAt: { lt: doneBefore } },
-        { status: { in: ['CANCELLED', 'REFUNDED'] }, updatedAt: { lt: doneBefore } },
+        { status: { in: ['CANCELLED', 'REFUNDED', 'DENIED'] }, updatedAt: { lt: doneBefore } },
       ],
     },
     select: { id: true, items: { select: { fileId: true } } },
     take: 200,
   });
 
-  // Files never attached to a paid/active order, e.g. abandoned uploads and drafts.
+  // Hard cap: files not needed by a live request are removed ORPHAN_FILE_RETENTION_HOURS after upload.
   const orphans = await prisma.uploadedFile.findMany({
     where: {
       deletedAt: null,
       createdAt: { lt: orphanBefore },
-      orderItems: { none: { order: { status: { in: ['PAID', 'PRINTING', 'READY', 'OUT_FOR_DELIVERY', 'COMPLETED'] } } } },
+      orderItems: { none: { order: { status: { in: ['REQUESTED', 'ACCEPTED', 'PAID', 'PRINTING'] } } } },
     },
     select: { id: true },
     take: 500,
@@ -39,7 +41,7 @@ export async function purgeExpiredFiles(now = new Date()) {
   for (const id of candidateIds) {
     // Keep a file if another order still needs it.
     const busy = await prisma.orderItem.findFirst({
-      where: { fileId: id, order: { status: { in: ['PAID', 'PRINTING', 'READY', 'OUT_FOR_DELIVERY'] } } },
+      where: { fileId: id, order: { status: { in: ['REQUESTED', 'ACCEPTED', 'PAID', 'PRINTING'] } } },
     });
     if (busy) continue;
     const file = await prisma.uploadedFile.findUnique({ where: { id } });
@@ -74,11 +76,40 @@ export async function expireStalePayments(now = new Date()) {
   return { expiredPayments: stale.count, cancelledOrders: oldUnpaid.length };
 }
 
+/** Requests the shop never answered, and accepted ones never paid, expire after a day. */
+export async function expireStaleRequests(now = new Date()) {
+  const before = new Date(now.getTime() - 24 * HOUR);
+  const stale = await prisma.printOrder.findMany({
+    where: {
+      OR: [
+        { status: 'REQUESTED', createdAt: { lt: before } },
+        ...(razorpayConfigured ? [{ status: 'ACCEPTED' as const, acceptedAt: { lt: before } }] : []),
+      ],
+    },
+    select: { id: true, status: true },
+    take: 200,
+  });
+  for (const o of stale) {
+    const note = o.status === 'REQUESTED' ? 'The shop did not respond within 24 hours' : 'Not paid within 24 hours of being accepted';
+    const moved = await prisma.$transaction(async (tx) => {
+      const r = await tx.printOrder.updateMany({ where: { id: o.id, status: o.status }, data: { status: 'CANCELLED', cancelledAt: now } });
+      if (r.count) await addEvent(tx, o.id, 'CANCELLED', null, note);
+      return r.count > 0;
+    });
+    if (moved) {
+      await purgeOrderFiles(o.id);
+      await broadcastOrder(o.id);
+    }
+  }
+  return stale.length;
+}
+
 export function startMaintenanceJobs() {
   const run = async () => {
     try {
       await purgeExpiredFiles();
       await expireStalePayments();
+      await expireStaleRequests();
     } catch (err) {
       logger.error({ err }, 'Maintenance job failed');
     }

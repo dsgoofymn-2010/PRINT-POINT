@@ -1,108 +1,77 @@
 # PrintPoint
 
-**Upload. Pay. Collect in minutes.** PrintPoint is a mobile-first web app for local xerox and print shops in India. Customers upload documents, choose print options, see the exact price, pay with Razorpay, and pick up from the shop or get local delivery. Shop owners manage orders and prices from a dashboard. Admins approve shops and keep an eye on payments, refunds and fraud.
+**Print it nearby.** PrintPoint connects customers with local xerox and print shops in India. A customer uploads files in a chat-style assistant, picks a shop and print options, sees the exact price and sends a request. The shop accepts (or declines with a reason), the customer pays, and collects the prints with a 6-digit pickup code. Everything updates live on both sides.
 
 ---
 
+## How it works
+
+```
+Customer (/)                      Server                          Shop owner (/owner)
+upload files ───────────────▶ magic-byte check, store privately
+pick shop, B/W, sides, copies,
+binding, note ─────────────▶ quote (same engine as the order)
+"Send request to shop" ────▶ REQUESTED ──── socket.io ───────────▶ new card + chime
+                                         ◀── Accept (ready time) ── ACCEPTED + pickup code
+status card: code + ready time ◀────────
+Pay (Razorpay) ────────────▶ PAID ───────────────────────────────▶ "Mark printing"
+                             PRINTING ──▶ READY ◀──────────────── "Mark ready"
+show code at counter ───────────────────────── verify code ──────▶ COMPLETED, files deleted
+```
+
+- **Deny**: the owner must give a reason; the customer sees it and is never charged.
+- **Cancel**: the customer can cancel while the request is still waiting for the shop.
+- **Expiry**: requests the shop never answers, and accepted requests never paid, are cancelled after 24 hours.
+- **No Razorpay keys (development)**: the owner can go straight from Accepted to Printing and collect payment at the counter. The app never marks anything as paid without a verified Razorpay signature.
+
 ## Features
 
-**Customers**
-- Sign in with mobile OTP (mocked in development) or email/mobile + password
-- Shop discovery with filters: area, open now, delivery, colour, binding, rating
-- Shop profile: services, full price list, timings, contact, map link, reviews
-- Upload PDF / DOCX / JPG / PNG (25 MB each, multiple files), page count for PDFs, preview
-- Print options per file: B/W or colour, A4/A3/Legal, single/double side, paper quality, copies, page range (`1-10, 15, 20-end`), orientation, fit/actual size, binding, lamination, special instructions
-- Live price estimate from the server, coupons, save as draft
-- Checkout with store pickup or local delivery (saved addresses)
-- Razorpay Standard Checkout, verified on the server
-- Order tracking timeline, 6-digit pickup OTP, WhatsApp "notify shop" link, PDF invoice, reorder, reviews
-- Account: orders, drafts, addresses, saved files, refunds ("wallet"), profile, help
+**Customers (home page `/`)**
+- Chat-style assistant: upload (drag-and-drop or picker, several files, PDF / DOCX / JPG / PNG up to 25 MB) → choose shop → B/W or colour → single or double-sided → copies → binding (none / spiral) → optional note
+- File list shows name, size and detected page count, with progress, retry and remove; asks for the page count when it can't be detected (some DOCX)
+- Sign in with mobile + OTP inside the chat (asked before the first upload)
+- Price summary from the server: each line shows the rate used (including the double-sided rate), and lines add up exactly to the total
+- Live status card: Waiting for shop → Accepted (pickup code + estimated ready time, Pay button) → Printing → Ready → Collected, or Denied with the shop's reason
+- "My requests" tab with active and past requests; returning customers land there when something is in progress
+- Side panel (desktop) / collapsible top sheet (phone) for the chosen shop: open/closed, today's hours, requests waiting, printing, estimated wait, price list, all live
 
-**Shop owners**
-- Shop onboarding (bank/UPI stored only as masked references)
-- Several price lists, one active; bulk % updates; live customer-price preview
-- Orders with 20-second polling plus sound/browser alerts for new paid orders
-- Download customer files (only for paid orders at their shop), printable job sheet
-- Status flow: Printing → Ready (pickup, OTP-verified) / Out for delivery → Completed; cancel with automatic refund
-- Sales: today's stats, 7/30-day revenue chart, top services, average order value, CSV export
+**Shop owners (`/owner`)**
+- Email/password sign-in on the page itself
+- Live list, newest first, with counters: Pending / Accepted / Printing / Ready / Completed today
+- Each card: customer name and masked phone (last 4 digits), files with preview/download (short-lived links), options, total, note, time received
+- Accept (choose ready time) · Deny (pick or type a reason) · Mark printing · Mark ready · Verify pickup code → Collected
+- New requests chime (after "Turn on sound alerts", since browsers block autoplay) and get a highlight
+- Open/closed switch, price list editor (`/shop/pricing`), takings and shop details (`/shop`)
 
-**Admins**
-- Approve / reject / suspend shops; enable / disable users
-- All orders, payments, refunds; issue refunds
-- Platform commission %
-- Fraud signals: 3+ failed payments in 7 days, unusually large orders, several accounts sharing a delivery phone
-- Platform analytics, audit log of admin actions
+**Admins** (`/admin`): approve shops, users, orders, payments, refunds, commission, fraud signals, audit log.
 
 ## Tech stack
 
 | Layer | Choice |
 |---|---|
-| Frontend | React 18, Vite 5, TypeScript, Tailwind CSS 3 (custom component kit), TanStack Query 5, React Router 6, Recharts, Zod |
-| Backend | Node.js, Express 4, TypeScript, Zod, Multer 2, pino logging, helmet, express-rate-limit |
+| Frontend | React 18, Vite 5, TypeScript, Tailwind CSS 3, TanStack Query 5, React Router 6, socket.io-client |
+| Backend | Node.js, Express 4, TypeScript, Zod, Multer 2, socket.io 4, pino, helmet, express-rate-limit |
 | Database | PostgreSQL + Prisma 5 (SQL migrations included) |
-| Auth | JWT access tokens (15 min, in memory) + rotating refresh tokens in an HTTP-only cookie; bcrypt hashing |
+| Auth | JWT access tokens (15 min, in memory) + rotating refresh tokens in an HTTP-only cookie |
 | Payments | Razorpay Standard Checkout + webhooks |
-| PDFs | pdf-lib (page counts), PDFKit (invoices) |
 | Tests | Vitest + Supertest |
-| Deploy | Dockerfile + Docker Compose (app + PostgreSQL) |
 
-**Substitutions made**
-- `bcryptjs` instead of `bcrypt`: same algorithm and hash format, no native build step (the native package often fails to install on Windows).
-- A small custom Tailwind component kit (`client/src/components/ui.tsx`) instead of the shadcn/ui CLI: same look and accessibility goals, no generator step.
+## Run it locally
 
-## Folder structure
-
-```
-.
-├── docker-compose.yml        # PostgreSQL + app
-├── Dockerfile                # multi-stage production image
-├── package.json              # npm workspaces: server, client
-├── server/
-│   ├── prisma/
-│   │   ├── schema.prisma     # all models, enums, indexes
-│   │   ├── migrations/       # SQL migrations (init + CHECK constraints)
-│   │   └── seed.ts           # demo data
-│   ├── src/
-│   │   ├── config/env.ts     # validated environment variables
-│   │   ├── lib/              # prisma, logger, errors, tokens, page ranges, money
-│   │   ├── middleware/       # auth/RBAC, rate limits, error handler
-│   │   ├── services/         # pricing engine, orders, payments, Razorpay, storage, notify, invoice
-│   │   ├── routes/           # auth, shops, uploads, orders, payments, shop (owner), admin, me
-│   │   ├── jobs/             # file retention + payment timeout jobs
-│   │   ├── app.ts            # Express app
-│   │   └── index.ts          # server entry
-│   ├── tests/                # Vitest + Supertest
-│   └── uploads/              # local file storage (dev)
-└── client/
-    └── src/
-        ├── lib/              # API client, auth, cart, Razorpay checkout, formatting, types
-        ├── components/       # UI kit, layout, shop card, price breakdown, timeline
-        └── pages/            # customer, shop/, admin/, account/, info/
-```
-
-## Local setup
-
-Prerequisites: Node.js 20+ and either Docker (for PostgreSQL) or a local PostgreSQL 14+.
+Prerequisites: Node.js 20+ and Docker (for PostgreSQL), or your own PostgreSQL 14+.
 
 ```bash
-# 1. Install dependencies (npm 11 may ask you to approve Prisma/esbuild install scripts; they are pre-approved in package.json)
 npm install
-
-# 2. Configure the server
-cp server/.env.example server/.env      # then edit secrets and Razorpay keys
-
-# 3. Start PostgreSQL (or point DATABASE_URL at your own)
-npm run db:up                           # docker compose up -d db
-
-# 4. Create tables and load demo data
-npm run db:deploy                       # applies prisma/migrations
-npm run db:seed
-
-# 5. Run API (http://localhost:4000) + web app (http://localhost:5173)
-npm run dev
+cp server/.env.example server/.env      # set JWT secrets; Razorpay test keys are optional
+npm run db:up                           # PostgreSQL in Docker
+npm run db:deploy                       # apply migrations
+npm run db:seed                         # demo shops, owners, customer
+npm run dev                             # API on :4000, web app on :5173
 ```
 
-Other scripts: `npm test` (API tests), `npm run typecheck`, `npm run build`, `npm start` (serves API + built frontend on port 4000). Use `npm run db:migrate` when you change `schema.prisma` during development.
+**Try the customer side:** open <http://localhost:5173>, drop a PDF in the chat, enter any valid mobile number (e.g. `9876543210`) and the development OTP `123456`.
+
+**Try the owner side:** in a second browser (or a private window) open <http://localhost:5173/owner> and sign in as `owner1@printpoint.test` / `Password@123`. Send a request to *Sri Murugan Xerox* from the customer window and watch it appear on the desk.
 
 ### Run with Docker (whole stack)
 
@@ -119,54 +88,12 @@ npm run docker:down                  # stop and remove containers
 
 `server/.env` is optional here: without it, compose falls back to local DB credentials, `http://localhost:4000` URLs, and **dev-only JWT secrets**. That is fine for a quick local look, but set real `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` (and Razorpay keys) in `server/.env` before any shared or production deploy — the server refuses to boot without valid JWT secrets. Demo data seeding needs dev dependencies, so run `npm install && npm run db:seed` from your machine against the exposed DB port (5432), not inside the container.
 
-## Environment variables (`server/.env`)
 
-| Variable | Purpose |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `PORT` | API port (default 4000) |
-| `CORS_ORIGINS` | Comma-separated allowed origins, e.g. `http://localhost:5173` |
-| `APP_URL` | Public URL of the web app |
-| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | Random strings, at least 32 characters each. Generate with `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` |
-| `ACCESS_TOKEN_TTL`, `REFRESH_TOKEN_TTL_DAYS` | Token lifetimes (default `15m`, `30`) |
-| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` | Razorpay API keys (use **test** keys in development) |
-| `RAZORPAY_WEBHOOK_SECRET` | Secret you set on the Razorpay webhook |
-| `STORAGE_DRIVER`, `UPLOAD_DIR` | `local` and the folder for uploads |
-| `MAX_FILE_SIZE_MB` | Upload limit per file (default 25) |
-| `FILE_RETENTION_HOURS` | Delete files this long after an order completes or is cancelled (default 24) |
-| `ORPHAN_FILE_RETENTION_HOURS` | Delete uploads never used in a paid order (default 72) |
-| `SMS_PROVIDER`, `DEV_OTP` | `console` logs OTPs; outside production `DEV_OTP` (default `123456`) is the OTP |
-| `DEFAULT_COMMISSION_PERCENT` | Used until an admin sets one |
+Other scripts: `npm test`, `npm run typecheck`, `npm run build`, `npm start` (serves API + built frontend on port 4000).
 
-Client (`client/.env`, optional): `VITE_API_URL` only if the API is on a different origin. In development Vite proxies `/api` to port 4000.
+### Seed logins
 
-## Razorpay test setup
-
-Test mode uses mock payment pages and never moves real money.
-
-1. Create a free account at <https://dashboard.razorpay.com/signup>. You do not need KYC to use test mode.
-2. Make sure the dashboard toggle (top bar) is set to **Test Mode**.
-3. Go to **Account & Settings → API Keys → Generate Test Key**. Copy the Key ID (`rzp_test_…`) and Key Secret into `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`. The secret is shown once and must never go to the frontend; PrintPoint only sends the Key ID to the browser.
-4. Webhooks (optional locally, recommended): **Account & Settings → Webhooks → Add New Webhook**
-   - URL: `https://<your-public-host>/api/v1/payments/webhook`. For local testing, expose port 4000 with a tunnel such as `ngrok http 4000` or `cloudflared tunnel --url http://localhost:4000`.
-   - Secret: any strong string; put the same value in `RAZORPAY_WEBHOOK_SECRET`.
-   - Events: `payment.captured`, `payment.failed`, `refund.processed`.
-5. Restart the API, place an order and pay with Razorpay's test methods, for example UPI ID `success@razorpay` (or `failure@razorpay` to test failures), or a test card from <https://razorpay.com/docs/payments/payments/test-card-details/>.
-
-**How the payment flow works**
-1. `POST /orders` creates the order with a price snapshot (status `PENDING_PAYMENT`).
-2. `POST /payments/create-order` creates a Razorpay order on the server and returns `order_id`, `key_id`, amount and `INR`.
-3. The browser opens Razorpay Checkout with those values and the customer's name, mobile and email.
-4. `POST /payments/verify` checks `HMAC_SHA256(order_id|payment_id, key_secret)` against `razorpay_signature` and confirms amount and status with Razorpay. Only then is the order marked **Paid**, given an order number like `PP-2026-000123`, and (for pickup) a 6-digit OTP.
-5. The webhook does the same if the browser closes before verify. Webhook signatures are checked over the raw body, and event IDs are stored so retries are ignored.
-6. Failed or cancelled checkouts are recorded as `FAILED`. Unused Razorpay orders time out after 30 minutes; unpaid orders are cancelled after 24 hours. Money captured for an order that was already cancelled is refunded automatically.
-7. Refunds (customer cancels before printing, shop cancels, or admin refund) go through the Razorpay refunds API; `refund.processed` finalises them.
-
-Without Razorpay keys the app still runs, but checkout returns "Online payments are not configured". The app never marks an order paid without a verified signature.
-
-## Seed logins
-
-All seed accounts use the password **`Password@123`**. In development the mobile OTP is **`123456`**.
+All seed accounts use the password **`Password@123`**. In development the OTP is **`123456`**.
 
 | Role | Email | Mobile |
 |---|---|---|
@@ -175,65 +102,82 @@ All seed accounts use the password **`Password@123`**. In development the mobile
 | Shop owner (Anna Nagar Copy Centre) | owner2@printpoint.test | 9000000003 |
 | Customer | customer@printpoint.test | 9876543210 |
 
-Seed data also includes 3 approved shops in Chennai (T. Nagar, Velachery, Anna Nagar) with pricing, a saved address, a completed order with a review, and coupon `STUDENT10` (10% off orders over ₹50, up to ₹50).
+An owner with several shops sees their first shop on `/owner`; add `?shopId=<id>` to API calls for the others.
 
-Change these passwords before using the database anywhere public.
+## Environment variables (`server/.env`)
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `PORT` | API port (default 4000) |
+| `CORS_ORIGINS` | Comma-separated allowed origins (also used for WebSockets) |
+| `APP_URL` | Public URL of the web app |
+| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | Random strings, 32+ characters. `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` |
+| `ACCESS_TOKEN_TTL`, `REFRESH_TOKEN_TTL_DAYS` | Token lifetimes (default `15m`, `30`) |
+| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | Razorpay test keys. Leave empty to take payment at the counter |
+| `STORAGE_DRIVER`, `UPLOAD_DIR` | `local` and the private folder for uploads (never served statically) |
+| `MAX_FILE_SIZE_MB` | Upload limit per file (default 25) |
+| `FILE_RETENTION_HOURS` | Safety net: delete files of finished orders after this long (default 24). Files are normally deleted right at pickup, deny or cancel |
+| `ORPHAN_FILE_RETENTION_HOURS` | Delete uploads not used by a live request this long after upload (default **24**) |
+| **`SIGNED_URL_TTL_SECONDS`** | New. How long a file preview/download link works (default 300) |
+| **`REQUEST_RATE_LIMIT`** | New. Print requests one customer may send per 10 minutes (default 10) |
+| `SMS_PROVIDER`, `DEV_OTP` | `console` logs OTPs; outside production `DEV_OTP` is accepted |
+| `DEFAULT_COMMISSION_PERCENT` | Used until an admin sets one |
+
+Client (`client/.env`, optional): `VITE_API_URL` if the API is on another origin (Vite proxies `/api` and `/socket.io` in development); `VITE_MAX_FILE_MB` to match `MAX_FILE_SIZE_MB` if you change it.
+
+## Realtime
+
+`socket.io` runs on the API server (`/socket.io`). Clients send their access token when connecting.
+
+| Room | Who joins | Events |
+|---|---|---|
+| `user:<id>` | every signed-in socket | `order:changed` for the customer's own orders |
+| `shop:<id>` | owners, only for shops they own (checked on the server) | `order:changed`, `shop:changed` |
+| `queue:<shopId>` | anyone viewing that shop | `queue:changed` |
+
+Events carry only ids and statuses; screens refetch over HTTP, so normal access checks decide what each person sees. If the socket drops, the screens poll every 10–15 seconds and show a "connection lost" note until it reconnects.
 
 ## API summary (`/api/v1`)
 
-All bodies are JSON and validated with Zod. Errors look like `{ "error": { "code", "message", "details?" } }`. Authenticated routes need `Authorization: Bearer <accessToken>`. Money is always in **paise**.
+Money is always in **paise**. Errors look like `{ "error": { "code", "message", "details?" } }`.
 
 | Area | Endpoints |
 |---|---|
-| Auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/otp/request`, `POST /auth/otp/verify`, `POST /auth/refresh` (cookie), `POST /auth/logout`, `GET /auth/me` |
-| Shops (public) | `GET /shops?city&area&q&openNow&delivery&color&binding&minRating`, `GET /shops/areas`, `GET /shops/:idOrSlug` |
-| Uploads | `POST /uploads` (multipart `files[]`), `GET /uploads`, `GET /uploads/:id/download`, `DELETE /uploads/:id` |
-| Orders | `POST /orders/quote`, `POST /orders`, `PUT /orders/:id` (draft/unpaid), `GET /orders?status=ACTIVE\|PAST\|DRAFT`, `GET /orders/:id`, `POST /orders/:id/cancel`, `GET /orders/:id/invoice`, `POST /orders/:id/reorder`, `POST /orders/:id/review` |
-| Payments | `POST /payments/create-order`, `POST /payments/verify`, `POST /payments/failed`, `POST /payments/webhook` |
-| Customer | `GET/POST/PUT/DELETE /me/addresses`, `PUT /me/profile`, `GET /me/refunds` |
-| Shop owner | `POST /shop/register`, `GET /shop/shops`, `GET /shop/dashboard`, `GET/PUT /shop/profile`, `GET/POST /shop/pricing`, `PUT/DELETE /shop/pricing/:id`, `POST /shop/pricing/:id/activate`, `POST /shop/pricing/:id/bulk`, `POST /shop/pricing/preview`, `GET /shop/orders`, `GET /shop/orders/:id`, `PATCH /shop/orders/:id/status`, `POST /shop/orders/:id/refund`, `GET /shop/orders/export`, `GET /shop/analytics?days=7\|30`, `GET /shop/notifications` |
-| Admin | `GET /admin/shops`, `PATCH /admin/shops/:id/approve\|reject\|suspend`, `GET /admin/users`, `PATCH /admin/users/:id/active`, `GET /admin/orders`, `GET /admin/payments`, `GET/POST /admin/refunds`, `GET /admin/settings`, `PUT /admin/settings/commission`, `GET /admin/fraud`, `GET /admin/analytics`, `GET /admin/audit-logs` |
+| Auth | `POST /auth/login`, `POST /auth/register`, `POST /auth/otp/request`, `POST /auth/otp/verify`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me` |
+| Shops (public) | `GET /shops`, `GET /shops/:idOrSlug`, `GET /shops/:id/queue` |
+| Uploads | `POST /uploads` (multipart `files[]`), `GET /uploads`, `GET /uploads/:id/link?d=inline\|attachment` (signed link), `DELETE /uploads/:id` |
+| Files | `GET /files/:id?exp&d&sig` (signed, expiring; no login needed) |
+| Requests (customer) | `POST /requests/quote`, `POST /requests`, `GET /requests`, `GET /requests/:id`, `POST /requests/:id/cancel` |
+| Requests (owner) | `GET /shop/requests?scope=active\|done`, `POST /shop/requests/:id/accept\|deny\|printing\|ready\|collect`, `POST /shop/open` |
+| Payments | `POST /payments/create-order` (accepted orders), `POST /payments/verify`, `POST /payments/failed`, `POST /payments/webhook` |
+| Shop owner | `GET/PUT /shop/profile`, pricing CRUD under `/shop/pricing`, `GET /shop/analytics`, `GET /shop/orders/export` |
+| Admin | under `/admin` (shops, users, orders, payments, refunds, settings, fraud, analytics, audit logs) |
 
-Shop-owner routes act on the owner's first shop, or on `?shopId=` for owners with several shops.
+**Pricing** (per file, chat flow uses A4 normal paper): `print = pages × copies × rate`, where the rate depends on colour and on single/double-sided; `binding = spiral rate × copies`; `total = Σ(print + binding) + tax`.
 
-**Pricing formula** (per file):
-`print = printed pages × copies × per-page rate × size multiplier`;
-add paper upgrade (per sheet), binding (per copy) and lamination (per sheet).
-`total = subtotal + delivery fee + tax − discount`. Orders below the shop's minimum cannot be placed.
+## Security
 
-## Security notes
+- **Pickup codes**: random 6 digits (crypto RNG), created on accept, shown only to the customer, checked with a timing-safe compare against one order of the owner's own shop, and cleared after use. Five wrong tries replace the code (the customer's card updates live), and the verify route is rate-limited per owner.
+- **Ownership**: every owner route loads the order through the owner's shop (`shopId` + `ownerId`); another shop's order is a 404. Sockets join a shop room only after the same check.
+- **Files**: type checked by magic bytes, not by extension; filenames are cleaned; stored under random names outside any public folder; opened only through signed links that expire after 5 minutes; deleted at pickup / deny / cancel, and within 24 hours at most.
+- **Privacy**: owners see the customer's phone masked to the last 4 digits.
+- **Rate limits**: login, OTP, uploads, request creation (per customer), pickup-code checks, payments and general API traffic.
+- Helmet headers with a CSP that allows only Razorpay checkout and the app's WebSocket; CORS allow-list; refresh tokens stored only as HMAC hashes and rotated.
 
-- bcrypt password hashing; refresh tokens stored only as HMAC hashes, rotated on every use, and reuse revokes all sessions
-- Role-based access (`CUSTOMER`, `SHOP_OWNER`, `ADMIN`) on every protected route; object-level checks on every order and file
-- Uploads: type checked by magic bytes, size-limited, saved under random UUID names, path-traversal-safe storage, served only through authorised download endpoints with `no-store`
-- Customer files are deleted automatically after the retention period
-- Rate limits on login, OTP, upload, payment and general API traffic
-- Helmet security headers with a CSP that allows only Razorpay checkout; CORS allow-list
-- Razorpay secret never leaves the server; card details are never stored
-- Audit log for admin actions; CSV export protected against formula injection
-- Pickup OTPs are shown only to the customer, never to the shop
+## Razorpay test setup
+
+1. Create an account at <https://dashboard.razorpay.com/signup> and switch to **Test Mode**.
+2. **Account & Settings → API Keys → Generate Test Key**; put the Key ID and Secret in `server/.env`.
+3. Optional webhook: `https://<public-host>/api/v1/payments/webhook` with events `payment.captured`, `payment.failed`, `refund.processed` and the same secret in `RAZORPAY_WEBHOOK_SECRET` (use `ngrok http 4000` locally).
+4. Pay with the test UPI ID `success@razorpay` (or `failure@razorpay`).
 
 ## Deployment
 
-**Docker Compose (single host)**
 ```bash
-cp server/.env.example server/.env    # set strong JWT secrets + Razorpay keys
+cp server/.env.example server/.env    # strong JWT secrets + Razorpay keys
 APP_URL=https://print.example.com docker compose up -d --build
-docker compose exec app npx tsx prisma/seed.ts   # optional demo data (needs dev deps; or run the seed from your machine against the DB)
 ```
-The app container applies migrations on start and serves both the API and the built frontend on port 4000. Put it behind HTTPS (Nginx, Caddy or a cloud load balancer): refresh cookies are `Secure` in production.
+The app container applies migrations on start and serves the API, WebSockets and the built frontend on port 4000. Put it behind HTTPS and make sure your proxy forwards WebSocket upgrades for `/socket.io`.
 
-**Elsewhere** (Render, Railway, a VPS, etc.): provision PostgreSQL, set the environment variables above with `NODE_ENV=production`, then run `npm ci && npm run build && npm run db:deploy && npm start`.
-
-Before going live:
-- Switch Razorpay to live keys and create a live-mode webhook
-- Plug in a real SMS provider (implement `SmsProvider` in `server/src/services/notify.ts`); production OTPs are random and never returned by the API
-- Move uploads to S3/Cloudinary by implementing `StorageDriver` in `server/src/services/storage.ts`, or mount a persistent volume
-- Replace the placeholder legal text in `client/src/pages/info/InfoPage.tsx` with reviewed copy
-
-## Extending
-
-- **Coupons**: the `Coupon` model and pricing engine already support shop-level and platform coupons; add an admin UI to manage them.
-- **Delivery partners**: `Delivery` stores partner name/phone and status; add a partner role and assignment flow.
-- **WhatsApp/SMS APIs**: notifications are recorded in `Notification` with a channel, so an API sender can process pending rows.
-- **Mobile app**: the REST API is versioned (`/api/v1`) and token-based, so a React Native or Flutter client can reuse it.
+Before going live: switch Razorpay to live keys, plug in a real SMS provider (`server/src/services/notify.ts`), move uploads to object storage or a persistent volume (`server/src/services/storage.ts`), and replace the placeholder legal text in `client/src/pages/info/InfoPage.tsx`.

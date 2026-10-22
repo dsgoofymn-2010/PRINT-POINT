@@ -13,7 +13,7 @@ export default function ShopRegister() {
     mutationFn: (p: ShopProfile) => api.post('/shop/register', { ...p, email: p.email || null, mapsUrl: p.mapsUrl || null }),
     onSuccess: () => {
       void qc.invalidateQueries();
-      navigate('/shop');
+      navigate('/owner');
     },
   });
   return (

@@ -3,7 +3,6 @@ import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import { useCart } from '@/lib/cart';
 import type { Role } from '@/lib/types';
 import { Loading, cn } from './ui';
 
@@ -50,18 +49,17 @@ const topLink = ({ isActive }: { isActive: boolean }) =>
 /** Customer screens: a plain bar over a centred column. */
 function CustomerShell() {
   const { user, signOut } = useAuth();
-  const { cart } = useCart();
   const [open, setOpen] = useState(false);
   const location = useLocation();
-  useEffect(() => setOpen(false), [location.pathname]);
-  const count = cart?.items.length ?? 0;
+  useEffect(() => setOpen(false), [location.pathname, location.search]);
+  const onHome = location.pathname === '/';
+  const mine = onHome && location.search.includes('view=mine');
 
   const links = (
     <>
-      <NavLink to="/shops" className={topLink}>Shops</NavLink>
-      {count > 0 && <NavLink to="/cart" className={topLink}>Cart <span className="num">{count}</span></NavLink>}
-      {user && user.role !== 'SHOP_OWNER' && <NavLink to="/account" className={topLink}>My orders</NavLink>}
-      {user?.role === 'SHOP_OWNER' && <NavLink to="/shop" className={topLink}>Shop desk</NavLink>}
+      <NavLink to="/" className={() => topLink({ isActive: onHome && !mine })}>New request</NavLink>
+      {user && user.role !== 'SHOP_OWNER' && <NavLink to="/?view=mine" className={() => topLink({ isActive: mine })}>My requests</NavLink>}
+      {user?.role !== 'CUSTOMER' && <NavLink to="/owner" className={topLink}>{user ? 'Shop desk' : 'For shops'}</NavLink>}
       {user?.role === 'ADMIN' && <NavLink to="/admin" className={topLink}>Admin</NavLink>}
     </>
   );
@@ -80,7 +78,7 @@ function CustomerShell() {
                 Sign out {user.name.split(' ')[0]}
               </button>
             ) : (
-              <Link to="/login" className="ml-2 inline-flex h-8 items-center rounded-control bg-primary px-3 text-sm font-medium text-on-primary">Sign in</Link>
+              <Link to="/login" className="ml-2 inline-flex h-9 items-center rounded-control bg-primary px-3 text-sm font-medium text-on-primary">Sign in</Link>
             )}
           </nav>
           <button onClick={() => setOpen((o) => !o)} className="h-9 rounded-control px-3 text-sm font-medium hover:bg-active md:hidden" aria-expanded={open}>
@@ -117,7 +115,7 @@ export function SmallFooter() {
         <Link className="hover:text-ink" to="/privacy">Privacy</Link>
         <Link className="hover:text-ink" to="/terms">Terms</Link>
         <Link className="hover:text-ink" to="/refund-policy">Refund policy</Link>
-        <Link className="hover:text-ink" to="/shop/register">List your shop</Link>
+        <Link className="hover:text-ink" to="/owner">For shop owners</Link>
       </div>
     </footer>
   );
@@ -136,6 +134,7 @@ function DeskShell() {
   const shop = useQuery({
     queryKey: ['shop-dashboard'],
     queryFn: () => api.get<{ shop: { name: string; status: string }; stats: { pendingOrders: number } }>('/shop/dashboard'),
+    refetchInterval: 30_000,
     enabled: !isAdmin && user?.role === 'SHOP_OWNER',
     retry: false,
   });
@@ -153,12 +152,11 @@ function DeskShell() {
     </>
   ) : (
     <>
-      <NavLink end to="/shop" className={() => sideLink({ isActive: location.pathname === '/shop' && !location.search })}>Today</NavLink>
-      <NavLink to="/shop?tab=orders" className={() => sideLink({ isActive: location.search === '?tab=orders' || location.pathname.startsWith('/shop/orders') })}>
-        <span>Orders to print</span>
+      <NavLink to="/owner" className={sideLink}>
+        <span>Requests</span>
         {waiting > 0 && <span className="num text-[14px] text-ink">{waiting}</span>}
       </NavLink>
-      <NavLink to="/shop?tab=sales" className={() => sideLink({ isActive: location.search === '?tab=sales' })}>Takings</NavLink>
+      <NavLink to="/shop?tab=sales" className={() => sideLink({ isActive: location.pathname === '/shop' && (location.search === '?tab=sales' || !location.search) })}>Takings</NavLink>
       <NavLink to="/shop/pricing" className={sideLink}>Price list</NavLink>
       <NavLink to="/shop?tab=profile" className={() => sideLink({ isActive: location.search === '?tab=profile' })}>Shop details</NavLink>
     </>
@@ -167,7 +165,7 @@ function DeskShell() {
   const sidebar = (
     <div className="flex h-full flex-col gap-6 px-3 py-5">
       <div className="px-3">
-        <Wordmark to={isAdmin ? '/admin' : '/shop'} />
+        <Wordmark to={isAdmin ? '/admin' : '/owner'} />
         <p className="mt-3 truncate text-[14px] text-muted">{scope}</p>
       </div>
       <nav className="flex flex-col gap-0.5" aria-label="Desk">{nav}</nav>
@@ -187,7 +185,7 @@ function DeskShell() {
     <div className="min-h-screen lg:grid lg:grid-cols-[240px_1fr]">
       <aside className="sticky top-0 hidden h-screen border-r border-line lg:block">{sidebar}</aside>
       <header className="sticky top-0 z-30 flex h-12 items-center justify-between border-b border-line bg-ground px-4 lg:hidden">
-        <Wordmark to={isAdmin ? '/admin' : '/shop'} />
+        <Wordmark to={isAdmin ? '/admin' : '/owner'} />
         <button onClick={() => setOpen(true)} className="h-9 rounded-control px-3 text-sm font-medium hover:bg-active" aria-expanded={open}>Menu</button>
       </header>
       {open && (
@@ -207,8 +205,10 @@ function DeskShell() {
 
 export function Layout() {
   const { pathname } = useLocation();
-  if (pathname === '/') return <Outlet />;
-  if ((pathname.startsWith('/shop') && !pathname.startsWith('/shops') && pathname !== '/shop/register') || pathname.startsWith('/admin')) return <DeskShell />;
+  const { user } = useAuth();
+  const owner = user && user.role !== 'CUSTOMER';
+  if (pathname === '/owner') return owner ? <DeskShell /> : <CustomerShell />;
+  if ((pathname.startsWith('/shop') && pathname !== '/shop/register') || pathname.startsWith('/admin')) return <DeskShell />;
   return <CustomerShell />;
 }
 

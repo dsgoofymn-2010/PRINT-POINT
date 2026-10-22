@@ -23,7 +23,10 @@ paymentsRouter.post(
     const { orderId } = z.object({ orderId: z.string().uuid() }).parse(req.body);
     const order = await prisma.printOrder.findFirst({ where: { id: orderId, customerId: user.id }, include: { customer: true, shop: true } });
     if (!order) throw notFound('Order not found');
-    if (order.status !== 'PENDING_PAYMENT') throw conflict(order.status === 'DRAFT' ? 'Submit the draft before paying' : 'This order is not awaiting payment');
+    // Request flow: the customer pays once the shop has accepted.
+    if (order.status !== 'PENDING_PAYMENT' && order.status !== 'ACCEPTED') {
+      throw conflict(order.status === 'REQUESTED' ? 'Wait for the shop to accept before paying' : 'This order is not awaiting payment');
+    }
     if (order.total < 100) throw badRequest('Order total must be at least ₹1');
 
     let payment = await prisma.payment.findFirst({

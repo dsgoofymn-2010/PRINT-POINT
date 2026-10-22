@@ -3,12 +3,14 @@ import { createApp } from './app';
 import { startMaintenanceJobs } from './jobs/maintenance';
 import { logger } from './lib/logger';
 import { prisma } from './lib/prisma';
+import { attachRealtime } from './services/realtime';
 
 const app = createApp();
 const server = app.listen(env.PORT, () => {
   logger.info(`PrintPoint API listening on http://localhost:${env.PORT}/api/v1`);
   if (!razorpayConfigured) logger.warn('Razorpay keys missing: online payments are disabled until you add test keys to server/.env');
 });
+attachRealtime(server);
 const timer = startMaintenanceJobs();
 
 const shutdown = async (signal: string) => {

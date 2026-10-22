@@ -9,7 +9,7 @@
   Values are RGB triplets so Tailwind can apply opacity.
 */
 :root {
-  --paper: 232 232 227;      /* #e8e8e3 newsprint, marketing page ground */
+  --paper: 232 232 227;      /* #e8e8e3 newsprint */
   --ground: 244 243 239;     /* #f4f3ef app ground, one step off white, from the paper */
   --surface: 255 255 255;
   --raised: 249 249 247;
@@ -76,7 +76,7 @@
   .num {
     font-variant-numeric: tabular-nums;
   }
-  /* Display type for the marketing page and the wordmark */
+  /* Condensed display type for headings, figures and the wordmark */
   .display {
     font-family: 'Bebas Neue', Impact, sans-serif;
     font-weight: 400;
@@ -87,27 +87,6 @@
   .page-gutter {
     padding-left: clamp(16px, 2.4vw, 32px);
     padding-right: clamp(16px, 2.4vw, 32px);
-  }
-}
-
-/* Entrance used on the marketing page only; content stays visible without script. */
-@media (prefers-reduced-motion: no-preference) {
-  .js .rise {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 600ms cubic-bezier(0.2, 0.7, 0.2, 1), transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
-    transition-delay: var(--d, 0ms);
-  }
-  .js .rise.in {
-    opacity: 1;
-    transform: none;
-  }
-  .drift {
-    animation: drift 18s ease-in-out infinite alternate;
-  }
-  @keyframes drift {
-    from { transform: scale(1.04) translate3d(-1%, 0, 0); }
-    to { transform: scale(1.1) translate3d(1%, -1%, 0); }
   }
 }
 

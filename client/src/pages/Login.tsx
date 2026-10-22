@@ -20,7 +20,7 @@ const registerSchema = z
   })
   .refine((v) => v.email || v.mobile, { message: 'Enter an email or mobile number', path: ['email'] });
 
-const homeFor = (u: User) => (u.role === 'ADMIN' ? '/admin' : u.role === 'SHOP_OWNER' ? '/shop' : '/account');
+const homeFor = (u: User) => (u.role === 'ADMIN' ? '/admin' : u.role === 'SHOP_OWNER' ? '/owner' : '/?view=mine');
 
 export default function Login() {
   const { user, signIn } = useAuth();
@@ -84,7 +84,7 @@ export default function Login() {
     <div className="mx-auto max-w-md">
       <Card className="p-6">
         <h1 className="mb-1 text-2xl font-bold">{mode === 'register' ? 'Create account' : 'Sign in'}</h1>
-        <p className="mb-5 text-sm text-muted">Track your print orders and reorder in one tap.</p>
+        <p className="mb-5 text-sm text-muted">Follow your print requests live and collect with a code.</p>
         <Segmented
           label="Method"
           name="mode"

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { DEFAULT_SETTINGS } from '@/lib/cart';
 import { dateTime, rupees } from '@/lib/format';
 import type { Pricing, PricingRule, PrintSettings, Quote } from '@/lib/types';
 import { PriceBreakdown } from '@/components/PriceBreakdown';
@@ -38,13 +37,26 @@ const payload = (f: Form) => {
   return out;
 };
 
+const PREVIEW_SETTINGS: PrintSettings = {
+  color: 'BW',
+  paperSize: 'A4',
+  sides: 'SINGLE',
+  paperQuality: 'NORMAL_70',
+  copies: 1,
+  pageRange: '',
+  orientation: 'PORTRAIT',
+  fitMode: 'FIT',
+  binding: 'NONE',
+  lamination: 'NONE',
+};
+
 export default function ShopPricing() {
   const qc = useQueryClient();
   const rules = useQuery({ queryKey: ['pricing'], queryFn: () => api.get<{ rules: PricingRule[] }>('/shop/pricing') });
   const [selected, setSelected] = useState<string | 'new' | null>(null);
   const [form, setForm] = useState<Form | null>(null);
   const [pct, setPct] = useState(10);
-  const [preview, setPreview] = useState<{ pages: number; settings: PrintSettings }>({ pages: 20, settings: { ...DEFAULT_SETTINGS } });
+  const [preview, setPreview] = useState<{ pages: number; settings: PrintSettings }>({ pages: 20, settings: { ...PREVIEW_SETTINGS } });
 
   useEffect(() => {
     if (!rules.data || selected) return;

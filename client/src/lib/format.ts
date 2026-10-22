@@ -21,18 +21,24 @@ export const time12 = (hhmm: string) => {
 
 export const STATUS_LABEL: Record<OrderStatus, string> = {
   DRAFT: 'Draft',
+  REQUESTED: 'Waiting for shop',
+  ACCEPTED: 'Accepted',
+  DENIED: 'Denied',
   PENDING_PAYMENT: 'Awaiting payment',
-  PAID: 'Payment confirmed',
+  PAID: 'Paid',
   PRINTING: 'Printing',
   READY: 'Ready for pickup',
   OUT_FOR_DELIVERY: 'Out for delivery',
-  COMPLETED: 'Completed',
+  COMPLETED: 'Collected',
   CANCELLED: 'Cancelled',
   REFUNDED: 'Refunded',
 };
 
 export const STATUS_TONE: Record<OrderStatus, 'gray' | 'blue' | 'amber' | 'green' | 'red'> = {
   DRAFT: 'gray',
+  REQUESTED: 'amber',
+  ACCEPTED: 'blue',
+  DENIED: 'red',
   PENDING_PAYMENT: 'amber',
   PAID: 'blue',
   PRINTING: 'blue',
@@ -56,3 +62,8 @@ export const SERVICE_LABEL: Record<ServiceType, string> = {
 };
 
 export const ALL_SERVICES = Object.keys(SERVICE_LABEL) as ServiceType[];
+
+export const clock = (iso: string | null | undefined) =>
+  iso ? new Date(iso).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) : '—';
+
+export const minutesLabel = (m: number) => (m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}`);

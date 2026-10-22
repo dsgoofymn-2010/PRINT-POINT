@@ -13,6 +13,7 @@ let refreshing: Promise<boolean> | null = null;
 export const setAccessToken = (t: string | null) => {
   accessToken = t;
 };
+export const getAccessToken = () => accessToken;
 export const setOnAuthLost = (fn: () => void) => {
   onAuthLost = fn;
 };
@@ -85,6 +86,18 @@ export const api = {
   patch: async <T>(path: string, body: unknown) => (await (await request(path, { method: 'PATCH', body })).json()) as T,
   del: async <T>(path: string) => (await (await request(path, { method: 'DELETE' })).json()) as T,
   upload: async <T>(path: string, form: FormData) => (await (await request(path, { form })).json()) as T,
+  /** Asks for a short-lived signed link, then opens (preview) or saves the file. */
+  openFile: async (fileId: string, mode: 'inline' | 'attachment' = 'inline') => {
+    const { url } = (await (await request(`/uploads/${fileId}/link?d=${mode}`)).json()) as { url: string };
+    const full = `${import.meta.env.VITE_API_URL ?? ''}${url}`;
+    if (mode === 'inline') window.open(full, '_blank', 'noopener');
+    else {
+      const a = document.createElement('a');
+      a.href = full;
+      a.rel = 'noopener';
+      a.click();
+    }
+  },
   /** Downloads an authenticated file and triggers a browser save. */
   download: async (path: string, fallbackName: string) => {
     const res = await request(path);

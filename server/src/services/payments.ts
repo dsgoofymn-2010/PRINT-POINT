@@ -5,6 +5,7 @@ import { randomDigits } from '../lib/tokens';
 import { newOrderShopMessage, recordNotification, whatsappLink } from './notify';
 import { addEvent, commissionPercent, nextOrderNumber } from './orders';
 import { razorpay } from './razorpay';
+import { broadcastOrder } from './realtime';
 
 interface PaidArgs {
   razorpayOrderId: string;
@@ -36,7 +37,7 @@ export async function markPaid(args: PaidArgs) {
     });
 
     // Money arrived for an order that was cancelled meanwhile (e.g. timeout) -> refund it.
-    if (payment.order.status !== 'PENDING_PAYMENT') {
+    if (payment.order.status !== 'PENDING_PAYMENT' && payment.order.status !== 'ACCEPTED') {
       return { order: payment.order, newlyPaid: false, refundNeeded: payment.order.status === 'CANCELLED' };
     }
 
@@ -46,7 +47,8 @@ export async function markPaid(args: PaidArgs) {
         status: 'PAID',
         paidAt: new Date(),
         orderNumber: payment.order.orderNumber ?? (await nextOrderNumber(tx)),
-        pickupOtp: payment.order.fulfillment === 'PICKUP' ? randomDigits(6) : null,
+        // Request-flow orders already got their code when the shop accepted.
+        pickupOtp: payment.order.fulfillment === 'PICKUP' ? (payment.order.pickupOtp ?? randomDigits(6)) : null,
         commissionPercent: pct,
         commissionAmount: Math.round((payment.order.subtotal * pct) / 100),
       },
@@ -62,7 +64,10 @@ export async function markPaid(args: PaidArgs) {
     );
   }
 
-  if (result.newlyPaid) await notifyShopOfNewOrder(result.order.id).catch((err) => logger.error({ err }, 'notify failed'));
+  if (result.newlyPaid) {
+    await notifyShopOfNewOrder(result.order.id).catch((err) => logger.error({ err }, 'notify failed'));
+    await broadcastOrder(result.order.id);
+  }
   return result.order;
 }
 
@@ -133,6 +138,7 @@ export async function initiateRefund(orderId: string, amount: number | null, rea
     if (processed) await finalizeRefund(tx, payment.id, orderId, refundAmount === remaining);
     return r;
   });
+  await broadcastOrder(orderId);
   return refund;
 }
 

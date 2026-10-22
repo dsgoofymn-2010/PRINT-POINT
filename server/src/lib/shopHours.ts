@@ -18,3 +18,9 @@ export function isShopOpen(shop: { openTime: string; closeTime: string; holidays
   const close = toMinutes(shop.closeTime);
   return close > open ? minutes >= open && minutes < close : minutes >= open || minutes < close;
 }
+
+/** Today's hours in IST, or null when today is a weekly holiday. */
+export function todaysHours(shop: { openTime: string; closeTime: string; holidays: string[] }, now = new Date()): { open: string; close: string } | null {
+  const { day } = nowIST(now);
+  return shop.holidays.includes(day) ? null : { open: shop.openTime, close: shop.closeTime };
+}

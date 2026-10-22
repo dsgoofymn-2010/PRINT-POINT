@@ -3,7 +3,7 @@ import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { ah, notFound } from '../lib/errors';
 import { prisma } from '../lib/prisma';
-import { isShopOpen } from '../lib/shopHours';
+import { queueInfo, shopIsTakingRequests } from '../services/requests';
 
 export const shopsRouter = Router();
 
@@ -41,6 +41,8 @@ const publicShopSelect = {
   estimatedPickupMins: true,
   rating: true,
   ratingCount: true,
+  acceptingRequests: true,
+  status: true,
   services: { select: { type: true, note: true } },
   pricingRules: { where: { isActive: true }, take: 1 },
 } satisfies Prisma.ShopSelect;
@@ -64,7 +66,7 @@ shopsRouter.get(
     const result = shops
       .map(({ pricingRules, ...s }) => ({
         ...s,
-        isOpen: isShopOpen(s),
+        isOpen: shopIsTakingRequests(s),
         minOrderAmount: pricingRules[0]?.minOrderAmount ?? 0,
         startingPrice: pricingRules[0]?.bwSingle ?? null,
       }))
@@ -83,6 +85,14 @@ shopsRouter.get(
       orderBy: [{ city: 'asc' }, { area: 'asc' }],
     });
     res.json({ areas: rows });
+  }),
+);
+
+/** Live queue numbers and prices for the chat side panel. */
+shopsRouter.get(
+  '/:id/queue',
+  ah(async (req, res) => {
+    res.json({ queue: await queueInfo(z.string().uuid().parse(req.params.id)) });
   }),
 );
 
@@ -108,7 +118,7 @@ shopsRouter.get(
     res.json({
       shop: {
         ...rest,
-        isOpen: isShopOpen(rest),
+        isOpen: shopIsTakingRequests(rest),
         pricing: rule && {
           bwSingle: rule.bwSingle,
           bwDouble: rule.bwDouble,

@@ -1,5 +1,5 @@
 export type Role = 'CUSTOMER' | 'SHOP_OWNER' | 'ADMIN';
-export type OrderStatus = 'DRAFT' | 'PENDING_PAYMENT' | 'PAID' | 'PRINTING' | 'READY' | 'OUT_FOR_DELIVERY' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED';
+export type OrderStatus = 'DRAFT' | 'REQUESTED' | 'ACCEPTED' | 'DENIED' | 'PENDING_PAYMENT' | 'PAID' | 'PRINTING' | 'READY' | 'OUT_FOR_DELIVERY' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED';
 export type Fulfillment = 'PICKUP' | 'DELIVERY';
 export type ServiceType =
   | 'XEROX_BW' | 'COLOR_PRINT' | 'PROJECT_REPORT' | 'SPIRAL_BINDING' | 'SOFT_BINDING' | 'HARD_BINDING' | 'LAMINATION' | 'SCANNING' | 'PASSPORT_PHOTO';
@@ -184,4 +184,69 @@ export interface Order {
   delivery?: (DeliveryInfo & { status: string; partnerName: string | null }) | null;
   review?: { rating: number; comment: string | null } | null;
   events?: { id: string; status: OrderStatus; note: string | null; createdAt: string }[];
+}
+
+/** Public queue numbers for a shop (side panel). */
+export interface QueueInfo {
+  shopId: string;
+  name: string;
+  isOpen: boolean;
+  acceptingRequests: boolean;
+  withinHours: boolean;
+  hoursToday: { open: string; close: string } | null;
+  pending: number;
+  printing: number;
+  estimatedWaitMins: number;
+  prices: { bwSingle: number; bwDouble: number; colorSingle: number; colorDouble: number; spiralBinding: number; taxPercent: number; minOrderAmount: number } | null;
+  updatedAt: string;
+}
+
+export interface ChatOptions {
+  color: 'BW' | 'COLOR';
+  sides: 'SINGLE' | 'DOUBLE';
+  copies: number;
+  binding: 'NONE' | 'SPIRAL';
+}
+
+export interface RequestItem {
+  id: string;
+  fileId: string;
+  fileName: string;
+  totalPages?: number;
+  printedPages: number;
+  copies: number;
+  color: 'BW' | 'COLOR';
+  sides: 'SINGLE' | 'DOUBLE';
+  binding: 'NONE' | 'SPIRAL' | 'SOFT' | 'HARD';
+  lineTotal: number;
+  file: { deletedAt: string | null; sizeBytes: number; mimeType: string };
+}
+
+/** A print request as the customer sees it. */
+export interface PrintRequest {
+  id: string;
+  orderNumber: string | null;
+  status: OrderStatus;
+  subtotal: number;
+  tax: number;
+  total: number;
+  pickupOtp: string | null;
+  denyReason: string | null;
+  specialInstructions: string | null;
+  estimatedReadyAt: string | null;
+  acceptedAt: string | null;
+  paidAt: string | null;
+  completedAt: string | null;
+  cancelledAt: string | null;
+  createdAt: string;
+  onlinePayment: boolean;
+  shop: { id: string; name: string; area: string; address: string; mobile: string; mapsUrl: string | null };
+  items: RequestItem[];
+  events: { status: OrderStatus; note: string | null; createdAt: string }[];
+}
+
+/** A request as the shop owner sees it (masked phone, no pickup code). */
+export interface IncomingRequest extends Omit<PrintRequest, 'pickupOtp' | 'onlinePayment' | 'shop' | 'events'> {
+  pickupAttempts: number;
+  customer: { name: string; mobile: string | null };
 }

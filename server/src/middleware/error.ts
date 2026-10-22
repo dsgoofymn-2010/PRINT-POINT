@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
 import multer from 'multer';
 import { ZodError } from 'zod';
+import { env } from '../config/env';
 import { AppError } from '../lib/errors';
 import { logger } from '../lib/logger';
 
@@ -20,7 +21,14 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     return res.status(err.status).json({ error: { code: err.code, message: err.message, details: err.details } });
   }
   if (err instanceof multer.MulterError) {
-    const message = err.code === 'LIMIT_FILE_SIZE' ? 'File is too large' : err.message;
+    const message =
+      err.code === 'LIMIT_FILE_SIZE'
+        ? `Each file must be ${env.MAX_FILE_SIZE_MB} MB or smaller`
+        : err.code === 'LIMIT_UNEXPECTED_FILE'
+          ? 'Only PDF, DOCX, JPG and PNG files are allowed'
+          : err.code === 'LIMIT_FILE_COUNT'
+            ? 'Upload at most 10 files at a time'
+            : err.message;
     return res.status(400).json({ error: { code: 'UPLOAD_ERROR', message } });
   }
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
