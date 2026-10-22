@@ -104,6 +104,21 @@ npm run dev
 
 Other scripts: `npm test` (API tests), `npm run typecheck`, `npm run build`, `npm start` (serves API + built frontend on port 4000). Use `npm run db:migrate` when you change `schema.prisma` during development.
 
+### Run with Docker (whole stack)
+
+Runs the API + built frontend and PostgreSQL in containers, with migrations applied on start. No local Node or Postgres needed.
+
+```bash
+cp server/.env.example server/.env   # optional but recommended: set JWT secrets + Razorpay keys
+npm run docker:up                    # docker compose up -d --build
+# → app at http://localhost:4000 (API serves the built web app)
+
+npm run docker:logs                  # follow app logs
+npm run docker:down                  # stop and remove containers
+```
+
+`server/.env` is optional here: without it, compose falls back to local DB credentials, `http://localhost:4000` URLs, and **dev-only JWT secrets**. That is fine for a quick local look, but set real `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` (and Razorpay keys) in `server/.env` before any shared or production deploy — the server refuses to boot without valid JWT secrets. Demo data seeding needs dev dependencies, so run `npm install && npm run db:seed` from your machine against the exposed DB port (5432), not inside the container.
+
 ## Environment variables (`server/.env`)
 
 | Variable | Purpose |
