@@ -62,7 +62,7 @@ Prerequisites: Node.js 20+ and Docker (for PostgreSQL), or your own PostgreSQL 1
 
 ```bash
 npm install
-cp server/.env.example server/.env      # set JWT secrets; Razorpay test keys are optional
+cp backend/.env.example backend/.env      # set JWT secrets; Razorpay test keys are optional
 npm run db:up                           # PostgreSQL in Docker
 npm run db:deploy                       # apply migrations
 npm run db:seed                         # demo shops, owners, customer
@@ -78,7 +78,7 @@ npm run dev                             # API on :4000, web app on :5173
 Runs the API + built frontend and PostgreSQL in containers, with migrations applied on start. No local Node or Postgres needed.
 
 ```bash
-cp server/.env.example server/.env   # optional but recommended: set JWT secrets + Razorpay keys
+cp backend/.env.example backend/.env   # optional but recommended: set JWT secrets + Razorpay keys
 npm run docker:up                    # docker compose up -d --build
 # → app at http://localhost:4000 (API serves the built web app)
 
@@ -86,7 +86,7 @@ npm run docker:logs                  # follow app logs
 npm run docker:down                  # stop and remove containers
 ```
 
-`server/.env` is optional here: without it, compose falls back to local DB credentials, `http://localhost:4000` URLs, and **dev-only JWT secrets**. That is fine for a quick local look, but set real `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` (and Razorpay keys) in `server/.env` before any shared or production deploy — the server refuses to boot without valid JWT secrets. Demo data seeding needs dev dependencies, so run `npm install && npm run db:seed` from your machine against the exposed DB port (5432), not inside the container.
+`backend/.env` is optional here: without it, compose falls back to local DB credentials, `http://localhost:4000` URLs, and **dev-only JWT secrets**. That is fine for a quick local look, but set real `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` (and Razorpay keys) in `backend/.env` before any shared or production deploy — the server refuses to boot without valid JWT secrets. Demo data seeding needs dev dependencies, so run `npm install && npm run db:seed` from your machine against the exposed DB port (5432), not inside the container.
 
 
 Other scripts: `npm test`, `npm run typecheck`, `npm run build`, `npm start` (serves API + built frontend on port 4000).
@@ -104,7 +104,7 @@ All seed accounts use the password **`Password@123`**. In development the OTP is
 
 An owner with several shops sees their first shop on `/owner`; add `?shopId=<id>` to API calls for the others.
 
-## Environment variables (`server/.env`)
+## Environment variables (`backend/.env`)
 
 | Variable | Purpose |
 |---|---|
@@ -124,7 +124,7 @@ An owner with several shops sees their first shop on `/owner`; add `?shopId=<id>
 | `SMS_PROVIDER`, `DEV_OTP` | `console` logs OTPs; outside production `DEV_OTP` is accepted |
 | `DEFAULT_COMMISSION_PERCENT` | Used until an admin sets one |
 
-Client (`client/.env`, optional): `VITE_API_URL` if the API is on another origin (Vite proxies `/api` and `/socket.io` in development); `VITE_MAX_FILE_MB` to match `MAX_FILE_SIZE_MB` if you change it.
+Client (`frontend/.env`, optional): `VITE_API_URL` if the API is on another origin (Vite proxies `/api` and `/socket.io` in development); `VITE_MAX_FILE_MB` to match `MAX_FILE_SIZE_MB` if you change it.
 
 ## Realtime
 
@@ -168,16 +168,16 @@ Money is always in **paise**. Errors look like `{ "error": { "code", "message", 
 ## Razorpay test setup
 
 1. Create an account at <https://dashboard.razorpay.com/signup> and switch to **Test Mode**.
-2. **Account & Settings → API Keys → Generate Test Key**; put the Key ID and Secret in `server/.env`.
+2. **Account & Settings → API Keys → Generate Test Key**; put the Key ID and Secret in `backend/.env`.
 3. Optional webhook: `https://<public-host>/api/v1/payments/webhook` with events `payment.captured`, `payment.failed`, `refund.processed` and the same secret in `RAZORPAY_WEBHOOK_SECRET` (use `ngrok http 4000` locally).
 4. Pay with the test UPI ID `success@razorpay` (or `failure@razorpay`).
 
 ## Deployment
 
 ```bash
-cp server/.env.example server/.env    # strong JWT secrets + Razorpay keys
+cp backend/.env.example backend/.env    # strong JWT secrets + Razorpay keys
 APP_URL=https://print.example.com docker compose up -d --build
 ```
 The app container applies migrations on start and serves the API, WebSockets and the built frontend on port 4000. Put it behind HTTPS and make sure your proxy forwards WebSocket upgrades for `/socket.io`.
 
-Before going live: switch Razorpay to live keys, plug in a real SMS provider (`server/src/services/notify.ts`), move uploads to object storage or a persistent volume (`server/src/services/storage.ts`), and replace the placeholder legal text in `client/src/pages/info/InfoPage.tsx`.
+Before going live: switch Razorpay to live keys, plug in a real SMS provider (`backend/src/services/notify.ts`), move uploads to object storage or a persistent volume (`backend/src/services/storage.ts`), and replace the placeholder legal text in `frontend/src/pages/info/InfoPage.tsx`.

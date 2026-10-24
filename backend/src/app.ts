@@ -75,7 +75,7 @@ export function createApp() {
   app.use('/api/v1', api);
 
   // In production the API also serves the built frontend.
-  const webDist = path.resolve(process.env.WEB_DIST_DIR ?? path.join(process.cwd(), '../client/dist'));
+  const webDist = path.resolve(process.env.WEB_DIST_DIR ?? path.join(process.cwd(), '../frontend/dist'));
   if (isProd && fs.existsSync(webDist)) {
     app.use(express.static(webDist, { index: false, maxAge: '1h' }));
     app.get('*', (_req, res) => res.sendFile(path.join(webDist, 'index.html')));

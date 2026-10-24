@@ -1,7 +1,7 @@
 node_modules
 **/node_modules
 **/dist
-server/uploads/*
+backend/uploads/*
 **/.env
 .git
 *.log
