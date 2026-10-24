@@ -1,7 +1,36 @@
+# Dependencies & build output
 node_modules
 dist
+coverage
+.vercel
+*.tsbuildinfo
+
+# Secrets - every .env file except the example templates
 .env
+.env.*
+*.env
+!.env.example
+!*.example.env
+deploy-settings.env
+
+# Keys & certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# User uploads (customer files)
 backend/uploads/*
 !backend/uploads/.gitkeep
-coverage
+
+# Logs
 *.log
+npm-debug.log*
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+.idea

@@ -36,8 +36,8 @@ async function issueSession(req: Request, res: Response, user: User) {
   });
   res.cookie(REFRESH_COOKIE, token, {
     httpOnly: true,
-    secure: isProd,
-    sameSite: 'strict',
+    secure: isProd || env.COOKIE_SAMESITE === 'none',
+    sameSite: env.COOKIE_SAMESITE,
     path: '/api/v1/auth',
     maxAge: days * 86_400_000,
   });
@@ -162,7 +162,11 @@ authRouter.post(
     if (typeof token === 'string' && token) {
       await prisma.refreshToken.updateMany({ where: { tokenHash: hashToken(token) }, data: { revokedAt: new Date() } });
     }
-    res.clearCookie(REFRESH_COOKIE, { path: '/api/v1/auth' });
+    res.clearCookie(REFRESH_COOKIE, {
+      path: '/api/v1/auth',
+      secure: isProd || env.COOKIE_SAMESITE === 'none',
+      sameSite: env.COOKIE_SAMESITE,
+    });
     res.json({ ok: true });
   }),
 );

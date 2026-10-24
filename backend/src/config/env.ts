@@ -5,6 +5,8 @@ const schema = z.object({
   PORT: z.coerce.number().int().positive().default(4000),
   CORS_ORIGINS: z.string().default('http://localhost:5173'),
   APP_URL: z.string().url().default('http://localhost:5173'),
+  // 'none' when the frontend is on a different domain (e.g. Vercel + Render). Needs HTTPS.
+  COOKIE_SAMESITE: z.enum(['strict', 'lax', 'none']).default('strict'),
   DATABASE_URL: z.string().min(1),
   JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 chars'),
   JWT_REFRESH_SECRET: z.string().min(32, 'JWT_REFRESH_SECRET must be at least 32 chars'),
