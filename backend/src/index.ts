@@ -1,4 +1,4 @@
-import { env, razorpayConfigured } from './config/env';
+import { env, razorpayConfigured, skipLogin } from './config/env';
 import { createApp } from './app';
 import { startMaintenanceJobs } from './jobs/maintenance';
 import { logger } from './lib/logger';
@@ -10,6 +10,7 @@ const server = app.listen(env.PORT, () => {
   logger.info(`PrintPoint API listening on http://localhost:${env.PORT}/api/v1`);
   if (!razorpayConfigured) logger.warn('Razorpay keys missing: online payments are disabled until you add test keys to server/.env');
 });
+if (skipLogin) logger.warn('TEST MODE: login is skipped (DEV_SKIP_LOGIN=true). Turn it off before sharing.');
 attachRealtime(server);
 const timer = startMaintenanceJobs();
 

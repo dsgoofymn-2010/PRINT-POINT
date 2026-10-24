@@ -3,8 +3,9 @@ import { z } from 'zod';
 import { razorpayConfigured } from '../config/env';
 import { badRequest, conflict, notFound } from '../lib/errors';
 import { logger } from '../lib/logger';
+import { getMainShopId } from '../lib/mainShop';
 import { prisma } from '../lib/prisma';
-import { isShopOpen, todaysHours } from '../lib/shopHours';
+import { formatIST, isShopOpen, nextRegularOpening, todaysHours } from '../lib/shopHours';
 import { randomDigits, safeEqual } from '../lib/tokens';
 import { addEvent, buildQuote, nextOrderNumber } from './orders';
 import { ruleSnapshot } from './pricing';
@@ -40,6 +41,8 @@ export const requestInputSchema = z.object({
     binding: z.enum(['NONE', 'SPIRAL']),
   }),
   note: z.string().trim().max(500).optional().nullable(),
+  // Book a later time, e.g. when the shop is closed. Empty = as soon as possible.
+  scheduledFor: z.coerce.date().optional().nullable(),
 });
 export type RequestInput = z.infer<typeof requestInputSchema>;
 
@@ -65,14 +68,61 @@ export function toQuoteInput(input: Pick<RequestInput, 'shopId' | 'files' | 'opt
   };
 }
 
-export function shopIsTakingRequests(shop: Pick<Shop, 'openTime' | 'closeTime' | 'holidays' | 'acceptingRequests' | 'status'>) {
-  return shop.status === 'APPROVED' && shop.acceptingRequests && isShopOpen(shop);
+type HoursShop = Pick<Shop, 'openTime' | 'closeTime' | 'holidays' | 'acceptingRequests' | 'reopensAt' | 'status'>;
+
+/** The owner's open switch, which turns itself back on once the set reopening time passes. */
+export function manuallyOpen(shop: Pick<Shop, 'acceptingRequests' | 'reopensAt'>, now = new Date()) {
+  return shop.acceptingRequests || (shop.reopensAt != null && shop.reopensAt <= now);
+}
+
+export function shopIsTakingRequests(shop: HoursShop, now = new Date()) {
+  return shop.status === 'APPROVED' && manuallyOpen(shop, now) && isShopOpen(shop, now);
+}
+
+/**
+ * When a closed shop takes requests again: the reopening time the shop set, or the
+ * start of its next opening hours. Null while open, or if closed with no time set.
+ */
+export function nextOpening(shop: HoursShop, now = new Date()): Date | null {
+  if (shop.status !== 'APPROVED' || shopIsTakingRequests(shop, now)) return null;
+  let from = now;
+  if (!manuallyOpen(shop, now)) {
+    if (!shop.reopensAt) return null;
+    from = shop.reopensAt;
+  }
+  return isShopOpen(shop, from) ? from : nextRegularOpening(shop, from);
+}
+
+const MAX_BOOK_AHEAD_MS = 7 * 86_400_000;
+
+/** Checks a booked time: the shop must be open then, and it must be within a week. */
+function checkScheduledTime(shop: HoursShop & { name: string }, when: Date | null | undefined, now = new Date()): Date | null {
+  const openNow = shopIsTakingRequests(shop, now);
+  if (!when) {
+    if (openNow) return null;
+    const next = nextOpening(shop, now);
+    throw conflict(
+      next
+        ? `${shop.name} is closed right now. It opens ${formatIST(next)}; book your request for then.`
+        : `${shop.name} is closed right now and hasn't set a reopening time yet. Please check back later.`,
+    );
+  }
+  if (when.getTime() < now.getTime() - 60_000) throw badRequest('Pick a time in the future');
+  if (when.getTime() > now.getTime() + MAX_BOOK_AHEAD_MS) throw badRequest('You can book up to 7 days ahead');
+  if (!openNow) {
+    const next = nextOpening(shop, now);
+    if (!next) throw conflict(`${shop.name} hasn't set a reopening time yet. Please check back later.`);
+    if (when < next) throw badRequest(`${shop.name} opens ${formatIST(next)}. Pick that time or later.`);
+  }
+  if (!isShopOpen(shop, when)) throw badRequest(`${shop.name} is closed at that time. Pick a time within its opening hours.`);
+  return when;
 }
 
 export async function createRequest(customerId: string, input: RequestInput) {
+  if (input.shopId !== (await getMainShopId())) throw badRequest('Requests can only be sent to this shop');
   const shop = await prisma.shop.findFirst({ where: { id: input.shopId, status: 'APPROVED', deletedAt: null } });
   if (!shop) throw notFound('Shop not found');
-  if (!shopIsTakingRequests(shop)) throw conflict(`${shop.name} is closed right now. Try again during opening hours or choose another shop.`);
+  const scheduledFor = checkScheduledTime(shop, input.scheduledFor);
 
   const built = await buildQuote(customerId, toQuoteInput(input));
   const { quote } = built;
@@ -93,6 +143,7 @@ export async function createRequest(customerId: string, input: RequestInput) {
         total: quote.total,
         priceSnapshot: { rule: ruleSnapshot(built.rule), quote } as unknown as Prisma.InputJsonValue,
         specialInstructions: input.note || null,
+        scheduledFor,
         items: {
           create: toQuoteInput(input).items.map((item, idx) => {
             const b = quote.items[idx];
@@ -118,7 +169,7 @@ export async function createRequest(customerId: string, input: RequestInput) {
         },
       },
     });
-    await addEvent(tx, o.id, 'REQUESTED', customerId, 'Request sent to shop');
+    await addEvent(tx, o.id, 'REQUESTED', customerId, scheduledFor ? `Request sent, booked for ${formatIST(scheduledFor)}` : 'Request sent to shop');
     return o;
   });
   await broadcastOrder(order.id, 'created');
@@ -156,9 +207,13 @@ export async function cancelRequest(orderId: string, customerId: string) {
 }
 
 export async function acceptRequest(orderId: string, actorId: string, readyInMinutes: number) {
-  await transition(orderId, ['REQUESTED'], 'ACCEPTED', actorId, `Accepted, ready in about ${readyInMinutes} min`, {
+  const order = await prisma.printOrder.findUniqueOrThrow({ where: { id: orderId }, select: { scheduledFor: true } });
+  // A booked order is ready that long after its booked time, not after now.
+  const start = Math.max(Date.now(), order.scheduledFor?.getTime() ?? 0);
+  const readyAt = new Date(start + readyInMinutes * 60_000);
+  await transition(orderId, ['REQUESTED'], 'ACCEPTED', actorId, `Accepted, ready by ${formatIST(readyAt)}`, {
     acceptedAt: new Date(),
-    estimatedReadyAt: new Date(Date.now() + readyInMinutes * 60_000),
+    estimatedReadyAt: readyAt,
     pickupOtp: randomDigits(6),
     pickupAttempts: 0,
   });
@@ -179,6 +234,51 @@ export async function markPrinting(orderId: string, actorId: string) {
 
 export async function markReady(orderId: string, actorId: string) {
   await transition(orderId, ['PRINTING'], 'READY', actorId, undefined);
+}
+
+/** Statuses where the shop can still ask to move the order to another time. */
+const RESCHEDULABLE: OrderStatus[] = ['REQUESTED', 'ACCEPTED', 'PAID'];
+
+/** Shop is busy: ask the customer to move the order to a new time. The customer accepts or declines. */
+export async function proposeNewTime(orderId: string, actorId: string, time: Date, note: string | null) {
+  if (time.getTime() < Date.now()) throw badRequest('Pick a time in the future');
+  if (time.getTime() > Date.now() + MAX_BOOK_AHEAD_MS) throw badRequest('Pick a time within the next 7 days');
+  const done = await prisma.$transaction(async (tx) => {
+    const order = await tx.printOrder.findUnique({ where: { id: orderId }, select: { status: true } });
+    if (!order || !RESCHEDULABLE.includes(order.status)) return false;
+    const r = await tx.printOrder.updateMany({
+      where: { id: orderId, status: order.status },
+      data: { proposedTime: time, proposedNote: note },
+    });
+    if (r.count === 0) return false;
+    await addEvent(tx, orderId, order.status, actorId, `Shop asked to move it to ${formatIST(time)}${note ? `: ${note}` : ''}`);
+    return true;
+  });
+  if (!done) throw conflict('This order can no longer be moved. Refresh to see its latest status.');
+  await broadcastOrder(orderId);
+}
+
+/** The customer's answer to the shop's new time. Accepting moves the order; declining keeps the old time. */
+export async function answerNewTime(orderId: string, customerId: string, accept: boolean) {
+  const done = await prisma.$transaction(async (tx) => {
+    const order = await tx.printOrder.findFirst({ where: { id: orderId, customerId } });
+    if (!order) throw notFound('Request not found');
+    if (!order.proposedTime) return false;
+    const moveReady = accept && order.estimatedReadyAt != null;
+    await tx.printOrder.update({
+      where: { id: orderId },
+      data: {
+        proposedTime: null,
+        proposedNote: null,
+        ...(accept ? { scheduledFor: order.proposedTime } : {}),
+        ...(moveReady ? { estimatedReadyAt: order.proposedTime } : {}),
+      },
+    });
+    await addEvent(tx, orderId, order.status, customerId, accept ? `Customer agreed to ${formatIST(order.proposedTime)}` : 'Customer kept the original time');
+    return true;
+  });
+  if (!done) throw conflict('The shop has no time change waiting for your answer.');
+  await broadcastOrder(orderId);
 }
 
 /**
@@ -250,7 +350,9 @@ export async function queueInfo(shopId: string) {
     shopId: shop.id,
     name: shop.name,
     isOpen: shopIsTakingRequests(shop),
-    acceptingRequests: shop.acceptingRequests,
+    acceptingRequests: manuallyOpen(shop),
+    reopensAt: manuallyOpen(shop) ? null : shop.reopensAt,
+    nextOpenAt: nextOpening(shop)?.toISOString() ?? null,
     withinHours: isShopOpen(shop),
     hoursToday: todaysHours(shop),
     pending,

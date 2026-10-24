@@ -3,7 +3,8 @@ import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { ah, notFound } from '../lib/errors';
 import { prisma } from '../lib/prisma';
-import { queueInfo, shopIsTakingRequests } from '../services/requests';
+import { nextOpening, queueInfo, shopIsTakingRequests } from '../services/requests';
+import { getMainShopId } from '../lib/mainShop';
 
 export const shopsRouter = Router();
 
@@ -42,6 +43,7 @@ const publicShopSelect = {
   rating: true,
   ratingCount: true,
   acceptingRequests: true,
+  reopensAt: true,
   status: true,
   services: { select: { type: true, note: true } },
   pricingRules: { where: { isActive: true }, take: 1 },
@@ -51,7 +53,10 @@ shopsRouter.get(
   '/',
   ah(async (req, res) => {
     const q = listQuery.parse(req.query);
-    const where: Prisma.ShopWhereInput = { status: 'APPROVED', deletedAt: null };
+    // Single-shop app: the list only ever holds the one shop.
+    const mainId = await getMainShopId();
+    if (!mainId) return res.json({ shops: [] });
+    const where: Prisma.ShopWhereInput = { id: mainId, status: 'APPROVED', deletedAt: null };
     if (q.city) where.city = { equals: q.city, mode: 'insensitive' };
     if (q.area) where.area = { contains: q.area, mode: 'insensitive' };
     if (q.q) where.OR = [{ name: { contains: q.q, mode: 'insensitive' } }, { area: { contains: q.q, mode: 'insensitive' } }];
@@ -72,6 +77,26 @@ shopsRouter.get(
       }))
       .filter((s) => !q.openNow || s.isOpen);
     res.json({ shops: result });
+  }),
+);
+
+/** The one shop this app serves. */
+shopsRouter.get(
+  '/main',
+  ah(async (_req, res) => {
+    const id = await getMainShopId();
+    if (!id) throw notFound('The shop is not set up yet');
+    const s = await prisma.shop.findFirstOrThrow({ where: { id }, select: publicShopSelect });
+    const { pricingRules, ...rest } = s;
+    res.json({
+      shop: {
+        ...rest,
+        isOpen: shopIsTakingRequests(rest),
+        nextOpenAt: nextOpening(rest)?.toISOString() ?? null,
+        minOrderAmount: pricingRules[0]?.minOrderAmount ?? 0,
+        startingPrice: pricingRules[0]?.bwSingle ?? null,
+      },
+    });
   }),
 );
 

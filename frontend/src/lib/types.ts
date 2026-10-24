@@ -59,6 +59,8 @@ export interface ShopSummary {
   ratingCount: number;
   services: { type: ServiceType; note: string | null }[];
   isOpen: boolean;
+  /** When a closed shop takes requests again; customers can book from then. */
+  nextOpenAt?: string | null;
   minOrderAmount?: number;
   startingPrice?: number | null;
 }
@@ -192,6 +194,8 @@ export interface QueueInfo {
   name: string;
   isOpen: boolean;
   acceptingRequests: boolean;
+  reopensAt: string | null;
+  nextOpenAt: string | null;
   withinHours: boolean;
   hoursToday: { open: string; close: string } | null;
   pending: number;
@@ -234,6 +238,11 @@ export interface PrintRequest {
   denyReason: string | null;
   specialInstructions: string | null;
   estimatedReadyAt: string | null;
+  /** The time the customer booked (null = as soon as possible). */
+  scheduledFor: string | null;
+  /** A new time the shop asked for, waiting for the customer's answer. */
+  proposedTime: string | null;
+  proposedNote: string | null;
   acceptedAt: string | null;
   paidAt: string | null;
   completedAt: string | null;

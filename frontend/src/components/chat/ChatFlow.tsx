@@ -2,8 +2,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import { rupees, time12 } from '@/lib/format';
-import type { ChatOptions, PrintRequest, Quote, ShopSummary } from '@/lib/types';
+import { rupees } from '@/lib/format';
+import type { ChatOptions, PrintRequest, Quote } from '@/lib/types';
+import { useMainShop } from '@/lib/mainShop';
+import { when } from '@/lib/format';
+import { TimePicker, inMinutes } from '../TimePicker';
 import { Alert, Button, ErrorState } from '../ui';
 import { Bot, Chips, Me } from './Bubbles';
 import { FileStep } from './FileStep';
@@ -14,13 +17,13 @@ import { useShopQueue } from './QueuePanel';
 import { StatusCard } from './StatusCard';
 import { useChatFiles } from './useChatFiles';
 
-const STEPS = ['files', 'shop', 'color', 'sides', 'copies', 'binding', 'note', 'review', 'sent'] as const;
+const STEPS = ['files', 'color', 'sides', 'copies', 'binding', 'note', 'review', 'sent'] as const;
 type Step = (typeof STEPS)[number];
 
 const COPY_CHIPS = [1, 2, 3, 5, 10];
 
 /** The home page: a print assistant that asks one thing at a time. */
-export function ChatFlow({ shopId, onShopChange }: { shopId: string | null; onShopChange: (id: string | null) => void }) {
+export function ChatFlow() {
   const { user, loading: authLoading } = useAuth();
   const qc = useQueryClient();
   const files = useChatFiles(Boolean(user));
@@ -30,6 +33,7 @@ export function ChatFlow({ shopId, onShopChange }: { shopId: string | null; onSh
   const [note, setNote] = useState<string | null>(null);
   const [noteDraft, setNoteDraft] = useState('');
   const [sentId, setSentId] = useState<string | null>(null);
+  const [bookAt, setBookAt] = useState<string | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const at = (s: Step) => STEPS.indexOf(step) >= STEPS.indexOf(s);
   const go = (s: Step) => setStep(s);
@@ -38,14 +42,14 @@ export function ChatFlow({ shopId, onShopChange }: { shopId: string | null; onSh
     bottom.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [step, files.files.length]);
 
-  const shops = useQuery({
-    queryKey: ['shops'],
-    queryFn: () => api.get<{ shops: ShopSummary[] }>('/shops').then((r) => r.shops),
-    enabled: at('shop'),
-  });
-  const shop = shops.data?.find((s) => s.id === shopId) ?? null;
+  const mainShop = useMainShop();
+  const shop = mainShop.data ?? null;
+  const shopId = shop?.id ?? null;
   const queue = useShopQueue(shopId);
   const shopOpen = queue.data?.isOpen ?? shop?.isOpen ?? false;
+  // While closed, customers book a time from the shop's next opening onwards.
+  const nextOpen = shopOpen ? null : (queue.data?.nextOpenAt ?? shop?.nextOpenAt ?? null);
+  const bookTime = nextOpen && bookAt && bookAt >= nextOpen ? bookAt : nextOpen;
 
   const options = opts as ChatOptions;
   const fileInput = useMemo(
@@ -61,7 +65,7 @@ export function ChatFlow({ shopId, onShopChange }: { shopId: string | null; onSh
   });
 
   const send = useMutation({
-    mutationFn: () => api.post<{ order: PrintRequest }>('/requests', { ...body, note: note || null }),
+    mutationFn: () => api.post<{ order: PrintRequest }>('/requests', { ...body, note: note || null, scheduledFor: shopOpen ? null : bookTime }),
     onSuccess: (r) => {
       setSentId(r.order.id);
       qc.setQueryData<PrintRequest[]>(['requests', user?.id], (old) => [r.order, ...(old ?? [])]);
@@ -90,6 +94,14 @@ export function ChatFlow({ shopId, onShopChange }: { shopId: string | null; onSh
 
   return (
     <div className="space-y-6 pb-6">
+      {mainShop.isError && <Alert tone="amber">The shop isn’t taking online requests yet. Please check back soon.</Alert>}
+      {shop && !shopOpen && step !== 'sent' && (
+        <Alert tone="amber">
+          {nextOpen
+            ? `${shop.name} is closed right now and opens ${when(nextOpen)}. You can still send your files and book a time.`
+            : `${shop.name} is closed right now and hasn’t said when it opens again.`}
+        </Alert>
+      )}
       <Bot>
         <p>
           Hi! I’ll get your printing sorted. <span className="font-medium">Upload the files you want printed.</span>
@@ -111,7 +123,7 @@ export function ChatFlow({ shopId, onShopChange }: { shopId: string | null; onSh
         )}
         {step === 'files' && files.ready.length > 0 && (
           <div className="flex flex-wrap items-center gap-3">
-            <Button variant="primary" size="lg" disabled={!canContinueFiles} onClick={() => go('shop')}>
+            <Button variant="primary" size="lg" disabled={!canContinueFiles} onClick={() => go('color')}>
               Continue with {files.ready.length} file{files.ready.length === 1 ? '' : 's'}
             </Button>
             {files.busy && <span className="text-[16px] text-muted">Waiting for uploads to finish…</span>}
@@ -120,44 +132,11 @@ export function ChatFlow({ shopId, onShopChange }: { shopId: string | null; onSh
         )}
       </Bot>
 
-      {at('shop') && (
+      {at('color') && shop && (
         <>
           <Me onEdit={edit('files')}>
             {files.ready.length} file{files.ready.length === 1 ? '' : 's'} ready
           </Me>
-          <Bot>
-            <p>Which shop should print it?</p>
-            {shops.isPending ? (
-              <div className="flex gap-2" role="status" aria-label="Loading shops">
-                {[0, 1, 2].map((i) => <div key={i} className="h-14 w-40 rounded-control bg-active" />)}
-              </div>
-            ) : shops.error ? (
-              <ErrorState error={shops.error} onRetry={() => void shops.refetch()} />
-            ) : shops.data.length === 0 ? (
-              <Alert tone="amber">No shops are taking requests on PrintPoint yet. Please check back soon.</Alert>
-            ) : step === 'shop' ? (
-              <Chips
-                label="Shops"
-                value={shopId}
-                onPick={(id) => {
-                  onShopChange(id);
-                  go('color');
-                }}
-                options={shops.data.map((s) => ({
-                  value: s.id,
-                  label: s.name,
-                  hint: s.isOpen ? `${s.area} · open till ${time12(s.closeTime)}` : `${s.area} · closed now`,
-                  disabled: !s.isOpen,
-                }))}
-              />
-            ) : null}
-          </Bot>
-        </>
-      )}
-
-      {at('color') && shop && (
-        <>
-          <Me onEdit={edit('shop')}>{shop.name}, {shop.area}</Me>
           <Bot>
             <p>Black & white or colour?</p>
             {step === 'color' && (
@@ -314,7 +293,27 @@ export function ChatFlow({ shopId, onShopChange }: { shopId: string | null; onSh
             )}
             {step === 'review' && (
               <>
-                {!shopOpen && <Alert tone="red">{shop?.name ?? 'This shop'} just closed. Pick another shop to send your request.</Alert>}
+                {!shopOpen && nextOpen && bookTime && (
+                  <div className="space-y-3 rounded-card border border-line bg-raised p-4">
+                    <p>
+                      <span className="font-medium">{shop?.name} is closed right now.</span> It opens {when(nextOpen)}. Book your order for that time or later.
+                    </p>
+                    <TimePicker
+                      label="Book for"
+                      value={bookTime}
+                      min={nextOpen}
+                      onChange={setBookAt}
+                      quick={[
+                        { label: 'When it opens', iso: nextOpen },
+                        { label: '+1 hour', iso: inMinutes(60, new Date(nextOpen).getTime()) },
+                        { label: '+2 hours', iso: inMinutes(120, new Date(nextOpen).getTime()) },
+                      ]}
+                    />
+                  </div>
+                )}
+                {!shopOpen && !nextOpen && (
+                  <Alert tone="red">{shop?.name ?? 'The shop'} is closed and hasn’t set a reopening time yet. Please check back later.</Alert>
+                )}
                 {send.error && <ErrorState error={send.error} />}
                 <div className="flex flex-wrap items-center gap-3">
                   <Button
@@ -322,12 +321,11 @@ export function ChatFlow({ shopId, onShopChange }: { shopId: string | null; onSh
                     size="lg"
                     className="min-h-[52px] px-6 text-[18px]"
                     loading={send.isPending}
-                    disabled={!quote.data || !quote.data.quote.meetsMinimum || !shopOpen}
+                    disabled={!quote.data || !quote.data.quote.meetsMinimum || (!shopOpen && !bookTime)}
                     onClick={() => send.mutate()}
                   >
-                    Send request to shop
+                    {shopOpen || !bookTime ? 'Send request to shop' : `Book for ${when(bookTime)}`}
                   </Button>
-                  {!shopOpen && <Button size="lg" onClick={() => go('shop')}>Choose another shop</Button>}
                 </div>
                 <p className="text-[15px] text-muted">
                   You pay only after the shop accepts. Your files are deleted after pickup, or 24 hours at most.

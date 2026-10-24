@@ -1,8 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { useAuth } from '@/lib/auth';
+import { SKIP_LOGIN, useAuth } from '@/lib/auth';
 import type { Role } from '@/lib/types';
 import { Loading, cn } from './ui';
 
@@ -59,7 +59,7 @@ function CustomerShell() {
     <>
       <NavLink to="/" className={() => topLink({ isActive: onHome && !mine })}>New request</NavLink>
       {user && user.role !== 'SHOP_OWNER' && <NavLink to="/?view=mine" className={() => topLink({ isActive: mine })}>My requests</NavLink>}
-      {user?.role !== 'CUSTOMER' && <NavLink to="/owner" className={topLink}>{user ? 'Shop desk' : 'For shops'}</NavLink>}
+      {user && user.role !== 'CUSTOMER' && <NavLink to="/owner" className={topLink}>Shop desk</NavLink>}
       {user?.role === 'ADMIN' && <NavLink to="/admin" className={topLink}>Admin</NavLink>}
     </>
   );
@@ -207,9 +207,46 @@ export function Layout() {
   const { pathname } = useLocation();
   const { user } = useAuth();
   const owner = user && user.role !== 'CUSTOMER';
-  if (pathname === '/owner') return owner ? <DeskShell /> : <CustomerShell />;
-  if ((pathname.startsWith('/shop') && pathname !== '/shop/register') || pathname.startsWith('/admin')) return <DeskShell />;
-  return <CustomerShell />;
+  let shell = <CustomerShell />;
+  if (pathname === '/owner') shell = owner ? <DeskShell /> : <CustomerShell />;
+  else if ((pathname.startsWith('/shop') && pathname !== '/shop/register') || pathname.startsWith('/admin')) shell = <DeskShell />;
+  return (
+    <>
+      {shell}
+      {SKIP_LOGIN && <TestModeBar />}
+    </>
+  );
+}
+
+const TEST_ROLES: { role: Role; label: string; home: string }[] = [
+  { role: 'CUSTOMER', label: 'Customer', home: '/' },
+  { role: 'SHOP_OWNER', label: 'Shop owner', home: '/owner' },
+  { role: 'ADMIN', label: 'Admin', home: '/admin' },
+];
+
+/** Test mode only: one-click switch between roles, no password. */
+function TestModeBar() {
+  const { user, switchRole } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  return (
+    <div className="fixed bottom-3 left-1/2 z-50 flex -translate-x-1/2 flex-wrap items-center gap-1 rounded-control border border-line bg-ground p-1 text-xs shadow-lg">
+      <span className="px-2 font-medium text-muted">Test mode</span>
+      {TEST_ROLES.map((r) => (
+        <button
+          key={r.role}
+          onClick={() => {
+            setError('');
+            switchRole(r.role).then(() => navigate(r.home), (e: Error) => setError(e.message));
+          }}
+          className={`rounded-control px-2 py-1 ${user?.role === r.role ? 'bg-primary text-on-primary' : 'text-ink hover:bg-active'}`}
+        >
+          {r.label}
+        </button>
+      ))}
+      {error && <span className="px-2 text-red-600">{error}</span>}
+    </div>
+  );
 }
 
 export function RequireAuth({ roles, children }: { roles?: Role[]; children: ReactNode }) {

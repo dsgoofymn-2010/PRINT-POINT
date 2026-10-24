@@ -7,7 +7,7 @@ import { prisma } from '../lib/prisma';
 import { authenticate, currentUser } from '../middleware/auth';
 import { requestLimiter } from '../middleware/rateLimit';
 import { buildQuote } from '../services/orders';
-import { cancelRequest, createRequest, requestInputSchema, toQuoteInput } from '../services/requests';
+import { answerNewTime, cancelRequest, createRequest, requestInputSchema, toQuoteInput } from '../services/requests';
 
 /** Customer side of the chat flow: price, send, follow and cancel requests. */
 export const requestsRouter = Router();
@@ -41,7 +41,7 @@ const idParam = (v: unknown) => z.string().uuid().parse(v);
 requestsRouter.post(
   '/quote',
   ah(async (req, res) => {
-    const input = requestInputSchema.omit({ note: true }).parse(req.body);
+    const input = requestInputSchema.omit({ note: true, scheduledFor: true }).parse(req.body);
     const { quote, rule } = await buildQuote(currentUser(req).id, toQuoteInput(input));
     res.json({ quote, rates: { bwSingle: rule.bwSingle, bwDouble: rule.bwDouble, colorSingle: rule.colorSingle, colorDouble: rule.colorDouble, spiralBinding: rule.spiralBinding, taxPercent: rule.taxPercent } });
   }),
@@ -86,6 +86,18 @@ requestsRouter.post(
     const user = currentUser(req);
     const id = idParam(req.params.id);
     await cancelRequest(id, user.id);
+    const order = await prisma.printOrder.findUniqueOrThrow({ where: { id }, include: customerRequestInclude });
+    res.json({ order: forCustomer(order) });
+  }),
+);
+
+/** The customer's answer when the shop asks to move the order to another time. */
+requestsRouter.post(
+  '/:id/new-time',
+  ah(async (req, res) => {
+    const id = idParam(req.params.id);
+    const { accept } = z.object({ accept: z.boolean() }).parse(req.body ?? {});
+    await answerNewTime(id, currentUser(req).id, accept);
     const order = await prisma.printOrder.findUniqueOrThrow({ where: { id }, include: customerRequestInclude });
     res.json({ order: forCustomer(order) });
   }),

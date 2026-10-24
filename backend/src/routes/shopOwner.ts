@@ -4,6 +4,7 @@ import type { OrderStatus, Prisma, ServiceType, Shop } from '@prisma/client';
 import { razorpayConfigured } from '../config/env';
 import { ah, badRequest, conflict, forbidden, notFound } from '../lib/errors';
 import { prisma } from '../lib/prisma';
+import { shopExists } from '../lib/mainShop';
 import { authenticate, currentUser, requireRole } from '../middleware/auth';
 import { addEvent, orderDetailInclude, SHOP_TRANSITIONS } from '../services/orders';
 import { initiateRefund } from '../services/payments';
@@ -11,7 +12,7 @@ import { calculateQuote, ruleSnapshot } from '../services/pricing';
 import { printSettingsSchema } from '../services/orders';
 import { pickupLimiter } from '../middleware/rateLimit';
 import { broadcastOrder, emitShopChanged, joinOwnerToShop } from '../services/realtime';
-import { acceptRequest, collectWithCode, denyRequest, markPrinting, markReady, maskMobile, queueInfo } from '../services/requests';
+import { acceptRequest, collectWithCode, denyRequest, manuallyOpen, markPrinting, markReady, maskMobile, proposeNewTime, queueInfo } from '../services/requests';
 
 export const shopOwnerRouter = Router();
 shopOwnerRouter.use(authenticate, requireRole('SHOP_OWNER', 'ADMIN'));
@@ -97,13 +98,15 @@ shopOwnerRouter.post(
   '/register',
   ah(async (req, res) => {
     const user = currentUser(req);
+    // Single-shop app: only the first shop can be registered, and it goes live right away.
+    if (await shopExists()) throw conflict('This app is set up for one shop, and it already exists.');
     const body = profileSchema.extend({ pricing: pricingSchema.optional() }).parse(req.body);
     const shop = await prisma.shop.create({
       data: {
         ...shopData(body),
         ownerId: user.id,
         slug: slugify(body.name),
-        status: 'PENDING',
+        status: 'APPROVED',
         services: { create: body.services.map((type) => ({ type })) },
         pricingRules: {
           create: body.pricing ?? {
@@ -470,7 +473,9 @@ shopOwnerRouter.get(
         id: shop.id,
         name: shop.name,
         status: shop.status,
-        acceptingRequests: shop.acceptingRequests,
+        acceptingRequests: manuallyOpen(shop),
+        reopensAt: manuallyOpen(shop) ? null : shop.reopensAt,
+        nextOpenAt: queue?.nextOpenAt ?? null,
         openTime: shop.openTime,
         closeTime: shop.closeTime,
         estimatedPickupMins: shop.estimatedPickupMins,
@@ -552,13 +557,37 @@ shopOwnerRouter.post(
   }),
 );
 
-/** Owner's manual open/closed switch (opening hours still apply on top). */
+shopOwnerRouter.post(
+  '/requests/:id/new-time',
+  ah(async (req, res) => {
+    const { id } = await ownRequest(req);
+    const { time, note } = z
+      .object({ time: z.coerce.date(), note: z.string().trim().max(200).optional().nullable() })
+      .parse(req.body ?? {});
+    await proposeNewTime(id, currentUser(req).id, time, note || null);
+    res.json(await reply(id));
+  }),
+);
+
+/**
+ * Owner's manual open/closed switch (opening hours still apply on top).
+ * When closing, `reopensAt` tells customers when to book for; the shop opens itself again then.
+ */
 shopOwnerRouter.post(
   '/open',
   ah(async (req, res) => {
     const shop = await myShop(req);
-    const { open } = z.object({ open: z.boolean() }).parse(req.body);
-    await prisma.shop.update({ where: { id: shop.id }, data: { acceptingRequests: open } });
+    const { open, reopensAt } = z
+      .object({ open: z.boolean(), reopensAt: z.coerce.date().optional().nullable() })
+      .parse(req.body);
+    if (!open && reopensAt) {
+      if (reopensAt.getTime() <= Date.now()) throw badRequest('Pick a reopening time in the future');
+      if (reopensAt.getTime() > Date.now() + 30 * 86_400_000) throw badRequest('Pick a reopening time within 30 days');
+    }
+    await prisma.shop.update({
+      where: { id: shop.id },
+      data: { acceptingRequests: open, reopensAt: open ? null : (reopensAt ?? null) },
+    });
     emitShopChanged(shop.id);
     res.json({ acceptingRequests: open, queue: await queueInfo(shop.id).catch(() => null) });
   }),

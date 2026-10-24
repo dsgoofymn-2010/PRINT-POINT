@@ -213,6 +213,7 @@ model Shop {
   deliveryRadiusKm    Float      @default(0)
   estimatedPickupMins Int        @default(30)
   acceptingRequests   Boolean    @default(true) // owner's manual open/closed switch
+  reopensAt           DateTime? // when a closed shop opens again; customers can book from then
   rating              Float      @default(0)
   ratingCount         Int        @default(0)
   payoutUpiMasked     String? // masked reference only, never full details
@@ -341,6 +342,9 @@ model PrintOrder {
   denyReason          String?
   acceptedAt          DateTime?
   estimatedReadyAt    DateTime?
+  scheduledFor        DateTime? // time the customer booked (null = as soon as possible)
+  proposedTime        DateTime? // new time the shop asks for, waiting for the customer's answer
+  proposedNote        String?
   paidAt              DateTime?
   completedAt         DateTime?
   cancelledAt         DateTime?

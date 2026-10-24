@@ -1,4 +1,4 @@
-/* Seed: 1 admin, 2 shop owners, 3 Chennai shops, pricing, 1 customer, 1 completed order. */
+/* Seed: 1 admin, 2 shop owners, 1 shop (single-shop app), pricing, 1 customer, 1 completed order. */
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -69,18 +69,6 @@ async function main() {
     {
       slug: 'sri-murugan-xerox-tnagar', owner: owner1, name: 'Sri Murugan Xerox', area: 'T. Nagar', pincode: '600017',
       address: '12, Usman Road, T. Nagar', open: '08:30', close: '21:30', delivery: true, radius: 5, services: allServices, rating: 4.6, rule: baseRule,
-    },
-    {
-      slug: 'velachery-print-hub', owner: owner1, name: 'Velachery Print Hub', area: 'Velachery', pincode: '600042',
-      address: '45, 100 Feet Road, Velachery', open: '09:00', close: '22:00', delivery: true, radius: 4,
-      services: ['XEROX_BW', 'COLOR_PRINT', 'SPIRAL_BINDING', 'LAMINATION', 'SCANNING'] as ServiceType[], rating: 4.3,
-      rule: { ...baseRule, bwSingle: 200, bwDouble: 150, colorSingle: 1200 },
-    },
-    {
-      slug: 'anna-nagar-copy-centre', owner: owner2, name: 'Anna Nagar Copy Centre', area: 'Anna Nagar', pincode: '600040',
-      address: '3rd Avenue, Anna Nagar West', open: '09:30', close: '20:30', delivery: false, radius: 0,
-      services: ['XEROX_BW', 'PROJECT_REPORT', 'SOFT_BINDING', 'HARD_BINDING', 'PASSPORT_PHOTO'] as ServiceType[], rating: 4.8,
-      rule: { ...baseRule, colorSingle: 900, colorDouble: 700, minOrderAmount: 500 },
     },
   ];
 

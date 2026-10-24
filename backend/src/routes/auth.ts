@@ -2,18 +2,31 @@ import { Router, type Request, type Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import type { User } from '@prisma/client';
-import { env, isProd } from '../config/env';
+import { env, isProd, skipLogin } from '../config/env';
 import { ah, badRequest, conflict, unauthorized } from '../lib/errors';
 import { prisma } from '../lib/prisma';
 import { hashToken, newRefreshToken, randomDigits, signAccessToken } from '../lib/tokens';
 import { authenticate, currentUser } from '../middleware/auth';
 import { loginLimiter, otpLimiter } from '../middleware/rateLimit';
 import { sms } from '../services/notify';
+import { shopExists } from '../lib/mainShop';
 
 export const authRouter = Router();
 
 const REFRESH_COOKIE = 'pp_refresh';
 const DUMMY_HASH = bcrypt.hashSync('timing-equaliser', 10);
+// Test mode only: sign in as the first seeded user with the chosen role, no password.
+authRouter.post(
+  '/dev-login',
+  ah(async (req, res) => {
+    if (!skipLogin) throw unauthorized('Test mode is off');
+    const role = z.enum(['CUSTOMER', 'SHOP_OWNER', 'ADMIN']).parse(req.body?.role);
+    const user = await prisma.user.findFirst({ where: { role }, orderBy: { createdAt: 'asc' } });
+    if (!user) throw badRequest(`No ${role} user found. Run "npm run db:seed" first.`);
+    res.json(await issueSession(req, res, user));
+  }),
+);
+
 const mobileSchema = z
   .string()
   .trim()
@@ -59,6 +72,7 @@ authRouter.post(
   loginLimiter,
   ah(async (req, res) => {
     const body = registerSchema.parse(req.body);
+    if (body.role === 'SHOP_OWNER' && (await shopExists())) throw badRequest('Shop accounts are closed. Sign up as a customer.');
     const existing = await prisma.user.findFirst({
       where: { OR: [body.email ? { email: body.email } : {}, body.mobile ? { mobile: body.mobile } : {}].filter((c) => Object.keys(c).length) },
     });

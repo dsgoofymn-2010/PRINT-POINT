@@ -24,3 +24,20 @@ export function todaysHours(shop: { openTime: string; closeTime: string; holiday
   const { day } = nowIST(now);
   return shop.holidays.includes(day) ? null : { open: shop.openTime, close: shop.closeTime };
 }
+
+/** The next time regular hours start, at or after `from` (skips weekly holidays). */
+export function nextRegularOpening(shop: { openTime: string; holidays: string[] }, from = new Date()): Date | null {
+  const open = toMinutes(shop.openTime);
+  const ist = new Date(from.getTime() + 330 * 60_000);
+  const dayStart = Date.UTC(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate());
+  for (let d = 0; d <= 7; d++) {
+    const istOpen = dayStart + d * 86_400_000 + open * 60_000;
+    const at = new Date(istOpen - 330 * 60_000);
+    if (at >= from && !shop.holidays.includes(DAYS[new Date(istOpen).getUTCDay()])) return at;
+  }
+  return null;
+}
+
+/** "Sat, 26 Oct, 9:00 am" in India time, for messages. */
+export const formatIST = (d: Date) =>
+  d.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });

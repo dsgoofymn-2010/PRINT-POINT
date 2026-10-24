@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { minutesLabel, rupees, time12 } from '@/lib/format';
+import { minutesLabel, rupees, time12, when } from '@/lib/format';
 import { usePollWhenOffline, useQueueRoom, useSocketEvent } from '@/lib/realtime';
 import type { QueueInfo } from '@/lib/types';
 import { Badge, ErrorState, cn } from '../ui';
@@ -39,7 +39,12 @@ function Body({ q }: { q: QueueInfo }) {
           {q.hoursToday ? `Today ${time12(q.hoursToday.open)} – ${time12(q.hoursToday.close)}` : 'Closed today'}
         </span>
       </div>
-      {!q.acceptingRequests && q.withinHours && <p className="text-[16px] text-muted">The owner has paused new requests for now.</p>}
+      {!q.isOpen && q.nextOpenAt && (
+        <p className="text-[16px]">
+          Opens <span className="font-medium">{when(q.nextOpenAt)}</span>. You can book your order for then.
+        </p>
+      )}
+      {!q.isOpen && !q.nextOpenAt && <p className="text-[16px] text-muted">The shop hasn’t said when it opens again.</p>}
 
       <dl className="grid grid-cols-3 divide-x divide-line rounded-card border border-line bg-surface text-center">
         <div className="px-2 py-3">

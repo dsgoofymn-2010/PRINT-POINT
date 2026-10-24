@@ -125,7 +125,6 @@ export default function Login() {
           )}
           {mode === 'register' && (
             <>
-              <Segmented label="I am a" name="role" value={form.role} onChange={(r) => setForm((f) => ({ ...f, role: r }))} options={[{ value: 'CUSTOMER', label: 'Customer' }, { value: 'SHOP_OWNER', label: 'Shop owner' }]} />
               <Input label="Full name" autoComplete="name" value={form.name} onChange={set('name')} error={fieldErrors.name} />
               <Input label="Email" type="email" autoComplete="email" value={form.email} onChange={set('email')} error={fieldErrors.email} />
               <Input label="Mobile number" inputMode="numeric" autoComplete="tel" maxLength={10} value={form.mobile} onChange={set('mobile')} error={fieldErrors.mobile} />

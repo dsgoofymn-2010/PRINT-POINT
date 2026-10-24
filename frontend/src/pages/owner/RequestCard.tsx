@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { clock, fileSize, rupees, STATUS_LABEL } from '@/lib/format';
+import { clock, fileSize, rupees, STATUS_LABEL, when } from '@/lib/format';
+import { TimePicker, inMinutes } from '@/components/TimePicker';
 import type { IncomingRequest } from '@/lib/types';
 import { Alert, Badge, Button, cn } from '@/components/ui';
 import { Chips } from '@/components/chat/Bubbles';
@@ -16,13 +17,18 @@ export function minutesAgo(iso: string) {
 
 const DENY_REASONS = ['File unreadable', 'Shop busy', 'Out of colour ink', 'Out of paper', 'Closing soon'];
 const READY_IN = [10, 15, 30, 45, 60, 120];
+const BUSY_NOTES = ['Shop is busy right now', 'Long queue at the moment', 'Machine under repair'];
+/** The shop can ask to move an order until it starts printing. */
+const MOVABLE = ['REQUESTED', 'ACCEPTED', 'PAID'];
 
 const TONE = { REQUESTED: 'amber', ACCEPTED: 'brass', PAID: 'brass', PRINTING: 'brass', READY: 'green', COMPLETED: 'gray', DENIED: 'red', CANCELLED: 'red', REFUNDED: 'red' } as const;
 
 /** One incoming request with the single next action the shop can take. */
 export function RequestCard({ order, highlight, onlinePayment, defaultReadyMins }: { order: IncomingRequest; highlight: boolean; onlinePayment: boolean; defaultReadyMins: number }) {
   const qc = useQueryClient();
-  const [mode, setMode] = useState<'idle' | 'accept' | 'deny'>('idle');
+  const [mode, setMode] = useState<'idle' | 'accept' | 'deny' | 'time'>('idle');
+  const [newTime, setNewTime] = useState(() => inMinutes(60));
+  const [timeNote, setTimeNote] = useState(BUSY_NOTES[0]);
   const [readyIn, setReadyIn] = useState<number>(defaultReadyMins);
   const [reason, setReason] = useState('');
   const [code, setCode] = useState('');
@@ -107,6 +113,15 @@ export function RequestCard({ order, highlight, onlinePayment, defaultReadyMins 
           {order.estimatedReadyAt && ['ACCEPTED', 'PAID', 'PRINTING'].includes(order.status) && <span className="text-muted"> · promised by {clock(order.estimatedReadyAt)}</span>}
         </p>
         {order.status === 'DENIED' && order.denyReason && <p className="text-muted">Denied: {order.denyReason}</p>}
+        {order.scheduledFor && (
+          <p className="rounded-control bg-raised px-3 py-2">
+            <span className="text-muted">Booked for </span>
+            <span className="font-medium">{when(order.scheduledFor)}</span>
+          </p>
+        )}
+        {order.proposedTime && (
+          <Alert tone="amber">You asked to move this to {when(order.proposedTime)}. Waiting for the customer to answer.</Alert>
+        )}
       </div>
 
       {/* Actions */}
@@ -115,6 +130,39 @@ export function RequestCard({ order, highlight, onlinePayment, defaultReadyMins 
           <div className="flex flex-wrap gap-2">
             <Button variant="primary" size="lg" onClick={() => setMode('accept')}>Accept</Button>
             <Button variant="danger" size="lg" onClick={() => setMode('deny')}>Deny</Button>
+            <Button size="lg" onClick={() => setMode('time')}>Ask for another time</Button>
+          </div>
+        )}
+        {(order.status === 'ACCEPTED' || order.status === 'PAID') && mode === 'idle' && (
+          <Button size="lg" onClick={() => setMode('time')}>Ask for another time</Button>
+        )}
+        {MOVABLE.includes(order.status) && mode === 'time' && (
+          <div className="space-y-3">
+            <p className="font-medium">Too busy? Suggest a new time. The customer can agree or keep their time.</p>
+            <TimePicker
+              label="New time"
+              value={newTime}
+              min={new Date().toISOString()}
+              onChange={setNewTime}
+              quick={[
+                { label: 'In 30 min', iso: inMinutes(30) },
+                { label: 'In 1 hour', iso: inMinutes(60) },
+                { label: 'In 2 hours', iso: inMinutes(120) },
+              ]}
+            />
+            <Chips label="Message" value={timeNote} onPick={setTimeNote} options={BUSY_NOTES.map((r) => ({ value: r, label: r }))} />
+            <input
+              value={timeNote}
+              onChange={(e) => setTimeNote(e.target.value.slice(0, 200))}
+              placeholder="Message for the customer (optional)"
+              className="h-11 w-full rounded-control border border-control bg-surface px-3 text-[17px] placeholder:text-muted"
+            />
+            <div className="flex flex-wrap gap-2">
+              <Button variant="primary" size="lg" loading={act.isPending} onClick={() => run('new-time', { time: newTime, note: timeNote.trim() || null })}>
+                Send {when(newTime)}
+              </Button>
+              <Button size="lg" onClick={() => setMode('idle')}>Back</Button>
+            </div>
           </div>
         )}
         {order.status === 'REQUESTED' && mode === 'accept' && (
@@ -147,7 +195,7 @@ export function RequestCard({ order, highlight, onlinePayment, defaultReadyMins 
             </div>
           </div>
         )}
-        {order.status === 'ACCEPTED' && onlinePayment && <p className="text-muted">Waiting for the customer to pay online. You’ll be able to start printing once it’s paid.</p>}
+        {order.status === 'ACCEPTED' && onlinePayment && mode === 'idle' && <p className="text-muted">Waiting for the customer to pay online. You’ll be able to start printing once it’s paid.</p>}
         {order.status === 'ACCEPTED' && !onlinePayment && (
           <div className="flex flex-wrap items-center gap-3">
             <Button variant="primary" size="lg" loading={act.isPending} onClick={() => run('printing')}>Mark printing</Button>

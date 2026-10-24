@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api } from '@/lib/api';
-import { clock, dateTime, rupees, STATUS_LABEL } from '@/lib/format';
+import { clock, dateTime, rupees, STATUS_LABEL, when } from '@/lib/format';
 import { payForOrder } from '@/lib/razorpay';
 import type { OrderStatus, PrintRequest } from '@/lib/types';
 import { Alert, Badge, Button, cn } from '../ui';
@@ -29,7 +29,7 @@ const TONE: Partial<Record<OrderStatus, 'amber' | 'green' | 'red' | 'gray' | 'br
 function headline(o: PrintRequest): string {
   switch (o.status) {
     case 'REQUESTED':
-      return `Waiting for ${o.shop.name} to accept`;
+      return o.scheduledFor ? `Booked for ${when(o.scheduledFor)}. Waiting for ${o.shop.name} to accept` : `Waiting for ${o.shop.name} to accept`;
     case 'ACCEPTED':
       return o.onlinePayment ? 'Accepted. Pay now so the shop can start printing' : 'Accepted. Pay at the counter when you collect';
     case 'PAID':
@@ -58,6 +58,7 @@ export function StatusCard({ order, compact }: { order: PrintRequest; compact?: 
   const refresh = () => void qc.invalidateQueries({ queryKey: ['requests'] });
 
   const cancel = useMutation({ mutationFn: () => api.post(`/requests/${order.id}/cancel`), onSuccess: refresh });
+  const answer = useMutation({ mutationFn: (accept: boolean) => api.post(`/requests/${order.id}/new-time`, { accept }), onSuccess: refresh });
   const pay = useMutation({
     mutationFn: () => payForOrder(order.id),
     onSuccess: (r) => {
@@ -96,6 +97,30 @@ export function StatusCard({ order, compact }: { order: PrintRequest; compact?: 
               );
             })}
           </ol>
+        )}
+
+        {order.proposedTime && !ended && (
+          <div className="space-y-3 rounded-card border border-ink bg-raised p-4">
+            <p className="text-[17px]">
+              <span className="font-medium">{order.shop.name} is busy</span> and asked to move your order to{' '}
+              <span className="font-medium">{when(order.proposedTime)}</span>.
+            </p>
+            {order.proposedNote && <p className="text-[16px] text-muted">“{order.proposedNote}”</p>}
+            <div className="flex flex-wrap gap-2">
+              <Button variant="primary" size="lg" loading={answer.isPending && answer.variables === true} disabled={answer.isPending} onClick={() => answer.mutate(true)}>
+                OK, move it
+              </Button>
+              <Button size="lg" loading={answer.isPending && answer.variables === false} disabled={answer.isPending} onClick={() => answer.mutate(false)}>
+                Keep my time
+              </Button>
+            </div>
+            {answer.error && <Alert tone="red">{answer.error.message}</Alert>}
+          </div>
+        )}
+        {order.scheduledFor && !ended && order.status !== 'COMPLETED' && !order.proposedTime && (
+          <p className="text-[16px]">
+            Booked for <span className="font-medium">{when(order.scheduledFor)}</span>
+          </p>
         )}
 
         {order.status === 'DENIED' && (
