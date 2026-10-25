@@ -12,7 +12,7 @@ const variants: Record<Variant, string> = {
   danger: 'border border-control bg-surface text-negative hover:bg-raised disabled:opacity-50',
   brass: 'bg-brass text-brass-ink hover:brightness-95 active:brightness-90 disabled:opacity-50',
 };
-const sizes = { sm: 'h-8 px-3 text-[14px]', md: 'h-9 px-4 text-sm', lg: 'h-11 px-5 text-[15px]' };
+const sizes = { sm: 'h-8 px-3 text-[0.875rem]', md: 'h-9 px-4 text-sm', lg: 'h-11 px-5 text-[0.9375rem]' };
 const btnBase =
   'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-control font-medium transition-[background-color,opacity,transform] duration-150 active:translate-y-px disabled:cursor-not-allowed';
 
@@ -55,11 +55,11 @@ function FieldWrap({ label, hint, error, id, children }: { label?: string; hint?
       )}
       {children}
       {error ? (
-        <p id={`${id}-err`} className="text-[14px] text-negative" role="alert">
+        <p id={`${id}-err`} className="text-[0.875rem] text-negative" role="alert">
           {error}
         </p>
       ) : (
-        hint && <p className="text-[14px] text-muted">{hint}</p>
+        hint && <p className="text-[0.875rem] text-muted">{hint}</p>
       )}
     </div>
   );
@@ -236,9 +236,9 @@ export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: { valu
 export function Stat({ label, value, hint }: { label: string; value: ReactNode; hint?: ReactNode }) {
   return (
     <div className="px-5 py-4">
-      <p className="text-[14px] text-muted">{label}</p>
+      <p className="text-[0.875rem] text-muted">{label}</p>
       <p className="num mt-1 text-2xl font-medium leading-8">{value}</p>
-      {hint && <p className="mt-0.5 text-[14px] text-muted">{hint}</p>}
+      {hint && <p className="mt-0.5 text-[0.875rem] text-muted">{hint}</p>}
     </div>
   );
 }
@@ -252,8 +252,8 @@ export function PageTitle({ title, subtitle, action }: { title: string; subtitle
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
-        <h1 className="text-2xl font-semibold leading-8 tracking-[-0.01em]">{title}</h1>
-        {subtitle && <p className="mt-1 text-[15px] text-muted">{subtitle}</p>}
+        <h1 className="text-[1.25rem] font-semibold leading-8 tracking-[-0.01em] sm:text-2xl">{title}</h1>
+        {subtitle && <p className="mt-1 text-[0.9375rem] text-muted">{subtitle}</p>}
       </div>
       {action && <div className="flex flex-wrap gap-2">{action}</div>}
     </div>

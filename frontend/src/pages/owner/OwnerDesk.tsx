@@ -47,11 +47,11 @@ function OwnerLogin() {
   };
   return (
     <div className="mx-auto max-w-sm py-10">
-      <h1 className="display text-[48px]">Shop desk</h1>
-      <p className="mb-6 text-[17px] text-muted">Sign in to accept print requests for your shop.</p>
+      <h1 className="display text-[3rem]">Shop desk</h1>
+      <p className="mb-6 text-[1.0625rem] text-muted">Sign in to accept print requests for your shop.</p>
       <form onSubmit={submit} className="space-y-4">
-        <Input label="Email or mobile" autoComplete="username" value={identifier} onChange={(e) => setIdentifier(e.target.value)} className="h-11 text-[17px]" />
-        <Input label="Password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 text-[17px]" />
+        <Input label="Email or mobile" autoComplete="username" value={identifier} onChange={(e) => setIdentifier(e.target.value)} className="h-11 text-[1.0625rem]" />
+        <Input label="Password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 text-[1.0625rem]" />
         {login.error && <Alert tone="red">{login.error.message}</Alert>}
         <Button type="submit" variant="primary" size="lg" className="w-full" loading={login.isPending} disabled={!identifier || !password}>Sign in</Button>
       </form>
@@ -82,8 +82,7 @@ function Desk() {
   const [sound, setSound] = useState(false);
   const audio = useRef<AudioContext | null>(null);
   const known = useRef<Set<string> | null>(null);
-  const [shopId, setShopId] = useState<string | null>(null);
-  const shops = useQuery({ queryKey: ['owner-shops'], queryFn: () => api.get<{ shops: { id: string; name: string; area: string }[] }>('/shop/shops').then((r) => r.shops) });
+  const shopId: string | null = null;
   const shopParam = shopId ? `&shopId=${shopId}` : '';
 
   const q = useQuery({
@@ -168,20 +167,17 @@ function Desk() {
         </Alert>
       )}
 
-      {(shops.data?.length ?? 0) > 1 && (
-        <Tabs
-          value={shopId ?? d.shop.id}
-          onChange={(id) => {
-            known.current = null; // don't chime for requests that were already waiting at the other shop
-            setShopId(id);
-          }}
-          tabs={shops.data!.map((s) => ({ value: s.id, label: `${s.name}, ${s.area}` }))}
-        />
-      )}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="display text-[44px] leading-none sm:text-[56px]">{d.shop.name}</h1>
-          <p className="mt-2 text-[17px] text-muted">
+          <h1 className="text-[1.25rem] font-semibold leading-8 sm:text-2xl">Requests</h1>
+          <p className="mt-1 text-[1.125rem] font-medium">
+            {d.counts.pending > 0
+              ? `${d.counts.pending} ${d.counts.pending === 1 ? 'request is' : 'requests are'} waiting for you to accept or deny.`
+              : d.counts.ready > 0
+                ? `Nothing to accept. ${d.counts.ready} ready for pickup.`
+                : 'Nothing waiting. New requests appear here the moment they arrive.'}
+          </p>
+          <p className="mt-1 text-[1rem] text-muted">
             Hours {time12(d.shop.openTime)} – {time12(d.shop.closeTime)}
             {!d.shop.withinHours && ' · outside opening hours'}
             {!d.shop.acceptingRequests && (d.shop.reopensAt ? ` · opens again ${when(d.shop.reopensAt)}` : ' · no reopening time set')}
@@ -195,8 +191,8 @@ function Desk() {
             onClick={() => (d.shop.acceptingRequests ? setClosing(true) : toggleOpen.mutate({ open: true }))}
             disabled={toggleOpen.isPending}
             className={cn(
-              'inline-flex min-h-[44px] items-center gap-3 rounded-control border px-4 text-[17px] font-medium',
-              d.shop.acceptingRequests ? 'border-positive text-positive' : 'border-negative text-negative',
+              'inline-flex min-h-[44px] items-center gap-3 rounded-control border px-4 text-[1.0625rem] font-medium',
+              d.shop.acceptingRequests ? 'border-positive text-ink' : 'border-negative text-ink',
             )}
           >
             <span className={cn('h-3 w-3 rounded-full', d.shop.acceptingRequests ? 'bg-positive' : 'bg-negative')} aria-hidden="true" />
@@ -212,8 +208,8 @@ function Desk() {
       </div>
       {closing && (
         <div className="space-y-3 rounded-card border border-line bg-surface p-4">
-          <p className="text-[17px] font-medium">When will you open again?</p>
-          <p className="text-[16px] text-muted">Customers see this time and can book their orders for it. The shop opens itself again at that time.</p>
+          <p className="text-[1.0625rem] font-medium">When will you open again?</p>
+          <p className="text-[1rem] text-muted">Customers see this time and can book their orders for it. The shop opens itself again at that time.</p>
           <TimePicker
             label="Opens again at"
             value={reopenAt}
@@ -241,13 +237,13 @@ function Desk() {
       <dl className="grid grid-cols-2 divide-line overflow-hidden rounded-card border border-line bg-surface sm:grid-cols-5 sm:divide-x">
         {counters.map((c, i) => (
           <div key={c.label} className={cn('px-4 py-3', i > 1 && 'max-sm:border-t', i % 2 === 1 && 'max-sm:border-l', i === 4 && 'max-sm:col-span-2')}>
-            <dt className="text-[15px] text-muted">{c.label}</dt>
-            <dd className={cn('num display mt-1 text-[40px] leading-none', c.lead && c.value > 0 && 'text-data')}>{c.value}</dd>
+            <dt className="text-[0.9375rem] text-muted">{c.label}</dt>
+            <dd className={cn('num mt-1 text-[1.75rem] font-semibold leading-none', c.lead && c.value > 0 && 'text-data')}>{c.value}</dd>
           </div>
         ))}
       </dl>
 
-      <Tabs value={scope} onChange={setScope} tabs={[{ value: 'active', label: 'Incoming & in progress' }, { value: 'done', label: 'Done (7 days)' }]} />
+      <Tabs value={scope} onChange={setScope} tabs={[{ value: 'active', label: 'Incoming & in progress' }, { value: 'done', label: 'Done, last 7 days' }]} />
 
       {d.orders.length === 0 ? (
         <EmptyState
@@ -255,7 +251,7 @@ function Desk() {
           body={scope === 'active' ? (d.shop.isOpen ? 'New requests appear here instantly.' : 'Your shop is closed to customers. Open it to receive requests.') : undefined}
         />
       ) : (
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid items-start gap-3 md:grid-cols-2 2xl:grid-cols-3">
           {d.orders.map((o) => (
             <div key={o.id} onClick={() => fresh.has(o.id) && setFresh((s) => new Set([...s].filter((x) => x !== o.id)))}>
               <RequestCard order={o} highlight={fresh.has(o.id)} onlinePayment={d.onlinePayment} defaultReadyMins={d.shop.estimatedPickupMins} />
@@ -264,7 +260,7 @@ function Desk() {
         </div>
       )}
 
-      <p className="text-[15px] text-muted">
+      <p className="text-[0.9375rem] text-muted">
         Customer phone numbers are hidden except the last 4 digits. Files are deleted automatically after pickup, or 24 hours at most.
       </p>
     </div>

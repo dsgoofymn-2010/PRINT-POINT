@@ -33,7 +33,7 @@ export function TimePicker({
                 onClick={() => onChange(q.iso)}
                 aria-pressed={active}
                 className={cn(
-                  'min-h-[40px] rounded-control border px-3 text-[15px]',
+                  'min-h-[40px] rounded-control border px-3 text-[0.9375rem]',
                   active ? 'border-ink bg-ink text-on-primary' : 'border-line bg-surface hover:bg-active',
                 )}
               >
@@ -44,16 +44,16 @@ export function TimePicker({
         </div>
       )}
       <label className="block">
-        <span className="mb-1 block text-[15px] font-medium">{label}</span>
+        <span className="mb-1 block text-[0.9375rem] font-medium">{label}</span>
         <input
           type="datetime-local"
           value={toLocalInput(new Date(value))}
           min={min ? toLocalInput(new Date(min)) : undefined}
           onChange={(e) => e.target.value && onChange(new Date(e.target.value).toISOString())}
-          className="h-11 w-full max-w-xs rounded-control border border-control bg-surface px-3 text-[17px]"
+          className="h-11 w-full max-w-xs rounded-control border border-control bg-surface px-3 text-[1.0625rem]"
         />
       </label>
-      <p className="text-[15px] text-muted">{when(value)}</p>
+      <p className="text-[0.9375rem] text-muted">{when(value)}</p>
     </div>
   );
 }

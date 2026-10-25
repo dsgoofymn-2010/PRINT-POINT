@@ -6,6 +6,7 @@ import { usePollWhenOffline, useSocketEvent } from '@/lib/realtime';
 import type { PrintRequest } from '@/lib/types';
 import { EmptyState, ErrorState } from '../ui';
 import { StatusCard } from './StatusCard';
+import { PastRequest } from './PastRequest';
 
 const ACTIVE = ['REQUESTED', 'ACCEPTED', 'PAID', 'PRINTING', 'READY'];
 
@@ -45,7 +46,7 @@ export function MyRequests({ onNew }: { onNew: () => void }) {
         title="No requests yet"
         body="Send your first print request and it will show up here with live status."
         action={
-          <button onClick={onNew} className="min-h-[44px] rounded-control bg-primary px-5 text-[17px] font-medium text-on-primary">
+          <button onClick={onNew} className="min-h-[44px] rounded-control bg-primary px-5 text-[1.0625rem] font-medium text-on-primary">
             Start a request
           </button>
         }
@@ -55,13 +56,15 @@ export function MyRequests({ onNew }: { onNew: () => void }) {
   return (
     <div className="space-y-8">
       <section className="space-y-3">
-        <h2 className="display text-[30px]">Active</h2>
-        {active.length ? active.map((o) => <StatusCard key={o.id} order={o} />) : <p className="text-[17px] text-muted">Nothing in progress.</p>}
+        <h2 className="display text-[1.875rem]">Active</h2>
+        {active.length ? active.map((o) => <StatusCard key={o.id} order={o} />) : <p className="text-[1.0625rem] text-muted">Nothing in progress.</p>}
       </section>
       {past.length > 0 && (
         <section className="space-y-3">
-          <h2 className="display text-[30px]">Past</h2>
-          {past.map((o) => <StatusCard key={o.id} order={o} compact />)}
+          <h2 className="display text-[1.875rem]">Past</h2>
+          <ul className="space-y-2">
+            {past.map((o) => <PastRequest key={o.id} order={o} />)}
+          </ul>
         </section>
       )}
     </div>

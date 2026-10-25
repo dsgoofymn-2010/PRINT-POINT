@@ -61,7 +61,7 @@ export function Bars({ data, format, height = 200, ariaLabel }: { data: BarDatum
         })}
       </svg>
       {hover !== null && (
-        <figcaption className="num pointer-events-none absolute right-0 top-0 rounded-control bg-surface px-2 py-1 text-[14px]">
+        <figcaption className="num pointer-events-none absolute right-0 top-0 rounded-control bg-surface px-2 py-1 text-[0.875rem]">
           {data[hover].label}: {format(data[hover].value)}
         </figcaption>
       )}

@@ -126,8 +126,8 @@ export function ChatFlow() {
             <Button variant="primary" size="lg" disabled={!canContinueFiles} onClick={() => go('color')}>
               Continue with {files.ready.length} file{files.ready.length === 1 ? '' : 's'}
             </Button>
-            {files.busy && <span className="text-[16px] text-muted">Waiting for uploads to finish…</span>}
-            {!files.busy && files.needPages.length > 0 && <span className="text-[16px] text-muted">Enter the page count above to continue.</span>}
+            {files.busy && <span className="text-[1rem] text-muted">Waiting for uploads to finish…</span>}
+            {!files.busy && files.needPages.length > 0 && <span className="text-[1rem] text-muted">Enter the page count above to continue.</span>}
           </div>
         )}
       </Bot>
@@ -208,7 +208,7 @@ export function ChatFlow() {
                     }
                   }}
                 >
-                  <label htmlFor="copies-other" className="text-[16px] text-muted">Other</label>
+                  <label htmlFor="copies-other" className="text-[1rem] text-muted">Other</label>
                   <input
                     id="copies-other"
                     type="number"
@@ -217,7 +217,7 @@ export function ChatFlow() {
                     max={100}
                     value={customCopies}
                     onChange={(e) => setCustomCopies(e.target.value)}
-                    className="num h-11 w-24 rounded-control border border-control bg-surface px-3 text-[17px]"
+                    className="num h-11 w-24 rounded-control border border-control bg-surface px-3 text-[1.0625rem]"
                   />
                   <Button type="submit" size="lg" disabled={!customCopies || Number(customCopies) < 1 || Number(customCopies) > 100}>OK</Button>
                 </form>
@@ -267,7 +267,7 @@ export function ChatFlow() {
                   onChange={(e) => setNoteDraft(e.target.value.slice(0, 500))}
                   rows={2}
                   placeholder="e.g. Print pages 1–3 only in colour, staple each set"
-                  className="w-full rounded-control border border-control bg-surface px-3 py-2 text-[17px] placeholder:text-muted focus:border-ink focus:outline-none"
+                  className="w-full rounded-control border border-control bg-surface px-3 py-2 text-[1.0625rem] placeholder:text-muted focus:border-ink focus:outline-none"
                 />
                 <div className="flex flex-wrap gap-2">
                   <Button variant="primary" size="lg" disabled={!noteDraft.trim()} onClick={() => { setNote(noteDraft.trim()); go('review'); }}>Add note</Button>
@@ -319,7 +319,7 @@ export function ChatFlow() {
                   <Button
                     variant="brass"
                     size="lg"
-                    className="min-h-[52px] px-6 text-[18px]"
+                    className="min-h-[52px] px-6 text-[1.125rem]"
                     loading={send.isPending}
                     disabled={!quote.data || !quote.data.quote.meetsMinimum || (!shopOpen && !bookTime)}
                     onClick={() => send.mutate()}
@@ -327,7 +327,7 @@ export function ChatFlow() {
                     {shopOpen || !bookTime ? 'Send request to shop' : `Book for ${when(bookTime)}`}
                   </Button>
                 </div>
-                <p className="text-[15px] text-muted">
+                <p className="text-[0.9375rem] text-muted">
                   You pay only after the shop accepts. Your files are deleted after pickup, or 24 hours at most.
                 </p>
               </>

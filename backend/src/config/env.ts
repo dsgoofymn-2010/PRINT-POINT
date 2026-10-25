@@ -26,8 +26,9 @@ const schema = z.object({
   REQUEST_RATE_LIMIT: z.coerce.number().int().min(1).max(1000).default(10),
   SMS_PROVIDER: z.enum(['console']).default('console'),
   DEV_OTP: z.string().regex(/^\d{6}$/).default('123456'),
-  // Test mode: skip login and switch roles with one click. Never works in production.
-  DEV_SKIP_LOGIN: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
+  // Demo site: nobody signs in; visitors switch between customer, shop owner and admin with one click.
+  // On by default (this is a sample site). Set to false to require real sign-in.
+  DEV_SKIP_LOGIN: z.enum(['true', 'false']).default('true').transform((v) => v === 'true'),
   // Which shop this app serves (its slug). Empty = the oldest approved shop.
   SHOP_SLUG: z.string().trim().default(''),
   DEFAULT_COMMISSION_PERCENT: z.coerce.number().min(0).max(100).default(5),
@@ -45,4 +46,4 @@ export const corsOrigins = env.CORS_ORIGINS.split(',').map((o) => o.trim()).filt
 // The .env.example placeholders ("rzp_test_xxxx…") count as "not configured".
 const realKey = (v: string) => Boolean(v) && !/x{6,}/i.test(v);
 export const razorpayConfigured = realKey(env.RAZORPAY_KEY_ID) && realKey(env.RAZORPAY_KEY_SECRET);
-export const skipLogin = env.DEV_SKIP_LOGIN && !isProd;
+export const skipLogin = env.DEV_SKIP_LOGIN;

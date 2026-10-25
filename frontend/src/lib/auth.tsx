@@ -4,8 +4,8 @@ import { api, refreshSession, setAccessToken, setOnAuthLost } from './api';
 import { resetRealtimeIdentity } from './realtime';
 import type { Role, User } from './types';
 
-/** Test mode: skip login (set VITE_SKIP_LOGIN=true in frontend/.env). Never on in production builds. */
-export const SKIP_LOGIN = import.meta.env.DEV && import.meta.env.VITE_SKIP_LOGIN === 'true';
+/** Demo site: no sign-in, everyone can switch roles. On unless VITE_SKIP_LOGIN=false. */
+export const SKIP_LOGIN = import.meta.env.VITE_SKIP_LOGIN !== 'false';
 
 interface AuthState {
   user: User | null;
@@ -26,13 +26,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setOnAuthLost(() => setUser(null));
     // Restore the session from the httpOnly refresh cookie on page load.
+    // In test mode, the page you open decides who you're signed in as.
+    const path = window.location.pathname;
+    const wantRole: Role = path.startsWith('/admin') ? 'ADMIN' : path.startsWith('/owner') || path.startsWith('/shop') ? 'SHOP_OWNER' : 'CUSTOMER';
     refreshSession()
       .then(async (ok) => {
-        if (ok) {
-          setUser((await api.get<{ user: User }>('/auth/me')).user);
+        const me = ok ? (await api.get<{ user: User }>('/auth/me')).user : null;
+        if (me && (!SKIP_LOGIN || me.role === wantRole)) {
+          setUser(me);
           resetRealtimeIdentity();
         } else if (SKIP_LOGIN) {
-          const data = await api.post<{ accessToken: string; user: User }>('/auth/dev-login', { role: 'CUSTOMER' });
+          const data = await api.post<{ accessToken: string; user: User }>('/auth/dev-login', { role: wantRole });
           setAccessToken(data.accessToken);
           setUser(data.user);
           resetRealtimeIdentity();

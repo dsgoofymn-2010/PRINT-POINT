@@ -7,7 +7,7 @@ export function Bot({ children, className }: { children: ReactNode; className?: 
   return (
     <div className={cn('flex items-start gap-3', className)}>
       <Mark className="mt-1 h-7 w-7" />
-      <div className="min-w-0 max-w-[40rem] flex-1 space-y-3 text-[18px] leading-[28px]">{children}</div>
+      <div className="min-w-0 max-w-[40rem] flex-1 space-y-3 text-[1.125rem] leading-[28px]">{children}</div>
     </div>
   );
 }
@@ -16,10 +16,10 @@ export function Bot({ children, className }: { children: ReactNode; className?: 
 export function Me({ children, onEdit }: { children: ReactNode; onEdit?: () => void }) {
   return (
     <div className="flex justify-end">
-      <div className="max-w-[85%] rounded-card rounded-br-none bg-primary px-4 py-2.5 text-[17px] text-on-primary">
+      <div className="max-w-[85%] rounded-card rounded-br-none bg-primary px-4 py-2.5 text-[1.0625rem] text-on-primary">
         {children}
         {onEdit && (
-          <button onClick={onEdit} className="ml-3 text-[15px] underline underline-offset-2 opacity-80 hover:opacity-100">
+          <button onClick={onEdit} className="ml-3 text-[0.9375rem] underline underline-offset-2 opacity-80 hover:opacity-100">
             Change
           </button>
         )}
@@ -50,12 +50,12 @@ export function Chips<T extends string | number>({
           aria-pressed={value === o.value}
           onClick={() => onPick(o.value)}
           className={cn(
-            'min-h-[44px] rounded-control border px-4 py-2 text-left text-[17px] transition-colors disabled:cursor-not-allowed disabled:opacity-45',
+            'min-h-[44px] rounded-control border px-4 py-2 text-left text-[1.0625rem] transition-colors disabled:cursor-not-allowed disabled:opacity-45',
             value === o.value ? 'border-ink bg-brass text-brass-ink' : 'border-control bg-surface text-ink hover:border-ink',
           )}
         >
           <span className="block font-medium">{o.label}</span>
-          {o.hint && <span className="block text-[15px] text-muted">{o.hint}</span>}
+          {o.hint && <span className="block text-[0.9375rem] text-muted">{o.hint}</span>}
         </button>
       ))}
     </div>

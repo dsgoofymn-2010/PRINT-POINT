@@ -56,40 +56,39 @@ show code at counter ───────────────────�
 | Payments | Razorpay Standard Checkout + webhooks |
 | Tests | Vitest + Supertest |
 
+## Project layout
+
+The frontend and backend are two separate projects, each with its own `package.json`, `package-lock.json` and `node_modules`:
+
+| Folder | What | Deployed to |
+|---|---|---|
+| `frontend/` | React + Vite web app | Vercel (Root Directory `frontend`) |
+| `backend/` | Express API, Prisma, `Dockerfile` | Render (Root Directory `backend`, Docker) |
+| `docker-compose.yml` | Local PostgreSQL (and optionally the API) | local only |
+
 ## Run it locally
 
-Prerequisites: Node.js 20+ and Docker (for PostgreSQL), or your own PostgreSQL 14+.
+Prerequisites: Node.js 20+ and Docker Desktop (for PostgreSQL).
 
 ```bash
+docker compose up -d db                   # PostgreSQL in Docker
+
+cd backend
 npm install
-cp backend/.env.example backend/.env      # set JWT secrets; Razorpay test keys are optional
-npm run db:up                           # PostgreSQL in Docker
-npm run db:deploy                       # apply migrations
-npm run db:seed                         # demo shops, owners, customer
-npm run dev                             # API on :4000, web app on :5173
+cp .env.example .env                      # set JWT secrets; Razorpay test keys are optional
+npm run db:deploy                         # apply migrations
+npm run db:seed                           # the PrintPoint shop, its owner, an admin and a customer
+npm run dev                               # API on :4000
+
+# in a second terminal
+cd frontend
+npm install
+npm run dev                               # web app on :5173
 ```
 
-**Try the customer side:** open <http://localhost:5173>, drop a PDF in the chat, enter any valid mobile number (e.g. `9876543210`) and the development OTP `123456`.
+Open <http://localhost:5173>. It's a demo site: there's no sign-in, and the **View as** bar at the bottom switches between Customer, Shop owner and Admin.
 
-**Try the owner side:** in a second browser (or a private window) open <http://localhost:5173/owner> and sign in as `owner1@printpoint.test` / `Password@123`. Send a request to *Sri Murugan Xerox* from the customer window and watch it appear on the desk.
-
-### Run with Docker (whole stack)
-
-Runs the API + built frontend and PostgreSQL in containers, with migrations applied on start. No local Node or Postgres needed.
-
-```bash
-cp backend/.env.example backend/.env   # optional but recommended: set JWT secrets + Razorpay keys
-npm run docker:up                    # docker compose up -d --build
-# → app at http://localhost:4000 (API serves the built web app)
-
-npm run docker:logs                  # follow app logs
-npm run docker:down                  # stop and remove containers
-```
-
-`backend/.env` is optional here: without it, compose falls back to local DB credentials, `http://localhost:4000` URLs, and **dev-only JWT secrets**. That is fine for a quick local look, but set real `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` (and Razorpay keys) in `backend/.env` before any shared or production deploy — the server refuses to boot without valid JWT secrets. Demo data seeding needs dev dependencies, so run `npm install && npm run db:seed` from your machine against the exposed DB port (5432), not inside the container.
-
-
-Other scripts: `npm test`, `npm run typecheck`, `npm run build`, `npm start` (serves API + built frontend on port 4000).
+Other scripts, run inside `backend/` or `frontend/`: `npm test` (backend), `npm run typecheck`, `npm run build`.
 
 ### Seed logins
 

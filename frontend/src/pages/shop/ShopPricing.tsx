@@ -55,7 +55,7 @@ export default function ShopPricing() {
   const rules = useQuery({ queryKey: ['pricing'], queryFn: () => api.get<{ rules: PricingRule[] }>('/shop/pricing') });
   const [selected, setSelected] = useState<string | 'new' | null>(null);
   const [form, setForm] = useState<Form | null>(null);
-  const [pct, setPct] = useState(10);
+  const [pct, setPct] = useState(0);
   const [preview, setPreview] = useState<{ pages: number; settings: PrintSettings }>({ pages: 20, settings: { ...PREVIEW_SETTINGS } });
 
   useEffect(() => {
@@ -87,9 +87,10 @@ export default function ShopPricing() {
     },
   });
   const bulk = useMutation({
-    mutationFn: () => api.post<{ rule: PricingRule }>(`/shop/pricing/${selected}/bulk`, { percent: pct, scope: 'PER_PAGE' }),
+    mutationFn: () => api.post<{ rule: PricingRule }>(`/shop/pricing/${selected}/bulk`, { percent: pct, scope: 'ALL' }),
     onSuccess: (r) => {
       setForm(toForm(r.rule));
+      setPct(0);
       refresh();
     },
   });
@@ -109,7 +110,7 @@ export default function ShopPricing() {
 
   return (
     <div>
-      <PageTitle title="Pricing" subtitle="Changes apply to new orders only. Paid orders keep the price they were charged." />
+      <PageTitle title="Price list" subtitle="Changes apply to new orders only. Paid orders keep the price they were charged." />
       <div className="mb-4 flex flex-wrap gap-2">
         {rules.data?.rules.map((r) => (
           <button key={r.id} onClick={() => { setSelected(r.id); setForm(toForm(r)); }} className={`rounded-full border px-3 py-1.5 text-sm ${selected === r.id ? 'border-ink bg-active ' : 'border-line '}`}>
@@ -142,10 +143,27 @@ export default function ShopPricing() {
           </form>
           {current && (
             <div className="mt-6 border-t border-line pt-4">
-              <h3 className="mb-2 font-semibold">Bulk update per-page prices</h3>
-              <div className="flex items-end gap-2">
-                <Input label="Change by %" type="number" value={pct} onChange={(e) => setPct(Number(e.target.value))} hint="Use a negative number to reduce prices" />
-                <Button type="button" variant="secondary" loading={bulk.isPending} onClick={() => bulk.mutate()}>Apply</Button>
+              <div className="flex items-baseline justify-between gap-3">
+                <label htmlFor="overall-pct" className="font-semibold">Change all prices</label>
+                <span className={`num text-[1.25rem] font-semibold ${pct > 0 ? 'text-positive' : pct < 0 ? 'text-negative' : 'text-muted'}`}>{pct > 0 ? '+' : ''}{pct}%</span>
+              </div>
+              <input
+                id="overall-pct"
+                type="range"
+                min={-50}
+                max={50}
+                step={5}
+                value={pct}
+                onChange={(e) => setPct(Number(e.target.value))}
+                className="mt-3 h-2 w-full cursor-pointer accent-[rgb(var(--primary))]"
+              />
+              <div className="mt-1 flex justify-between text-xs text-muted"><span>−50%</span><span>0</span><span>+50%</span></div>
+              <p className="mt-2 text-sm text-muted">
+                B/W single becomes {rupees(Math.round((form.bwSingle * (100 + pct)) / 100))} a page, colour single {rupees(Math.round((form.colorSingle * (100 + pct)) / 100))}. Moves every price on this list, including binding and lamination.
+              </p>
+              <div className="mt-3 flex gap-2">
+                <Button type="button" variant="primary" disabled={pct === 0} loading={bulk.isPending} onClick={() => bulk.mutate()}>Apply {pct > 0 ? '+' : ''}{pct}%</Button>
+                {pct !== 0 && <Button type="button" variant="secondary" onClick={() => setPct(0)}>Reset</Button>}
               </div>
             </div>
           )}

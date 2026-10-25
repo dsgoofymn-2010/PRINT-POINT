@@ -54,24 +54,24 @@ export function PhoneStep() {
       {!sent ? (
         <form onSubmit={sendCode} className="flex flex-wrap items-end gap-2">
           <div className="w-full max-w-[16rem]">
-            <Input label="Mobile number" inputMode="numeric" autoComplete="tel-national" maxLength={10} placeholder="98765 43210" value={mobile} onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))} className="h-11 text-[17px]" />
+            <Input label="Mobile number" inputMode="numeric" autoComplete="tel-national" maxLength={10} placeholder="98765 43210" value={mobile} onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))} className="h-11 text-[1.0625rem]" />
           </div>
           <Button type="submit" variant="primary" size="lg" loading={busy}>Send code</Button>
         </form>
       ) : (
         <form onSubmit={verify} className="space-y-3">
-          <p className="text-[17px]">
+          <p className="text-[1.0625rem]">
             We sent a 6-digit code to <span className="num font-medium">{mobile}</span>.{' '}
             <button type="button" className="underline underline-offset-2" onClick={() => { setSent(false); setOtp(''); setNeedsName(false); }}>Change number</button>
           </p>
           {hint && <Alert tone="amber">{hint}</Alert>}
           <div className="flex flex-wrap items-end gap-2">
             <div className="w-full max-w-[10rem]">
-              <Input label="Code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} className="num h-11 text-[17px] tracking-[0.3em]" />
+              <Input label="Code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} className="num h-11 text-[1.0625rem] tracking-[0.3em]" />
             </div>
             {needsName && (
               <div className="w-full max-w-[16rem]">
-                <Input label="Your name (first time here)" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 text-[17px]" />
+                <Input label="Your name (first time here)" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 text-[1.0625rem]" />
               </div>
             )}
             <Button type="submit" variant="primary" size="lg" loading={busy} disabled={otp.length !== 6 || (needsName && name.trim().length < 2)}>

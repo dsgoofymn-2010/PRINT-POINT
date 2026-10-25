@@ -10,7 +10,7 @@ const PAGES: Record<string, { title: string; body: ReactNode }> = {
     title: 'About PrintPoint',
     body: (
       <>
-        <p>PrintPoint connects students and office users with neighbourhood xerox and print shops. Send your documents to a shop, see the exact price, pay once the shop accepts and collect your prints with a pickup code.</p>
+        <p>PrintPoint is a xerox and print shop in Chennai. Send us your documents online, see the exact price, pay once the shop accepts and collect your prints with a pickup code.</p>
         <p>Shop owners get a live desk to accept or decline requests, open files securely and keep customers updated.</p>
       </>
     ),

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { Layout, RequireAuth } from './components/Layout';
+import { SKIP_LOGIN } from './lib/auth';
 import { Loading } from './components/ui';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -27,7 +28,7 @@ export default function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="login" element={<Login />} />
+          <Route path="login" element={SKIP_LOGIN ? <Navigate to="/" replace /> : <Login />} />
           <Route path="owner" element={<OwnerDesk />} />
           <Route path="orders/:id" element={<OldOrderLink />} />
           <Route path="shops/*" element={<Navigate to="/" replace />} />

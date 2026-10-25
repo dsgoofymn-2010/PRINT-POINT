@@ -5,19 +5,17 @@ import { api } from '@/lib/api';
 import { dateTime, rupees, rupeesShort, STATUS_LABEL } from '@/lib/format';
 import type { OrderStatus, Payment, Refund, Role } from '@/lib/types';
 import { StatusBadge } from '@/components/StatusTimeline';
-import { Alert, Badge, Button, Card, EmptyState, ErrorState, Input, KpiStrip, Loading, PageTitle, Select, Stat } from '@/components/ui';
+import { Alert, Badge, Button, Card, EmptyState, ErrorState, Input, KpiStrip, Loading, PageTitle, Stat } from '@/components/ui';
 
-type Tab = 'overview' | 'shops' | 'users' | 'orders' | 'payments' | 'refunds' | 'fraud' | 'settings' | 'audit';
+type Tab = 'overview' | 'users' | 'orders' | 'payments' | 'refunds' | 'fraud' | 'audit';
 
 const TITLES: Record<Tab, [string, string]> = {
-  overview: ['Overview', 'Shops waiting for approval and money moving through the platform'],
-  shops: ['Shops', 'Approve new shops; suspend ones that break the rules'],
-  users: ['People', 'Customers, shop owners and admins'],
-  orders: ['Orders', 'Every order on the platform, newest first'],
+  overview: ['Overview', 'How PrintPoint is doing'],
+  users: ['People', 'Customers and staff'],
+  orders: ['Orders', 'Every PrintPoint order, newest first'],
   payments: ['Payments', 'Razorpay payments and their status'],
   refunds: ['Refunds', 'Money returned to customers'],
   fraud: ['Fraud checks', 'Signals from the last 7 days, for review by hand'],
-  settings: ['Commission', 'What PrintPoint keeps from each paid order'],
   audit: ['Audit log', 'Every admin action, newest first'],
 };
 
@@ -29,13 +27,11 @@ export default function AdminDashboard() {
     <div>
       <PageTitle title={title} subtitle={subtitle} />
       {tab === 'overview' && <Overview />}
-      {tab === 'shops' && <Shops />}
       {tab === 'users' && <Users />}
       {tab === 'orders' && <Orders />}
       {tab === 'payments' && <Payments />}
       {tab === 'refunds' && <Refunds />}
       {tab === 'fraud' && <Fraud />}
-      {tab === 'settings' && <Settings />}
       {tab === 'audit' && <Audit />}
     </div>
   );
@@ -51,63 +47,56 @@ function Overview() {
   const a = q.data!;
   return (
     <div className="space-y-4">
-      {a.pendingShops > 0 && (
-        <Alert tone="amber">
-          {a.pendingShops} {a.pendingShops === 1 ? 'shop is' : 'shops are'} waiting for approval. <a className="font-medium underline" href="/admin?tab=shops">Review shops</a>
-        </Alert>
-      )}
-      <KpiStrip cols={3}>
-        <Stat label="Paid order value" value={rupeesShort(a.gmv)} hint={`${a.paidOrders} paid orders, all time`} />
-        <Stat label="Commission earned" value={rupeesShort(a.commission)} />
+      {(() => {
+        const n = (st: OrderStatus) => a.byStatus.find((b) => b.status === st)?.count ?? 0;
+        const waiting = n('REQUESTED');
+        const inShop = n('ACCEPTED') + n('PAID') + n('PRINTING') + n('READY');
+        return (
+          <p className="text-[1.125rem] font-medium">
+            {waiting > 0 ? `${waiting} ${waiting === 1 ? 'request is' : 'requests are'} waiting for the shop to accept.` : 'No requests waiting.'}{' '}
+            {inShop > 0 ? `${inShop} in progress at the counter.` : ''}{' '}
+            <a className="underline underline-offset-2" href="/admin?tab=orders">See orders</a>
+          </p>
+        );
+      })()}
+      <KpiStrip cols={4}>
+        <Stat label="Takings" value={rupeesShort(a.gmv)} hint="Paid orders, all time" />
+        <Stat label="Paid orders" value={a.paidOrders} />
         <Stat label="Refunded" value={rupeesShort(a.refunded)} />
-      </KpiStrip>
-      <KpiStrip cols={3}>
-        <Stat label="Live shops" value={a.shops} />
-        <Stat label="Waiting for approval" value={a.pendingShops} />
         <Stat label="People" value={a.users} />
       </KpiStrip>
+      <div className="grid items-start gap-4 lg:grid-cols-[3fr_2fr]">
+      <LatestOrders />
       <Card title="Orders by status">
-        <ul className="grid gap-x-8 text-sm sm:grid-cols-3">
+        <ul className="text-sm">
           {a.byStatus.map((b) => (
             <li key={b.status} className="flex justify-between border-t border-rule py-2.5"><span className="text-muted">{STATUS_LABEL[b.status]}</span><span className="num">{b.count}</span></li>
           ))}
         </ul>
       </Card>
+      </div>
     </div>
   );
 }
 
-interface AdminShop { id: string; name: string; area: string; city: string; status: string; createdAt: string; owner: { name: string; email: string | null; mobile: string | null }; _count: { orders: number } }
-
-function Shops() {
-  const qc = useQueryClient();
-  const [status, setStatus] = useState('PENDING');
-  const q = useQuery({ queryKey: ['admin-shops', status], queryFn: () => api.get<{ shops: AdminShop[]; total: number }>(`/admin/shops${status ? `?status=${status}` : ''}`) });
-  const act = useMutation({
-    mutationFn: ({ id, action }: { id: string; action: 'approve' | 'reject' | 'suspend' }) => {
-      const reason = action === 'approve' ? undefined : prompt(`Reason to ${action}?`) ?? undefined;
-      return api.patch(`/admin/shops/${id}/${action}`, { reason });
-    },
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ['admin-shops'] }),
+function LatestOrders() {
+  const q = useQuery({
+    queryKey: ['admin-orders', ''],
+    queryFn: () => api.get<{ orders: { id: string; orderNumber: string | null; status: OrderStatus; total: number; createdAt: string; customer: { name: string } }[]; total: number }>('/admin/orders?q='),
   });
   return (
-    <Card>
-      <div className="mb-3 w-48">
-        <Select label="Status" value={status} onChange={(e) => setStatus(e.target.value)} options={[{ value: '', label: 'All' }, { value: 'PENDING', label: 'Pending' }, { value: 'APPROVED', label: 'Approved' }, { value: 'SUSPENDED', label: 'Suspended' }, { value: 'REJECTED', label: 'Rejected' }]} />
-      </div>
-      {act.error && <ErrorState error={act.error} />}
-      {q.isLoading ? <Loading /> : !q.data?.shops.length ? <EmptyState title="No shops" /> : (
-        <ul className="divide-y divide-line">
-          {q.data.shops.map((s) => (
-            <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
-              <div>
-                <p className="font-medium">{s.name} <Badge tone={s.status === 'APPROVED' ? 'green' : s.status === 'PENDING' ? 'amber' : 'red'}>{s.status}</Badge></p>
-                <p className="text-sm text-muted">{s.area}, {s.city} · {s.owner.name} ({s.owner.mobile ?? s.owner.email}) · {s._count.orders} orders · joined {dateTime(s.createdAt)}</p>
+    <Card title="Latest orders" action={<a className="text-sm underline underline-offset-2" href="/admin?tab=orders">View all{q.data ? ` ${q.data.total}` : ''}</a>}>
+      {q.isLoading ? <Loading rows={3} /> : !q.data?.orders.length ? <p className="text-sm text-muted">No orders yet.</p> : (
+        <ul className="divide-y divide-rule text-sm">
+          {q.data.orders.slice(0, 5).map((o) => (
+            <li key={o.id} className="flex items-center justify-between gap-3 py-2.5">
+              <div className="min-w-0">
+                <p className="truncate font-medium">{o.customer.name}</p>
+                <p className="text-muted">{o.orderNumber ?? 'Unpaid'} · {dateTime(o.createdAt)}</p>
               </div>
-              <div className="flex gap-2">
-                {s.status !== 'APPROVED' && <Button variant="primary" size="sm" onClick={() => act.mutate({ id: s.id, action: 'approve' })}>Approve</Button>}
-                {s.status === 'PENDING' && <Button size="sm" variant="secondary" onClick={() => act.mutate({ id: s.id, action: 'reject' })}>Reject</Button>}
-                {s.status === 'APPROVED' && <Button size="sm" variant="danger" onClick={() => act.mutate({ id: s.id, action: 'suspend' })}>Suspend</Button>}
+              <div className="flex flex-none items-center gap-3">
+                <span className="num">{rupees(o.total)}</span>
+                <StatusBadge status={o.status} />
               </div>
             </li>
           ))}
@@ -132,14 +121,14 @@ function Users() {
       {q.isLoading ? <Loading /> : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="text-xs uppercase text-muted"><tr><th className="py-2">Name</th><th>Contact</th><th>Role</th><th>Orders</th><th /></tr></thead>
+            <thead className="text-[0.8125rem] text-muted"><tr><th className="py-2 font-normal">Name</th><th className="font-normal">Contact</th><th className="font-normal">Role</th><th className="text-right font-normal">Orders</th><th /></tr></thead>
             <tbody>
               {q.data?.users.map((u) => (
                 <tr key={u.id} className="border-t border-line">
                   <td className="py-2">{u.name}</td>
                   <td>{u.email ?? u.mobile}</td>
-                  <td><Badge>{u.role}</Badge></td>
-                  <td>{u._count.orders}</td>
+                  <td><Badge>{{ ADMIN: 'Admin', SHOP_OWNER: 'Shop owner', CUSTOMER: 'Customer' }[u.role]}</Badge></td>
+                  <td className="num text-right">{u._count.orders}</td>
                   <td className="text-right">
                     <Button size="sm" variant={u.isActive ? 'secondary' : 'primary'} onClick={() => toggle.mutate({ id: u.id, isActive: !u.isActive })}>{u.isActive ? 'Disable' : 'Enable'}</Button>
                   </td>
@@ -178,7 +167,7 @@ function Orders() {
           {q.data?.orders.map((o) => (
             <li key={o.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
               <div>
-                <p className="font-medium">{o.orderNumber ?? 'Unpaid'} · {o.shop.name}</p>
+                <p className="font-medium">{o.orderNumber ?? 'Unpaid'}</p>
                 <p className="text-muted">{o.customer.name} · {dateTime(o.createdAt)}</p>
               </div>
               <div className="flex items-center gap-2">
@@ -200,14 +189,14 @@ function Payments() {
   return (
     <Card className="overflow-x-auto">
       <table className="w-full text-left text-sm">
-        <thead className="text-xs uppercase text-muted"><tr><th className="py-2">Razorpay order</th><th>Order</th><th>Amount</th><th>Status</th><th>When</th></tr></thead>
+        <thead className="text-[0.8125rem] text-muted"><tr><th className="py-2 font-normal">Razorpay order</th><th className="font-normal">Order</th><th className="text-right font-normal">Amount</th><th className="pl-4 font-normal">Status</th><th className="font-normal">When</th></tr></thead>
         <tbody>
           {q.data?.payments.map((p) => (
             <tr key={p.id} className="border-t border-line">
               <td className="py-2 font-mono text-xs">{p.razorpayOrderId}<br />{p.razorpayPaymentId}</td>
-              <td>{p.order.orderNumber ?? '—'}<br /><span className="text-muted">{p.order.customer.name}</span></td>
-              <td className="tabular-nums">{rupees(p.amount)}</td>
-              <td><Badge tone={p.status === 'PAID' ? 'green' : p.status === 'FAILED' ? 'red' : p.status === 'REFUNDED' ? 'amber' : 'gray'}>{p.status}</Badge>{p.failureReason && <p className="text-xs text-muted">{p.failureReason}</p>}</td>
+              <td>{p.order.orderNumber ?? 'Unpaid'}<br /><span className="text-muted">{p.order.customer.name}</span></td>
+              <td className="num text-right">{rupees(p.amount)}</td>
+              <td className="pl-4"><Badge tone={p.status === 'PAID' ? 'green' : p.status === 'FAILED' ? 'red' : p.status === 'REFUNDED' ? 'amber' : 'gray'}>{p.status}</Badge>{p.failureReason && <p className="text-xs text-muted">{p.failureReason}</p>}</td>
               <td>{dateTime(p.createdAt)}</td>
             </tr>
           ))}
@@ -255,34 +244,17 @@ function Fraud() {
     <div className="grid gap-5 md:grid-cols-3">
       <Card>
         <h3 className="mb-2 font-semibold">3+ failed payments (7 days)</h3>
-        {f.multipleFailedPayments.length ? f.multipleFailedPayments.map((u) => <p key={u.id} className="text-sm">{u.name} ({u.mobile ?? u.email}) — {u.failedCount} failures</p>) : <p className="text-sm text-muted">None</p>}
+        {f.multipleFailedPayments.length ? f.multipleFailedPayments.map((u) => <p key={u.id} className="text-sm">{u.name} ({u.mobile ?? u.email}): {u.failedCount} failures</p>) : <p className="text-sm text-muted">None</p>}
       </Card>
       <Card>
         <h3 className="mb-2 font-semibold">Unusual order value (≥ {rupees(f.unusualOrders.threshold)})</h3>
-        {f.unusualOrders.orders.length ? f.unusualOrders.orders.map((o) => <p key={o.id} className="text-sm">{o.orderNumber ?? 'Unpaid'} · {o.customer.name} @ {o.shop.name} — {rupees(o.total)}</p>) : <p className="text-sm text-muted">None</p>}
+        {f.unusualOrders.orders.length ? f.unusualOrders.orders.map((o) => <p key={o.id} className="text-sm">{o.orderNumber ?? 'Unpaid'} · {o.customer.name}, {rupees(o.total)}</p>) : <p className="text-sm text-muted">None</p>}
       </Card>
       <Card>
         <h3 className="mb-2 font-semibold">Possible duplicate accounts</h3>
         {f.duplicateAccounts.length ? f.duplicateAccounts.map((d) => <p key={d.mobile} className="text-sm">Delivery mobile {d.mobile} used by {d.accounts} accounts</p>) : <p className="text-sm text-muted">None</p>}
       </Card>
     </div>
-  );
-}
-
-function Settings() {
-  const qc = useQueryClient();
-  const q = useQuery({ queryKey: ['admin-settings'], queryFn: () => api.get<{ commissionPercent: number }>('/admin/settings') });
-  const [value, setValue] = useState<string>('');
-  const save = useMutation({ mutationFn: () => api.put('/admin/settings/commission', { commissionPercent: Number(value) }), onSuccess: () => void qc.invalidateQueries({ queryKey: ['admin-settings'] }) });
-  if (q.isLoading) return <Loading />;
-  return (
-    <Card className="max-w-sm space-y-3">
-      <p className="text-sm">Current commission: <strong>{q.data?.commissionPercent}%</strong> of order subtotal (applied to newly paid orders).</p>
-      <Input label="New commission %" type="number" min={0} max={50} step="0.5" value={value} onChange={(e) => setValue(e.target.value)} />
-      {save.error && <ErrorState error={save.error} />}
-      {save.isSuccess && <Alert tone="green">Saved</Alert>}
-      <Button variant="primary" disabled={value === ''} loading={save.isPending} onClick={() => save.mutate()}>Save</Button>
-    </Card>
   );
 }
 

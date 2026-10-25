@@ -3,10 +3,10 @@
 | Part | Host |
 |---|---|
 | Frontend (`frontend/`) | Vercel |
-| Backend (`backend/`) | Render (runs the `Dockerfile`) |
+| Backend (`backend/`) | Render (runs `backend/Dockerfile`) |
 | Database | Supabase Postgres |
 
-Keep your values in `deploy-settings.env` (git-ignored) while you go.
+Copy `deploy-settings.example.env` to `deploy-settings.env` (git-ignored) and keep your values there while you go.
 
 ## 1. Supabase - database
 1. Create a project and save the database password.
@@ -15,7 +15,7 @@ Keep your values in `deploy-settings.env` (git-ignored) while you go.
 
 ## 2. Render - backend
 1. **New → Web Service** → connect the GitHub repo.
-2. Runtime: **Docker**. Leave root directory empty (the `Dockerfile` is at the repo root).
+2. Runtime: **Docker**. **Root Directory: `backend`** (the `Dockerfile` is in `backend/`).
 3. Paste section 3 of `deploy-settings.env` into **Environment**. Leave `CORS_ORIGINS` / `APP_URL` as a placeholder for now.
 4. Deploy. Tables are created automatically on start (`prisma migrate deploy`).
 5. Copy the service URL into `BACKEND_URL`. Check `BACKEND_URL/api/v1/health` shows `{"ok":true,...}`.
@@ -34,6 +34,7 @@ If you change `VITE_API_URL` later, redeploy on Vercel (it's baked in at build t
 Webhook URL: `BACKEND_URL/api/v1/payments/webhook`, secret = `RAZORPAY_WEBHOOK_SECRET`.
 
 ## Things to know
-- **Uploaded files**: Render's disk is wiped on every redeploy/restart. Fine for testing; for real use add a Render persistent disk mounted at `/app/backend/uploads`, or move uploads to Supabase Storage.
+- **Uploaded files**: Render's disk is wiped on every redeploy/restart. Fine for testing; for real use add a Render persistent disk mounted at `/app/uploads`, or move uploads to Supabase Storage.
 - **Free Render plan** sleeps after ~15 min idle; the first request then takes ~30-50 s.
-- **Demo data**: run `npm run db:seed` locally with `DATABASE_URL` set to the Supabase URL.
+- **Demo data**: inside `backend/`, run `npm run db:seed` with `DATABASE_URL` set to the Supabase URL.
+- **Demo mode (on by default)**: nobody signs in. Every visitor gets a "View as" bar to switch between Customer, Shop owner and Admin, and anyone can act as the admin. It needs the seeded users, so run the seed above once. To require real sign-in later, set `DEV_SKIP_LOGIN=false` on Render and `VITE_SKIP_LOGIN=false` on Vercel, then redeploy both.

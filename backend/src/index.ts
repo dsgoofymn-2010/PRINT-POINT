@@ -10,7 +10,7 @@ const server = app.listen(env.PORT, () => {
   logger.info(`PrintPoint API listening on http://localhost:${env.PORT}/api/v1`);
   if (!razorpayConfigured) logger.warn('Razorpay keys missing: online payments are disabled until you add test keys to server/.env');
 });
-if (skipLogin) logger.warn('TEST MODE: login is skipped (DEV_SKIP_LOGIN=true). Turn it off before sharing.');
+if (skipLogin) logger.warn('DEMO MODE: no sign-in; anyone can act as customer, shop owner or admin (DEV_SKIP_LOGIN=true).');
 attachRealtime(server);
 const timer = startMaintenanceJobs();
 

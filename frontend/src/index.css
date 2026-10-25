@@ -9,8 +9,8 @@
   Values are RGB triplets so Tailwind can apply opacity.
 */
 :root {
-  --paper: 232 232 227;      /* #e8e8e3 newsprint */
-  --ground: 244 243 239;     /* #f4f3ef app ground, one step off white, from the paper */
+  --paper: 231 232 231;      /* #e7e8e7, matches the printer video */
+  --ground: 231 232 231;     /* same as the video so the intro blends in */
   --surface: 255 255 255;
   --raised: 249 249 247;
   --active: 233 233 229;     /* nav pill, selected row */
@@ -56,6 +56,7 @@
 
 @layer base {
   html {
+    font-size: 125%; /* 20px base: everything bigger */
     -webkit-tap-highlight-color: transparent;
   }
   body {

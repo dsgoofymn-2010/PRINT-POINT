@@ -17,7 +17,7 @@ services:
       retries: 10
 
   app:
-    build: .
+    build: ./backend
     restart: unless-stopped
     depends_on:
       db:
@@ -30,7 +30,7 @@ services:
       DATABASE_URL: postgresql://printpoint:${POSTGRES_PASSWORD:-printpoint}@db:5432/printpoint?schema=public
       CORS_ORIGINS: ${APP_URL:-http://localhost:4000}
       APP_URL: ${APP_URL:-http://localhost:4000}
-      UPLOAD_DIR: /app/backend/uploads
+      UPLOAD_DIR: /app/uploads
       # Dev-only fallbacks so `docker compose up` works out of the box.
       # Override with real secrets via backend/.env or shell env before deploying.
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-only-access-secret-change-me-0123456789abcdef}
@@ -38,7 +38,7 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      - uploads:/app/backend/uploads
+      - uploads:/app/uploads
 
 volumes:
   pgdata:

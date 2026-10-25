@@ -53,11 +53,6 @@ async function main() {
     update: {},
     create: { name: 'Ravi Kumar', email: 'owner1@printpoint.test', mobile: '9000000002', role: 'SHOP_OWNER', passwordHash: hash },
   });
-  const owner2 = await prisma.user.upsert({
-    where: { email: 'owner2@printpoint.test' },
-    update: {},
-    create: { name: 'Lakshmi Priya', email: 'owner2@printpoint.test', mobile: '9000000003', role: 'SHOP_OWNER', passwordHash: hash },
-  });
   const customer = await prisma.user.upsert({
     where: { email: 'customer@printpoint.test' },
     update: {},
@@ -67,7 +62,7 @@ async function main() {
   const allServices: ServiceType[] = ['XEROX_BW', 'COLOR_PRINT', 'PROJECT_REPORT', 'SPIRAL_BINDING', 'SOFT_BINDING', 'HARD_BINDING', 'LAMINATION', 'SCANNING', 'PASSPORT_PHOTO'];
   const shopsData = [
     {
-      slug: 'sri-murugan-xerox-tnagar', owner: owner1, name: 'Sri Murugan Xerox', area: 'T. Nagar', pincode: '600017',
+      slug: 'printpoint', owner: owner1, name: 'PrintPoint', area: 'T. Nagar', pincode: '600017',
       address: '12, Usman Road, T. Nagar', open: '08:30', close: '21:30', delivery: true, radius: 5, services: allServices, rating: 4.6, rule: baseRule,
     },
   ];

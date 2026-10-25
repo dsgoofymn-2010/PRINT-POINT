@@ -68,8 +68,8 @@ export default function ShopDashboard() {
 function Figure({ label, value, lead }: { label: string; value: string; lead?: boolean }) {
   return (
     <div>
-      <p className="text-[14px] text-muted">{label}</p>
-      <p className={cn('num mt-0.5 leading-tight', lead ? 'text-[30px] font-semibold' : 'text-2xl')}>{value}</p>
+      <p className="text-[0.875rem] text-muted">{label}</p>
+      <p className={cn('num mt-0.5 leading-tight', lead ? 'text-[1.875rem] font-semibold' : 'text-2xl')}>{value}</p>
     </div>
   );
 }
@@ -108,13 +108,13 @@ function Takings() {
             highlight: i === all.length - 1,
           }))}
         />
-        <p className="mt-2 text-[14px] text-muted">Cancelled and refunded orders are left out of the takings.</p>
+        <p className="mt-2 text-[0.875rem] text-muted">Cancelled and refunded orders are left out of the takings.</p>
       </Card>
       <Card title="What sold">
         {a.topServices.length ? (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-[14px] text-muted">
+              <tr className="text-[0.875rem] text-muted">
                 <th className="pb-2 text-left font-normal">Service</th>
                 <th className="pb-2 text-right font-normal">Units</th>
               </tr>

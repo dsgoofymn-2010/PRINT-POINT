@@ -55,18 +55,18 @@ export function PriceSummary({ quote, options }: { quote: Quote; options: ChatOp
     <div className="rounded-card border border-line bg-surface">
       <dl className="divide-y divide-rule px-4">
         {lines.map((l) => (
-          <div key={l.key} className="flex items-baseline justify-between gap-4 py-2.5 text-[16px] text-muted">
+          <div key={l.key} className="flex items-baseline justify-between gap-4 py-2.5 text-[1rem] text-muted">
             <dt className="min-w-0">{l.label}</dt>
             <dd className="num whitespace-nowrap text-ink">{rupees(l.amount)}</dd>
           </div>
         ))}
         {quote.tax > 0 && (
           <>
-            <div className="flex items-baseline justify-between gap-4 py-2.5 text-[16px] text-muted">
+            <div className="flex items-baseline justify-between gap-4 py-2.5 text-[1rem] text-muted">
               <dt>Subtotal</dt>
               <dd className="num text-ink">{rupees(quote.subtotal)}</dd>
             </div>
-            <div className="flex items-baseline justify-between gap-4 py-2.5 text-[16px] text-muted">
+            <div className="flex items-baseline justify-between gap-4 py-2.5 text-[1rem] text-muted">
               <dt>Tax ({quote.taxPercent}%)</dt>
               <dd className="num text-ink">{rupees(quote.tax)}</dd>
             </div>
@@ -74,11 +74,11 @@ export function PriceSummary({ quote, options }: { quote: Quote; options: ChatOp
         )}
       </dl>
       <div className="flex items-baseline justify-between gap-4 border-t border-ink px-4 py-3">
-        <span className="text-[18px] font-semibold">Total</span>
-        <span className="num display text-[34px] leading-none">{rupees(quote.total)}</span>
+        <span className="text-[1.125rem] font-semibold">Total</span>
+        <span className="num display text-[2.125rem] leading-none">{rupees(quote.total)}</span>
       </div>
       {!quote.meetsMinimum && (
-        <p className="border-t border-line px-4 py-2.5 text-[15px] text-negative">
+        <p className="border-t border-line px-4 py-2.5 text-[0.9375rem] text-negative">
           This shop’s minimum order is {rupees(quote.minOrderAmount)}. Add copies or files to send it.
         </p>
       )}

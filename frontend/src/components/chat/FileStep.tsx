@@ -40,13 +40,13 @@ export function FileStep({ files, onAdd, onRemove, onRetry, onPages, signedIn, l
           )}
         >
           <div>
-            <p className="text-[17px] font-medium">Drop files here</p>
-            <p className="text-[15px] text-muted">PDF, DOCX, JPG or PNG · up to {MAX_FILE_MB} MB each · {MAX_FILES} files max</p>
+            <p className="text-[1.0625rem] font-medium">Drop files here</p>
+            <p className="text-[0.9375rem] text-muted">PDF, DOCX, JPG or PNG · up to {MAX_FILE_MB} MB each · {MAX_FILES} files max</p>
           </div>
           <button
             type="button"
             onClick={() => input.current?.click()}
-            className="min-h-[44px] rounded-control bg-primary px-5 text-[17px] font-medium text-on-primary hover:opacity-90"
+            className="min-h-[44px] rounded-control bg-primary px-5 text-[1.0625rem] font-medium text-on-primary hover:opacity-90"
           >
             Choose files
           </button>
@@ -69,8 +69,8 @@ export function FileStep({ files, onAdd, onRemove, onRetry, onPages, signedIn, l
           {files.map((f) => (
             <li key={f.key} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3">
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[17px] font-medium" title={f.name}>{f.name}</p>
-                <p className="text-[15px] text-muted">
+                <p className="truncate text-[1.0625rem] font-medium" title={f.name}>{f.name}</p>
+                <p className="text-[0.9375rem] text-muted">
                   {f.size > 0 && fileSize(f.size)}
                   {f.status === 'done' && f.uploaded?.pageCount != null && ` · ${f.uploaded.pageCount} page${f.uploaded.pageCount === 1 ? '' : 's'}`}
                   {f.status === 'waiting' && !signedIn && ' · uploads after you sign in'}
@@ -82,7 +82,7 @@ export function FileStep({ files, onAdd, onRemove, onRetry, onPages, signedIn, l
                   </div>
                 )}
                 {f.status === 'error' && (
-                  <p className="text-[15px] text-negative" role="alert">
+                  <p className="text-[0.9375rem] text-negative" role="alert">
                     {f.error}
                     {f.file && (
                       <button className="ml-2 underline underline-offset-2" onClick={() => onRetry(f.key)}>
@@ -92,7 +92,7 @@ export function FileStep({ files, onAdd, onRemove, onRetry, onPages, signedIn, l
                   </p>
                 )}
                 {f.status === 'done' && f.uploaded?.pageCount == null && (
-                  <label className="mt-2 flex items-center gap-2 text-[15px]">
+                  <label className="mt-2 flex items-center gap-2 text-[0.9375rem]">
                     We couldn’t count the pages. How many?
                     <input
                       type="number"
@@ -102,7 +102,7 @@ export function FileStep({ files, onAdd, onRemove, onRetry, onPages, signedIn, l
                       disabled={locked}
                       value={f.pagesOverride ?? ''}
                       onChange={(e) => onPages(f.key, e.target.value ? Math.max(1, Math.min(2000, Number(e.target.value))) : undefined)}
-                      className="num h-10 w-20 rounded-control border border-control bg-surface px-2 text-[17px]"
+                      className="num h-10 w-20 rounded-control border border-control bg-surface px-2 text-[1.0625rem]"
                     />
                   </label>
                 )}
@@ -111,7 +111,7 @@ export function FileStep({ files, onAdd, onRemove, onRetry, onPages, signedIn, l
                 <button
                   type="button"
                   onClick={() => onRemove(f.key)}
-                  className="min-h-[44px] rounded-control px-3 text-[15px] text-muted hover:bg-active hover:text-ink"
+                  className="min-h-[44px] rounded-control px-3 text-[0.9375rem] text-muted hover:bg-active hover:text-ink"
                   aria-label={`Remove ${f.name}`}
                 >
                   Remove
