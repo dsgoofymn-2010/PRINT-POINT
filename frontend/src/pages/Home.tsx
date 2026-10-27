@@ -37,7 +37,7 @@ export default function Home() {
 
   return (
     <>
-    <PrinterScrollIntro />
+    <PrinterScrollIntro shopName={shop?.name} />
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-10">
       {view === 'mine' && user ? (
         <PickupPanel
@@ -51,7 +51,8 @@ export default function Home() {
       )}
       <div className="min-w-0 lg:col-start-1 lg:row-start-1">
         <Reveal>
-          <h1 className="display mt-4 text-[2.75rem] sm:text-[3.5rem] lg:mt-0">{view === 'mine' ? 'My requests' : 'Print something'}</h1>
+          {/* The shop name above is the page's h1. */}
+          <h2 className="display mt-4 text-[2.75rem] sm:text-[3.5rem] lg:mt-0">{view === 'mine' ? 'My requests' : 'Print something'}</h2>
           <p className="mt-1 max-w-[38rem] text-[1.125rem] leading-relaxed text-muted">{view === 'mine' ? 'Track your orders and pickup codes.' : 'Upload your files. We check them, you pay, and you collect at the counter with a code.'}</p>
         </Reveal>
 

@@ -6,10 +6,14 @@ const H = 720;
 const CROP = 1.3; // zoom in slightly to trim the frame edges
 const src = (i: number) => `/printer-frames/${String(i + 1).padStart(3, '0')}.webp`;
 
-/** Full-width scroll-driven printer animation shown above the home page. */
-export function PrinterScrollIntro() {
+/** Scroll share over which the shop name lifts away and the printer takes over. */
+const NAME_OUT = 0.16;
+
+/** Full-width scroll-driven printer animation shown above the home page, with the shop's name on top. */
+export function PrinterScrollIntro({ shopName }: { shopName?: string }) {
   const trackRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const nameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -56,6 +60,13 @@ export function PrinterScrollIntro() {
       cur = reduce ? target : cur + (target - cur) * 0.18;
       if (Math.abs(target - cur) < 0.05) cur = target;
       draw(Math.round(cur));
+      const name = nameRef.current;
+      if (name) {
+        const out = clamp(p / NAME_OUT);
+        name.style.opacity = String(1 - out);
+        // Reduced motion: fade only, no travel.
+        name.style.transform = reduce ? '' : `translate3d(0, ${-out * 64}px, 0)`;
+      }
       raf = requestAnimationFrame(tick);
     };
 
@@ -66,15 +77,23 @@ export function PrinterScrollIntro() {
   }, []);
 
   return (
-    <section
-      ref={trackRef}
-      aria-hidden="true"
-      className="relative ml-[calc(50%-50vw)] w-screen bg-paper"
-      style={{ height: '268vh' }}
-    >
+    <section ref={trackRef} className="relative ml-[calc(50%-50vw)] w-screen bg-paper" style={{ height: '268vh' }}>
       <div className="sticky top-0 h-[100dvh] overflow-hidden">
-        <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent to-paper" />
+        {/* First frame as a plain image: shows before the frames load, and without script. */}
+        <img src={src(0)} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full scale-[1.3] object-cover" />
+        <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 block h-full w-full" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent to-paper" />
+        {/* Same column as the page below; top padding clears the floating nav. */}
+        <div ref={nameRef} className="absolute inset-0 mx-auto flex max-w-[1152px] items-center justify-center px-4 will-change-transform sm:px-6">
+          <div className="text-center">
+            <h1 className="intro-name display text-balance text-ink" style={{ fontSize: 'clamp(2.75rem, 7vw, 6.5rem)' }}>
+              {shopName ?? 'PrintPoint'}
+            </h1>
+            <p className="mx-auto mt-4 max-w-[30rem] rounded-control bg-paper px-3 py-1.5 text-[1.0625rem] text-ink">
+              Xerox and printing in Chennai. Send your files, pay once we accept, collect at the counter.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

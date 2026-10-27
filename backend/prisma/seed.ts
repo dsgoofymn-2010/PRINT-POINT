@@ -1,11 +1,9 @@
 /* Seed: 1 admin, 2 shop owners, 1 shop (single-shop app), pricing, 1 customer, 1 completed order. */
-import fs from 'node:fs';
-import path from 'node:path';
-import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { PrismaClient, type ServiceType } from '@prisma/client';
 import { calculateQuote, ruleSnapshot } from '../src/services/pricing';
+import { newStorageKey, storage } from '../src/services/storage';
 
 const prisma = new PrismaClient();
 const PASSWORD = 'Password@123';
@@ -103,11 +101,10 @@ async function main() {
   if (!exists) {
     const shop = shops[0];
     const rule = shop.pricingRules[0];
-    const uploadDir = path.resolve(process.env.UPLOAD_DIR ?? './uploads');
-    fs.mkdirSync(uploadDir, { recursive: true });
-    const key = `${crypto.randomUUID()}.pdf`;
+    // Same storage as the app (local folder or Supabase bucket).
+    const key = newStorageKey('pdf');
     const pdf = await samplePdf();
-    fs.writeFileSync(path.join(uploadDir, key), pdf);
+    await storage.save(key, pdf, 'application/pdf');
     const file = await prisma.uploadedFile.create({
       data: { ownerId: customer.id, storageKey: key, originalName: 'Mini-Project-Report.pdf', mimeType: 'application/pdf', sizeBytes: pdf.length, pageCount: 12 },
     });
@@ -150,8 +147,90 @@ async function main() {
     await prisma.shop.update({ where: { id: shop.id }, data: { rating: 4.6, ratingCount: 1 } });
   }
 
+  await seedFakeOrders(shops[0], hash);
+
   await prisma.auditLog.create({ data: { actorId: admin.id, action: 'seed.run', entityType: 'System', metadata: { shops: shops.length } } });
   console.log('Seed complete. Password for all seed users:', PASSWORD);
+}
+
+/** Fake customers with orders at every stage, so the queue, owner desk and admin pages have something to show. */
+async function seedFakeOrders(shop: { id: string; pricingRules: Parameters<typeof ruleSnapshot>[0][] }, hash: string) {
+  if (await prisma.user.findUnique({ where: { email: 'priya@printpoint.test' } })) return; // already seeded
+
+  const people = [
+    ['Priya R', 'priya', '9811100001'], ['Karthik M', 'karthik', '9811100002'], ['Divya S', 'divya', '9811100003'],
+    ['Vignesh P', 'vignesh', '9811100004'], ['Meena K', 'meena', '9811100005'], ['Surya N', 'surya', '9811100006'],
+    ['Lakshmi V', 'lakshmi', '9811100007'], ['Harish B', 'harish', '9811100008'],
+  ] as const;
+  // [status, file, pages, copies, colour, binding, hours ago]
+  const plan = [
+    ['REQUESTED', 'Lab-Record.pdf', 24, 1, 'BW', 'SPIRAL', 0.1],
+    ['REQUESTED', 'Resume.pdf', 2, 5, 'COLOR', 'NONE', 0.3],
+    ['REQUESTED', 'Assignment-3.pdf', 8, 1, 'BW', 'NONE', 0.5],
+    ['ACCEPTED', 'Notes-Unit2.pdf', 40, 1, 'BW', 'NONE', 0.8],
+    ['PAID', 'Seminar-Slides.pdf', 18, 2, 'COLOR', 'NONE', 1],
+    ['PAID', 'Thesis-Draft.pdf', 60, 1, 'BW', 'SOFT', 1.2],
+    ['PRINTING', 'Project-Report.pdf', 45, 2, 'BW', 'SPIRAL', 1.5],
+    ['READY', 'ID-Proofs.pdf', 3, 2, 'BW', 'NONE', 3],
+    ['COMPLETED', 'Question-Bank.pdf', 30, 1, 'BW', 'NONE', 26],
+    ['COMPLETED', 'Brochure.pdf', 4, 20, 'COLOR', 'NONE', 50],
+    ['COMPLETED', 'Record-Book.pdf', 50, 1, 'BW', 'HARD', 74],
+    ['DENIED', 'Blurry-Scan.pdf', 6, 1, 'BW', 'NONE', 30],
+    ['CANCELLED', 'Old-Notes.pdf', 12, 1, 'BW', 'NONE', 98],
+  ] as const;
+
+  const rule = ruleSnapshot(shop.pricingRules[0]);
+  const pdf = await samplePdf();
+  const year = new Date().getFullYear();
+  const paidStates = ['PAID', 'PRINTING', 'READY', 'COMPLETED'];
+
+  for (const [i, [status, fileName, pages, copies, color, binding, hoursAgo]] of plan.entries()) {
+    const [name, handle, mobile] = people[i % people.length];
+    const user = await prisma.user.upsert({
+      where: { email: `${handle}@printpoint.test` },
+      update: {},
+      create: { name, email: `${handle}@printpoint.test`, mobile, role: 'CUSTOMER', passwordHash: hash },
+    });
+    const key = newStorageKey('pdf');
+    await storage.save(key, pdf, 'application/pdf');
+    const file = await prisma.uploadedFile.create({
+      data: { ownerId: user.id, storageKey: key, originalName: fileName, mimeType: 'application/pdf', sizeBytes: pdf.length, pageCount: pages },
+    });
+    const settings = { color, paperSize: 'A4', sides: 'SINGLE', paperQuality: 'NORMAL_70', copies, pageRange: null, binding, lamination: 'NONE' } as const;
+    const quote = calculateQuote(rule, [{ key: file.id, fileName, totalPages: pages, settings }], 'PICKUP');
+    const createdAt = new Date(Date.now() - hoursAgo * 3_600_000);
+    const paid = paidStates.includes(status);
+    const counter = paid ? await prisma.orderCounter.upsert({ where: { year }, create: { year, value: 1 }, update: { value: { increment: 1 } } }) : null;
+
+    const order = await prisma.printOrder.create({
+      data: {
+        orderNumber: counter ? `PP-${year}-${String(counter.value).padStart(6, '0')}` : null,
+        customerId: user.id, shopId: shop.id, status, fulfillment: 'PICKUP', createdAt,
+        subtotal: quote.subtotal, total: quote.total, commissionPercent: 5, commissionAmount: Math.round(quote.subtotal * 0.05),
+        priceSnapshot: JSON.parse(JSON.stringify({ rule, quote })),
+        pickupOtp: paid ? String(100000 + i * 7919).slice(0, 6) : null,
+        acceptedAt: status === 'REQUESTED' || status === 'DENIED' ? null : new Date(createdAt.getTime() + 300_000),
+        paidAt: paid ? new Date(createdAt.getTime() + 600_000) : null,
+        completedAt: status === 'COMPLETED' ? new Date(createdAt.getTime() + 3_600_000) : null,
+        cancelledAt: status === 'CANCELLED' ? new Date(createdAt.getTime() + 900_000) : null,
+        denyReason: status === 'DENIED' ? 'The scan is too blurry to print. Please upload a clearer copy.' : null,
+        items: {
+          create: {
+            fileId: file.id, fileName, totalPages: pages, printedPages: pages, copies, color, paperSize: 'A4', sides: 'SINGLE',
+            paperQuality: 'NORMAL_70', orientation: 'PORTRAIT', fitMode: 'FIT', binding, lamination: 'NONE',
+            lineTotal: quote.items[0].lineTotal, breakdown: JSON.parse(JSON.stringify(quote.items[0])),
+          },
+        },
+        events: { create: [{ status: 'REQUESTED', note: 'Order sent to shop', createdAt }, ...(status === 'REQUESTED' ? [] : [{ status, createdAt: new Date(createdAt.getTime() + 600_000) }])] },
+      },
+    });
+    if (paid) {
+      await prisma.payment.create({
+        data: { orderId: order.id, razorpayOrderId: `order_fake_${order.id.slice(0, 8)}`, razorpayPaymentId: `pay_fake_${order.id.slice(0, 8)}`, amount: quote.total, status: 'PAID', method: 'upi' },
+      });
+    }
+  }
+  console.log(`Added ${plan.length} fake orders for ${people.length} fake customers.`);
 }
 
 main()

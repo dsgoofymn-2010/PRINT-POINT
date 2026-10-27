@@ -19,7 +19,8 @@ export function useShopQueue(shopId: string | null) {
     queryKey: ['queue', shopId],
     queryFn: () => api.get<{ queue: QueueInfo }>(`/shops/${shopId}/queue`).then((r) => r.queue),
     enabled: Boolean(shopId),
-    refetchInterval: poll,
+    // Socket events cover order changes; the minute tick catches opening/closing time passing.
+    refetchInterval: poll || 60_000,
     staleTime: 5_000,
   });
 }
@@ -121,7 +122,7 @@ export function QueuePanel({ shopId }: { shopId: string | null }) {
             <span className="min-w-0 truncate">
               <span className={cn('mr-2 inline-block h-2.5 w-2.5 rounded-full', q.data.isOpen ? 'bg-positive' : 'bg-negative')} aria-hidden="true" />
               <span className="font-medium">{q.data.name}</span>
-              <span className="text-muted"> · {q.data.pending} waiting · ~{q.data.estimatedWaitMins} min</span>
+              <span className="text-muted"> · {q.data.pending} waiting{q.data.estimatedWaitMins > 0 && ` · ~${q.data.estimatedWaitMins} min`}</span>
             </span>
           ) : (
             <span className="text-muted">Shop status & prices</span>

@@ -62,8 +62,18 @@ export function StatusCard({ order, compact }: { order: PrintRequest; compact?: 
   const pay = useMutation({
     mutationFn: () => payForOrder(order.id),
     onSuccess: (r) => {
-      setPayMsg(r.kind === 'success' ? null : r.kind === 'failed' ? r.reason : 'Payment window closed. You can pay any time before pickup.');
+      setPayMsg(
+        r.kind === 'success'
+          ? null
+          : r.kind === 'pending'
+            ? 'Payment received. Confirming with the bank, this usually takes a few seconds.'
+            : r.kind === 'failed'
+              ? r.reason
+              : 'Payment window closed. You can pay any time before pickup.',
+      );
       refresh();
+      // The capture webhook usually lands within seconds; check again so the status updates.
+      if (r.kind === 'pending') setTimeout(refresh, 5000);
     },
   });
 
@@ -74,7 +84,7 @@ export function StatusCard({ order, compact }: { order: PrintRequest; compact?: 
 
   return (
     <article className="overflow-hidden rounded-card border border-line bg-surface" aria-live="polite">
-      <header className="flex flex-wrap items-start justify-between gap-2 border-b border-line px-4 py-3">
+      <header className="flex flex-wrap items-start justify-between gap-2 bg-ground px-4 py-3">
         <div className="min-w-0">
           <p className="text-[0.9375rem] text-muted">
             <span className="num">{order.orderNumber}</span> · {dateTime(order.createdAt)}
@@ -85,6 +95,21 @@ export function StatusCard({ order, compact }: { order: PrintRequest; compact?: 
       </header>
 
       <div className="space-y-4 px-4 py-4">
+        {showCode && (
+          <div className="flex flex-wrap items-end justify-between gap-4 rounded-card bg-ink px-4 py-4 text-on-primary">
+            <div>
+              <p className="num display text-[3.25rem] leading-none tracking-[0.12em]">{order.pickupOtp}</p>
+              <p className="mt-1.5 text-[0.9375rem] opacity-80">Your pickup code. Show it at the counter.</p>
+            </div>
+            {order.estimatedReadyAt && order.status !== 'READY' && (
+              <div className="text-right">
+                <p className="num text-[1.375rem] font-medium">{clock(order.estimatedReadyAt)}</p>
+                <p className="text-[0.9375rem] opacity-80">Estimated ready</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {!ended && (
           <ol className="grid grid-cols-5 gap-1" aria-label="Progress">
             {STEPS.map((s) => {
@@ -130,21 +155,6 @@ export function StatusCard({ order, compact }: { order: PrintRequest; compact?: 
         )}
         {cancelledNote && <p className="text-[1rem] text-muted">{cancelledNote}.</p>}
 
-        {showCode && (
-          <div className="flex flex-wrap items-end justify-between gap-4 rounded-card bg-ink px-4 py-4 text-on-primary">
-            <div>
-              <p className="text-[0.9375rem] opacity-80">Pickup code. Show this at the counter</p>
-              <p className="num display mt-1 text-[3.25rem] leading-none tracking-[0.12em]">{order.pickupOtp}</p>
-            </div>
-            {order.estimatedReadyAt && order.status !== 'READY' && (
-              <div className="text-right">
-                <p className="text-[0.9375rem] opacity-80">Estimated ready</p>
-                <p className="num text-[1.375rem] font-medium">{clock(order.estimatedReadyAt)}</p>
-              </div>
-            )}
-          </div>
-        )}
-
         {order.status === 'ACCEPTED' && order.onlinePayment && (
           <div className="flex flex-wrap items-center gap-3">
             <Button variant="brass" size="lg" loading={pay.isPending} onClick={() => pay.mutate()}>
@@ -172,7 +182,7 @@ export function StatusCard({ order, compact }: { order: PrintRequest; compact?: 
           </div>
         )}
 
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
           <p className="text-[1.0625rem]">
             Total <span className="num font-semibold">{rupees(order.total)}</span>
           </p>

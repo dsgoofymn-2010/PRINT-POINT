@@ -114,7 +114,8 @@ An owner with several shops sees their first shop on `/owner`; add `?shopId=<id>
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | Random strings, 32+ characters. `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` |
 | `ACCESS_TOKEN_TTL`, `REFRESH_TOKEN_TTL_DAYS` | Token lifetimes (default `15m`, `30`) |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | Razorpay test keys. Leave empty to take payment at the counter |
-| `STORAGE_DRIVER`, `UPLOAD_DIR` | `local` and the private folder for uploads (never served statically) |
+| `STORAGE_DRIVER`, `UPLOAD_DIR` | `local` (private folder, never served statically) or `supabase` (private bucket) |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_BUCKET` | Needed when `STORAGE_DRIVER=supabase`; the key is backend-only |
 | `MAX_FILE_SIZE_MB` | Upload limit per file (default 25) |
 | `FILE_RETENTION_HOURS` | Safety net: delete files of finished orders after this long (default 24). Files are normally deleted right at pickup, deny or cancel |
 | `ORPHAN_FILE_RETENTION_HOURS` | Delete uploads not used by a live request this long after upload (default **24**) |

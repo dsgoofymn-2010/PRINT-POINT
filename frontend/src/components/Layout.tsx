@@ -136,7 +136,7 @@ function CustomerShell() {
 
 export function SmallFooter() {
   return (
-    <footer className="border-t border-line text-[0.875rem] text-muted">
+    <footer className="bg-surface text-[0.875rem] text-muted">
       <div className="mx-auto flex max-w-[1152px] flex-wrap gap-x-5 gap-y-2 px-4 py-5 sm:px-6">
         <span>PrintPoint, Chennai</span>
         <Link className="hover:text-ink" to="/about">About</Link>
@@ -257,7 +257,7 @@ function TestModeBar() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   return (
-    <div className="fixed bottom-3 left-1/2 z-50 flex -translate-x-1/2 flex-wrap items-center gap-1 rounded-control border border-line bg-ground p-1 text-xs shadow-sm">
+    <div className="mx-auto mb-4 flex w-fit flex-wrap items-center gap-1 rounded-control bg-active p-1 text-xs">
       <span className="px-2 font-medium text-muted">View as</span>
       {TEST_ROLES.map((r) => (
         <button

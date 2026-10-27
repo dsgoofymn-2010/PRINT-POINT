@@ -38,7 +38,13 @@ export function ChatFlow() {
   const at = (s: Step) => STEPS.indexOf(step) >= STEPS.indexOf(s);
   const go = (s: Step) => setStep(s);
 
+  // Follow the conversation as it grows, but not on first load: that would jump past the intro.
+  // Compare with the last values seen, so React's double-run of effects in development can't trigger it.
+  const seen = useRef(`${step}:${files.files.length}`);
   useEffect(() => {
+    const now = `${step}:${files.files.length}`;
+    if (now === seen.current) return;
+    seen.current = now;
     bottom.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [step, files.files.length]);
 

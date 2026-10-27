@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
+import { nextRegularOpening } from '../src/lib/shopHours';
+import { manuallyOpen, nextOpening, shopIsTakingRequests } from '../src/services/requests';
 
+// vitest hoists this above the imports, so services/requests gets the fake prisma.
 vi.mock('../src/lib/prisma', () => ({ prisma: {} }));
-
-const { nextRegularOpening } = await import('../src/lib/shopHours');
-const { manuallyOpen, nextOpening, shopIsTakingRequests } = await import('../src/services/requests');
 
 // India time (UTC+5:30) as a Date.
 const ist = (s: string) => new Date(`${s}+05:30`);

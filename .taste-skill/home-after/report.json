@@ -1,0 +1,1666 @@
+{
+ "url": "http://localhost:5173/",
+ "at": "2026-10-27T05:55:17.944Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 5,
+   "filled": [
+    0.26,
+    0.31,
+    0.35,
+    0.58,
+    0.57
+   ],
+   "motion": {
+    "elements": 10,
+    "css": 1,
+    "transitions": 3,
+    "scripted": 6,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 3862,
+     "screens": 4.3,
+     "words": 168,
+     "img": 1,
+     "video": 0,
+     "canvas": 1,
+     "svg": 6,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 1,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "001.webp"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "PRINTPOINT",
+     "words": 1,
+     "chars": 10,
+     "lines": 1,
+     "size": 100.8,
+     "vw": 7,
+     "font": "Bebas Neue",
+     "weight": 400,
+     "tracking": -0.02,
+     "leading": 0.88,
+     "upper": true,
+     "italic": false,
+     "mono": false,
+     "align": "center",
+     "position": "center",
+     "widthRatio": 0.38,
+     "top": 471,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "PRINTPOINT",
+     "words": 1,
+     "lines": 1,
+     "size": 100.8,
+     "font": "Bebas Neue"
+    },
+    "headings": [
+     {
+      "text": "PRINTPOINT",
+      "words": 1,
+      "chars": 10,
+      "lines": 1,
+      "size": 29.3,
+      "vw": 2,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": 0.01,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.1,
+      "top": 34,
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "PRINTPOINT",
+      "words": 1,
+      "chars": 10,
+      "lines": 1,
+      "size": 100.8,
+      "vw": 7,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.88,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.38,
+      "top": 471,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "MY REQUESTS",
+      "words": 2,
+      "chars": 11,
+      "lines": 1,
+      "size": 63,
+      "vw": 4.4,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.88,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.48,
+      "top": 2520,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "711888",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 31.5,
+      "vw": 2.2,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": 0.1,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.07,
+      "top": 2589,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "ACTIVE",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 33.8,
+      "vw": 2.3,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.88,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.48,
+      "top": 2649,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "711888",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 58.5,
+      "vw": 4.1,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": 0.12,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.21,
+      "top": 2817,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "PAST",
+      "words": 1,
+      "chars": 4,
+      "lines": 1,
+      "size": 33.8,
+      "vw": 2.3,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.88,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.48,
+      "top": 3216,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 7,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 2,
+     "centered": 1,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "IBM Plex Sans",
+       "share": 0.94,
+       "mono": false
+      },
+      {
+       "family": "Bebas Neue",
+       "share": 0.06,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      14,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      29,
+      32,
+      34,
+      59,
+      63,
+      101
+     ],
+     "sizeCount": 14,
+     "notLoaded": [],
+     "body": {
+      "font": "IBM Plex Sans",
+      "size": 19.1,
+      "leading": 1.41,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 14.6
+     },
+     "measureChars": 57,
+     "max": {
+      "size": 100.8,
+      "vw": 7,
+      "font": "Bebas Neue",
+      "text": "PrintPoint"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.09,
+     "centerShare": 0.15,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#e7e8e7",
+     "bodyBgHsl": {
+      "h": 120,
+      "s": 0.02,
+      "l": 0.91
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#e7e8e7",
+       "top": 108,
+       "hsl": {
+        "h": 120,
+        "s": 0.02,
+        "l": 0.91
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#181715",
+       "share": 0.54
+      },
+      {
+       "color": "#5c5b55",
+       "share": 0.33
+      },
+      {
+       "color": "#e8e8e3",
+       "share": 0.08
+      },
+      {
+       "color": "#04250e",
+       "share": 0.04
+      },
+      {
+       "color": "#831c1e",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#181715",
+      "hsl": {
+       "h": 40,
+       "s": 0.07,
+       "l": 0.09
+      },
+      "fg": "#e8e8e3"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 3,
+     "inHero": 0,
+     "radius": 6,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": []
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 1,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 1,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 2,
+     "dashed": 0,
+     "blurred": 1,
+     "roundedBoxes": 8,
+     "boxRadius": 8,
+     "squareMedia": 2,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 1
+     },
+     {
+      "type": "canvas",
+      "ratio": 0.88
+     }
+    ],
+    "nav": {
+     "links": 3,
+     "fixed": true,
+     "height": 63,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "bebas neue",
+     "ibm plex sans"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 3862,
+    "margins": {
+     "left": 171,
+     "right": 215
+    },
+    "sections": [
+     {
+      "sel": "section.relative.ml-[calc(50%-50vw)]",
+      "tag": "section",
+      "top": 108,
+      "height": 2412,
+      "words": 17,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "PrintPoint",
+       "size": 101,
+       "tag": "h1"
+      },
+      "left": 468,
+      "right": 468,
+      "textLeft": 468,
+      "textRight": 468,
+      "fullBleed": true,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": true
+     },
+     {
+      "sel": "div.lg:grid.lg:grid-cols-[minmax(0,1fr)_360px]",
+      "tag": "div",
+      "top": 2520,
+      "height": 1180,
+      "words": 122,
+      "media": 0,
+      "middle": 69,
+      "heading": {
+       "text": "711888",
+       "size": 59,
+       "tag": "p"
+      },
+      "left": 171,
+      "right": 195,
+      "textLeft": 171,
+      "textRight": 208,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": true
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "PRINTPOINT",
+      "size": 101,
+      "top": 471,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 171,
+      "n": 3
+     },
+     {
+      "x": 933,
+      "n": 2
+     },
+     {
+      "x": 190,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 6,
+    "bodySize": 19,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 5,
+   "filled": [
+    0.12,
+    0.14,
+    0.37,
+    0.66,
+    0.83
+   ],
+   "motion": {
+    "elements": 10,
+    "css": 1,
+    "transitions": 3,
+    "scripted": 6,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 4630,
+     "screens": 4.5,
+     "words": 168,
+     "img": 1,
+     "video": 0,
+     "canvas": 1,
+     "svg": 6,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 1,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "001.webp"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "PRINTPOINT",
+     "words": 1,
+     "chars": 10,
+     "lines": 1,
+     "size": 53.8,
+     "vw": 7,
+     "font": "Bebas Neue",
+     "weight": 400,
+     "tracking": -0.02,
+     "leading": 0.88,
+     "upper": true,
+     "italic": false,
+     "mono": false,
+     "align": "center",
+     "position": "center",
+     "widthRatio": 0.7,
+     "top": 554,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "PRINTPOINT",
+     "words": 1,
+     "lines": 1,
+     "size": 53.8,
+     "font": "Bebas Neue"
+    },
+    "headings": [
+     {
+      "text": "PRINTPOINT",
+      "words": 1,
+      "chars": 10,
+      "lines": 1,
+      "size": 29.3,
+      "vw": 3.8,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": 0.01,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.19,
+      "top": 34,
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "PRINTPOINT",
+      "words": 1,
+      "chars": 10,
+      "lines": 1,
+      "size": 53.8,
+      "vw": 7,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.88,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.7,
+      "top": 554,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "711888",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 31.5,
+      "vw": 4.1,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": 0.1,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.12,
+      "top": 2916,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "MY REQUESTS",
+      "words": 2,
+      "chars": 11,
+      "lines": 1,
+      "size": 63,
+      "vw": 8.2,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.88,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.93,
+      "top": 3287,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "ACTIVE",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 33.8,
+      "vw": 4.4,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.88,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.93,
+      "top": 3416,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "711888",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 58.5,
+      "vw": 7.6,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": 0.12,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.4,
+      "top": 3584,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "PAST",
+      "words": 1,
+      "chars": 4,
+      "lines": 1,
+      "size": 33.8,
+      "vw": 4.4,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.88,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.93,
+      "top": 3983,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 7,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 2,
+     "centered": 1,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "IBM Plex Sans",
+       "share": 0.94,
+       "mono": false
+      },
+      {
+       "family": "Bebas Neue",
+       "share": 0.06,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      14,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      29,
+      32,
+      34,
+      54,
+      59,
+      63
+     ],
+     "sizeCount": 14,
+     "notLoaded": [],
+     "body": {
+      "font": "IBM Plex Sans",
+      "size": 19.1,
+      "leading": 1.41,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 14.6
+     },
+     "measureChars": 57,
+     "max": {
+      "size": 63,
+      "vw": 8.2,
+      "font": "Bebas Neue",
+      "text": "My requests"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.09,
+     "centerShare": 0.15,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#e7e8e7",
+     "bodyBgHsl": {
+      "h": 120,
+      "s": 0.02,
+      "l": 0.91
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#e7e8e7",
+       "top": 108,
+       "hsl": {
+        "h": 120,
+        "s": 0.02,
+        "l": 0.91
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 2852,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#181715",
+       "share": 0.54
+      },
+      {
+       "color": "#5c5b55",
+       "share": 0.33
+      },
+      {
+       "color": "#e8e8e3",
+       "share": 0.08
+      },
+      {
+       "color": "#04250e",
+       "share": 0.04
+      },
+      {
+       "color": "#831c1e",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#181715",
+      "hsl": {
+       "h": 40,
+       "s": 0.07,
+       "l": 0.09
+      },
+      "fg": "#e8e8e3"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 3,
+     "inHero": 0,
+     "radius": 6,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": []
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 1,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 1,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 2,
+     "dashed": 0,
+     "blurred": 1,
+     "roundedBoxes": 8,
+     "boxRadius": 8,
+     "squareMedia": 2,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 1
+     },
+     {
+      "type": "canvas",
+      "ratio": 0.89
+     }
+    ],
+    "nav": {
+     "links": 3,
+     "fixed": true,
+     "height": 63,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "bebas neue",
+     "ibm plex sans"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 4630,
+    "margins": {
+     "left": 27,
+     "right": 27
+    },
+    "sections": [
+     {
+      "sel": "section.relative.ml-[calc(50%-50vw)]",
+      "tag": "section",
+      "top": 108,
+      "height": 2744,
+      "words": 17,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "PrintPoint",
+       "size": 54,
+       "tag": "h1"
+      },
+      "left": 132,
+      "right": 132,
+      "textLeft": 132,
+      "textRight": 132,
+      "fullBleed": true,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": true
+     },
+     {
+      "sel": "div.lg:grid.lg:grid-cols-[minmax(0,1fr)_360px]",
+      "tag": "div",
+      "top": 2852,
+      "height": 1615,
+      "words": 124,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "My requests",
+       "size": 63,
+       "tag": "h2"
+      },
+      "left": 27,
+      "right": 27,
+      "textLeft": 27,
+      "textRight": 46,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "PRINTPOINT",
+      "size": 54,
+      "top": 554,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 27,
+      "n": 3
+     },
+     {
+      "x": 46,
+      "n": 3
+     }
+    ],
+    "leftBlocks": 6,
+    "bodySize": 19,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 6,
+   "filled": [
+    0.17,
+    0.23,
+    0.42,
+    0.65,
+    0.75,
+    0.74
+   ],
+   "motion": {
+    "elements": 8,
+    "css": 1,
+    "transitions": 1,
+    "scripted": 6,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 4311,
+     "screens": 5.1,
+     "words": 165,
+     "img": 1,
+     "video": 0,
+     "canvas": 1,
+     "svg": 6,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 1,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "001.webp"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "PRINTPOINT",
+     "words": 1,
+     "chars": 10,
+     "lines": 1,
+     "size": 49.5,
+     "vw": 12.7,
+     "font": "Bebas Neue",
+     "weight": 400,
+     "tracking": -0.02,
+     "leading": 0.88,
+     "upper": true,
+     "italic": false,
+     "mono": false,
+     "align": "center",
+     "position": "center",
+     "widthRatio": 0.91,
+     "top": 452,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "PRINTPOINT",
+     "words": 1,
+     "lines": 1,
+     "size": 49.5,
+     "font": "Bebas Neue"
+    },
+    "headings": [
+     {
+      "text": "PRINTPOINT",
+      "words": 1,
+      "chars": 10,
+      "lines": 1,
+      "size": 29.3,
+      "vw": 7.5,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": 0.01,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.37,
+      "top": 29,
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "PRINTPOINT",
+      "words": 1,
+      "chars": 10,
+      "lines": 1,
+      "size": 49.5,
+      "vw": 12.7,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.88,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 452,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "711888",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 31.5,
+      "vw": 8.1,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": 0.1,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.24,
+      "top": 2434,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "MY REQUESTS",
+      "words": 2,
+      "chars": 11,
+      "lines": 1,
+      "size": 49.5,
+      "vw": 12.7,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.88,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 2859,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "ACTIVE",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 33.8,
+      "vw": 8.7,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.88,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 2976,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "711888",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 58.5,
+      "vw": 15,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": 0.12,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.72,
+      "top": 3175,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "PAST",
+      "words": 1,
+      "chars": 4,
+      "lines": 1,
+      "size": 33.8,
+      "vw": 8.7,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": -0.02,
+      "leading": 0.88,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 3629,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 7,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 2,
+     "centered": 1,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "IBM Plex Sans",
+       "share": 0.94,
+       "mono": false
+      },
+      {
+       "family": "Bebas Neue",
+       "share": 0.06,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      29,
+      32,
+      34,
+      50,
+      59
+     ],
+     "sizeCount": 14,
+     "notLoaded": [],
+     "body": {
+      "font": "IBM Plex Sans",
+      "size": 19.1,
+      "leading": 1.41,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 14.6
+     },
+     "measureChars": 37,
+     "max": {
+      "size": 58.5,
+      "vw": 15,
+      "font": "Bebas Neue",
+      "text": "711888"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.09,
+     "centerShare": 0.16,
+     "smallText": 0
+    },
+    "eyebrows": [
+     {
+      "text": "Ready for pickup",
+      "above": "711888",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 3103
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#e7e8e7",
+     "bodyBgHsl": {
+      "h": 120,
+      "s": 0.02,
+      "l": 0.91
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#e7e8e7",
+       "top": 108,
+       "hsl": {
+        "h": 120,
+        "s": 0.02,
+        "l": 0.91
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 2370,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#181715",
+       "share": 0.54
+      },
+      {
+       "color": "#5c5b55",
+       "share": 0.32
+      },
+      {
+       "color": "#e8e8e3",
+       "share": 0.08
+      },
+      {
+       "color": "#04250e",
+       "share": 0.04
+      },
+      {
+       "color": "#831c1e",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#181715",
+      "hsl": {
+       "h": 40,
+       "s": 0.07,
+       "l": 0.09
+      },
+      "fg": "#e8e8e3"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 3,
+     "inHero": 0,
+     "radius": 6,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": []
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 1,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 1,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 2,
+     "dashed": 0,
+     "blurred": 1,
+     "roundedBoxes": 9,
+     "boxRadius": 8,
+     "squareMedia": 2,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 1
+     },
+     {
+      "type": "canvas",
+      "ratio": 0.87
+     }
+    ],
+    "nav": {
+     "links": 1,
+     "fixed": true,
+     "height": 63,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "bebas neue",
+     "ibm plex sans"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 4311,
+    "margins": {
+     "left": 18,
+     "right": 18
+    },
+    "sections": [
+     {
+      "sel": "section.relative.ml-[calc(50%-50vw)]",
+      "tag": "section",
+      "top": 108,
+      "height": 2262,
+      "words": 17,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "PrintPoint",
+       "size": 50,
+       "tag": "h1"
+      },
+      "left": 33,
+      "right": 33,
+      "textLeft": 33,
+      "textRight": 33,
+      "fullBleed": true,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": true
+     },
+     {
+      "sel": "div.mb-4.rounded-card",
+      "tag": "div",
+      "top": 2370,
+      "height": 471,
+      "words": 41,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "711888",
+       "size": 32,
+       "tag": "span"
+      },
+      "left": 37,
+      "right": 37,
+      "textLeft": 37,
+      "textRight": 53,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.min-w-0.lg:col-start-1",
+      "tag": "div",
+      "top": 2859,
+      "height": 1254,
+      "words": 81,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "711888",
+       "size": 59,
+       "tag": "p"
+      },
+      "left": 18,
+      "right": 18,
+      "textLeft": 18,
+      "textRight": 37,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "PRINTPOINT",
+      "size": 50,
+      "top": 452,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 18,
+      "n": 3
+     },
+     {
+      "x": 37,
+      "n": 3
+     }
+    ],
+    "leftBlocks": 6,
+    "bodySize": 19,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "outlined-box",
+   "width": 1440,
+   "message": "2 box(es) drawn with a 1px outline.",
+   "fix": "Prefer a filled surface or no box.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "size-count",
+   "width": 1440,
+   "message": "14 different font sizes (13, 14, 16, 17, 18, 19, 20, 21, 29, 32, 34, 59, 63, 101).",
+   "fix": "A page needs about five: display, heading, lead, body, small.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "first-action",
+   "width": 1440,
+   "message": "No visible button in the first screen.",
+   "fix": "Give the one primary action a real button in the first screen (a filled or solid-bordered control, 44px or taller), not only a link in the navigation.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "few-pictures",
+   "width": 1440,
+   "message": "Only 1 picture(s) on the page (1 photographs, footage or raster images, 0 interface fragments). Drawings in SVG do not count.",
+   "fix": "Find real pictures of the subject's world with scripts/assets.mjs (photographs, archival images, maps, engravings, footage), download them to assets/ and give them room: a hero picture, one per section that has a subject, a full-width band. At least four, usually six to twelve."
+  },
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "WARN",
+   "id": "dev-server",
+   "width": 1440,
+   "message": "This page is served by a development server (Vite, webpack or Next in dev mode).",
+   "fix": "Run the last gate on the production build too (vite build && vite preview, next build && next start, or the built index.html): minifiers and bundlers change the CSS a visitor receives.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "off-centre",
+   "width": 1440,
+   "message": "The margins differ: 171px on the left, 215px on the right, at 1440px.",
+   "fix": "Put the navigation and the content on one pair of margins; check for padding on one side only, a scrollbar gutter, or a header on another inset than the page."
+  },
+  {
+   "level": "WARN",
+   "id": "pinned-over-picture",
+   "width": 1440,
+   "message": "Pinned large text slides across pictures while the page scrolls: \"PRINTPOINT\" (screen 3, 100% over a picture)",
+   "fix": "Jurors read a pinned title crossing drawings or photographs as a collision. Keep the pictures in the column the title does not occupy, or unpin it.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "long-pin",
+   "width": 1440,
+   "message": "The same large text stays on screen for 3 screens in a row: \"PRINTPOINT\"",
+   "fix": "A pinned element earns two screens, and something must change at each. Shorten the run or give every screen its own content."
+  },
+  {
+   "level": "WARN",
+   "id": "still-page",
+   "width": 1440,
+   "message": "Little motion: 10 element(s) moved while the page loaded and scrolled.",
+   "fix": "Give every section an entrance for its parts (not one fade of the whole block) and add one moving picture: a looping clip or a slow move on a photograph."
+  },
+  {
+   "level": "FAIL",
+   "id": "eyebrow",
+   "width": 390,
+   "message": "1 eyebrow/kicker label(s) above headings: \"Ready for pickup\" above \"711888\"",
+   "fix": "Delete them. If the label carried real information, fold it into the headline or the supporting sentence."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\home-after\\desktop-fold.jpg",
+   "pages": [
+    "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\home-after\\desktop-page-01.jpg",
+    "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\home-after\\desktop-page-02.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\home-after\\tablet-fold.jpg",
+   "pages": [
+    "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\home-after\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\home-after\\mobile-fold.jpg",
+   "pages": [
+    "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\home-after\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

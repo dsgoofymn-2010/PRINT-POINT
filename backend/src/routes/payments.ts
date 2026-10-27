@@ -82,9 +82,14 @@ paymentsRouter.post(
 
     // Defence in depth: confirm with Razorpay that this payment belongs to the order and amount.
     const rp = await razorpay().payments.fetch(body.razorpay_payment_id);
-    if (rp.order_id !== body.razorpay_order_id || Number(rp.amount) !== payment.amount || !['captured', 'authorized'].includes(rp.status)) {
+    if (rp.order_id !== body.razorpay_order_id || Number(rp.amount) !== payment.amount) {
       throw badRequest('Payment could not be confirmed with Razorpay');
     }
+    if (rp.status === 'authorized') {
+      // Money is on hold, not captured yet; the payment.captured webhook marks the order paid.
+      return res.status(202).json({ ok: true, pending: true, orderId: payment.orderId });
+    }
+    if (rp.status !== 'captured') throw badRequest('Payment could not be confirmed with Razorpay');
 
     const order = await markPaid({
       razorpayOrderId: body.razorpay_order_id,

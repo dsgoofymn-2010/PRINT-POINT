@@ -24,7 +24,7 @@ const MOVABLE = ['REQUESTED', 'ACCEPTED', 'PAID'];
 const TONE = { REQUESTED: 'amber', ACCEPTED: 'brass', PAID: 'brass', PRINTING: 'brass', READY: 'green', COMPLETED: 'gray', DENIED: 'red', CANCELLED: 'red', REFUNDED: 'red' } as const;
 
 /** One incoming request with the single next action the shop can take. */
-export function RequestCard({ order, highlight, onlinePayment, defaultReadyMins }: { order: IncomingRequest; highlight: boolean; onlinePayment: boolean; defaultReadyMins: number }) {
+export function RequestCard({ order, showStatus = true, highlight, onlinePayment, defaultReadyMins }: { order: IncomingRequest; showStatus?: boolean; highlight: boolean; onlinePayment: boolean; defaultReadyMins: number }) {
   const qc = useQueryClient();
   const [mode, setMode] = useState<'idle' | 'accept' | 'deny' | 'time'>('idle');
   const [newTime, setNewTime] = useState(() => inMinutes(60));
@@ -60,7 +60,7 @@ export function RequestCard({ order, highlight, onlinePayment, defaultReadyMins 
     first?.sides === 'DOUBLE' ? '2-sided' : '1-sided',
     `${first?.copies ?? 1} cop${first?.copies === 1 ? 'y' : 'ies'}`,
     first?.binding && first.binding !== 'NONE' ? `${first.binding.toLowerCase()} binding` : null,
-    `${pages} pg`,
+    `${pages} ${pages === 1 ? 'page' : 'pages'}`,
   ].filter(Boolean).join(' · ');
 
   return (
@@ -77,18 +77,18 @@ export function RequestCard({ order, highlight, onlinePayment, defaultReadyMins 
             <span className="text-muted"> · {minutesAgo(order.createdAt)}</span>
           </p>
           {highlight && <Badge tone="brass">New</Badge>}
-          <Badge tone={TONE[order.status as keyof typeof TONE] ?? 'gray'}>{STATUS_LABEL[order.status]}</Badge>
+          {showStatus && <Badge tone={TONE[order.status as keyof typeof TONE] ?? 'gray'}>{STATUS_LABEL[order.status]}</Badge>}
           <span className="num font-semibold">{rupees(order.total)}</span>
         </div>
 
-        <p className="text-muted">{spec}{order.paidAt ? ' · paid' : ''}</p>
+        <p className="text-muted">{spec}{order.paidAt ? ' · Paid' : ''}</p>
 
         <ul className="space-y-0.5">
           {order.items.map((i) => (
             <li key={i.id} className="flex items-center gap-3">
               <span className="min-w-0 flex-1 truncate" title={i.fileName}>{i.fileName}</span>
               {i.file.deletedAt ? (
-                <span className="text-muted">deleted</span>
+                <span className="text-muted">File deleted</span>
               ) : (
                 <span className="flex flex-none gap-3 text-[0.875rem]">
                   {i.file.mimeType !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' && (
@@ -105,12 +105,12 @@ export function RequestCard({ order, highlight, onlinePayment, defaultReadyMins 
         {(order.specialInstructions || order.scheduledFor || (order.estimatedReadyAt && ['ACCEPTED', 'PAID', 'PRINTING'].includes(order.status))) && (
           <p className="text-[0.875rem]">
             {order.scheduledFor && <span>Booked for <span className="font-medium">{when(order.scheduledFor)}</span>. </span>}
-            {order.estimatedReadyAt && ['ACCEPTED', 'PAID', 'PRINTING'].includes(order.status) && <span>Promised by {clock(order.estimatedReadyAt)}. </span>}
+            {order.estimatedReadyAt && ['ACCEPTED', 'PAID', 'PRINTING'].includes(order.status) && <span>Promised for {clock(order.estimatedReadyAt)}. </span>}
             {order.specialInstructions && <span className="text-muted">Note: “{order.specialInstructions}”</span>}
           </p>
         )}
         {order.status === 'DENIED' && order.denyReason && <p className="text-muted">Denied: {order.denyReason}</p>}
-        {order.proposedTime && <p className="text-[0.875rem] text-brass-ink">Asked to move to {when(order.proposedTime)}. Waiting for the customer.</p>}
+        {order.proposedTime && <p className="text-[0.875rem] text-brass-ink">You suggested {when(order.proposedTime)}. Waiting for the customer to reply.</p>}
       </div>
 
       {/* Actions */}
@@ -127,7 +127,7 @@ export function RequestCard({ order, highlight, onlinePayment, defaultReadyMins 
         )}
         {MOVABLE.includes(order.status) && mode === 'time' && (
           <div className="space-y-3">
-            <p className="font-medium">Too busy? Suggest a new time. The customer can agree or keep their time.</p>
+            <p className="font-medium">Suggest a new time. The customer can accept it or keep theirs.</p>
             <TimePicker
               label="New time"
               value={newTime}
@@ -156,7 +156,7 @@ export function RequestCard({ order, highlight, onlinePayment, defaultReadyMins 
         )}
         {order.status === 'REQUESTED' && mode === 'accept' && (
           <div className="space-y-3">
-            <p className="font-medium">Ready in about…</p>
+            <p className="font-medium">How soon will it be ready?</p>
             <Chips label="Ready in" value={readyIn} onPick={setReadyIn} options={READY_IN.map((m) => ({ value: m, label: m < 60 ? `${m} min` : `${m / 60} h` }))} />
             <div className="flex flex-wrap gap-2">
               <Button variant="primary" loading={act.isPending} onClick={() => run('accept', { readyInMinutes: readyIn })}>
@@ -168,7 +168,7 @@ export function RequestCard({ order, highlight, onlinePayment, defaultReadyMins 
         )}
         {order.status === 'REQUESTED' && mode === 'deny' && (
           <div className="space-y-3">
-            <p className="font-medium">Why? The customer will see this.</p>
+            <p className="font-medium">Tell the customer why. They will see this message.</p>
             <Chips label="Deny reason" value={reason} onPick={setReason} options={DENY_REASONS.map((r) => ({ value: r, label: r }))} />
             <input
               value={reason}
@@ -184,11 +184,11 @@ export function RequestCard({ order, highlight, onlinePayment, defaultReadyMins 
             </div>
           </div>
         )}
-        {order.status === 'ACCEPTED' && onlinePayment && mode === 'idle' && <p className="text-muted">Waiting for the customer to pay.</p>}
+        {order.status === 'ACCEPTED' && onlinePayment && mode === 'idle' && <p className="text-muted">Waiting for the customer to pay online.</p>}
         {order.status === 'ACCEPTED' && !onlinePayment && (
           <div className="flex flex-wrap items-center gap-3">
             <Button variant="primary" loading={act.isPending} onClick={() => run('printing')}>Mark printing</Button>
-            <span className="text-[0.9375rem] text-muted">Collect {rupees(order.total)} at the counter.</span>
+            <span className="text-[0.9375rem] text-muted">Collect {rupees(order.total)} when they pick up.</span>
           </div>
         )}
         {order.status === 'PAID' && <Button variant="primary" loading={act.isPending} onClick={() => run('printing')}>Mark printing</Button>}

@@ -15,7 +15,12 @@ const schema = z.object({
   RAZORPAY_KEY_ID: z.string().default(''),
   RAZORPAY_KEY_SECRET: z.string().default(''),
   RAZORPAY_WEBHOOK_SECRET: z.string().default(''),
-  STORAGE_DRIVER: z.enum(['local']).default('local'),
+  // 'supabase' keeps uploads in a private Supabase Storage bucket (survives Render redeploys).
+  STORAGE_DRIVER: z.enum(['local', 'supabase']).default('local'),
+  SUPABASE_URL: z.string().url().optional(),
+  // Server-only secret (Project Settings -> API -> service_role). Never put it in the frontend.
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(20).optional(),
+  SUPABASE_BUCKET: z.string().regex(/^[a-z0-9._-]+$/).default('uploads'),
   UPLOAD_DIR: z.string().default('./uploads'),
   MAX_FILE_SIZE_MB: z.coerce.number().positive().default(25),
   FILE_RETENTION_HOURS: z.coerce.number().positive().default(24),
@@ -28,7 +33,9 @@ const schema = z.object({
   DEV_OTP: z.string().regex(/^\d{6}$/).default('123456'),
   // Demo site: nobody signs in; visitors switch between customer, shop owner and admin with one click.
   // On by default (this is a sample site). Set to false to require real sign-in.
-  DEV_SKIP_LOGIN: z.enum(['true', 'false']).default('true').transform((v) => v === 'true'),
+  DEV_SKIP_LOGIN: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
+  // Production refuses to start in demo mode unless this is also true (anyone could act as admin).
+  ALLOW_DEMO_IN_PROD: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
   // Which shop this app serves (its slug). Empty = the oldest approved shop.
   SHOP_SLUG: z.string().trim().default(''),
   DEFAULT_COMMISSION_PERCENT: z.coerce.number().min(0).max(100).default(5),
@@ -46,4 +53,15 @@ export const corsOrigins = env.CORS_ORIGINS.split(',').map((o) => o.trim()).filt
 // The .env.example placeholders ("rzp_test_xxxx…") count as "not configured".
 const realKey = (v: string) => Boolean(v) && !/x{6,}/i.test(v);
 export const razorpayConfigured = realKey(env.RAZORPAY_KEY_ID) && realKey(env.RAZORPAY_KEY_SECRET);
+if (env.STORAGE_DRIVER === 'supabase' && (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY)) {
+  console.error('STORAGE_DRIVER=supabase needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.');
+  process.exit(1);
+}
+if (isProd && env.DEV_SKIP_LOGIN && !env.ALLOW_DEMO_IN_PROD) {
+  console.error(
+    'Refusing to start: DEV_SKIP_LOGIN=true in production lets anyone sign in as admin. ' +
+      'Set DEV_SKIP_LOGIN=false, or also set ALLOW_DEMO_IN_PROD=true for a throwaway demo site.',
+  );
+  process.exit(1);
+}
 export const skipLogin = env.DEV_SKIP_LOGIN;

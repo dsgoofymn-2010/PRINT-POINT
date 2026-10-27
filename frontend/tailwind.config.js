@@ -30,12 +30,12 @@ export default {
       },
       fontFamily: {
         display: ['"Bebas Neue"', 'Impact', 'sans-serif'],
-        serif: ['"EB Garamond"', 'Georgia', 'serif'],
-        sans: ['"EB Garamond"', 'Georgia', 'serif'],
+        serif: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
+        sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
       },
       borderRadius: { card: '8px', control: '6px', chip: '4px' },
-      // EB Garamond sets small; the app scale sits one step above the grotesk defaults.
-      fontSize: { xs: ['14px', '20px'], sm: ['15px', '22px'], base: ['17px', '26px'], lg: ['19px', '28px'] },
+      // IBM Plex Sans for all text; Bebas Neue only for the wordmark and display headings.
+      fontSize: { xs: ['13px', '18px'], sm: ['14px', '20px'], base: ['16px', '24px'], lg: ['18px', '28px'] },
     },
   },
   plugins: [],

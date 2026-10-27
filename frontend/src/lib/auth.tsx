@@ -4,8 +4,8 @@ import { api, refreshSession, setAccessToken, setOnAuthLost } from './api';
 import { resetRealtimeIdentity } from './realtime';
 import type { Role, User } from './types';
 
-/** Demo site: no sign-in, everyone can switch roles. On unless VITE_SKIP_LOGIN=false. */
-export const SKIP_LOGIN = import.meta.env.VITE_SKIP_LOGIN !== 'false';
+/** Demo site: no sign-in, everyone can switch roles. Off unless VITE_SKIP_LOGIN=true. */
+export const SKIP_LOGIN = import.meta.env.VITE_SKIP_LOGIN === 'true';
 
 interface AuthState {
   user: User | null;

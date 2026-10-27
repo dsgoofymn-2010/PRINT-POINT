@@ -54,6 +54,8 @@ interface CreateOrderResponse {
 
 export type PayResult =
   | { kind: 'success'; orderNumber: string | null }
+  /** Money is on hold at Razorpay; the order turns Paid when it is captured. */
+  | { kind: 'pending' }
   | { kind: 'failed'; reason: string }
   | { kind: 'cancelled' };
 
@@ -93,8 +95,8 @@ export async function payForOrder(orderId: string): Promise<PayResult> {
       },
       handler: (resp) => {
         api
-          .post<{ orderNumber: string | null }>('/payments/verify', resp)
-          .then((v) => done({ kind: 'success', orderNumber: v.orderNumber }))
+          .post<{ orderNumber?: string | null; pending?: boolean }>('/payments/verify', resp)
+          .then((v) => done(v.pending ? { kind: 'pending' } : { kind: 'success', orderNumber: v.orderNumber ?? null }))
           .catch((e: Error) => done({ kind: 'failed', reason: e.message }));
       },
     });
