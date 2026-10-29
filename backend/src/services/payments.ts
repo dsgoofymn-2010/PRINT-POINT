@@ -101,6 +101,7 @@ export async function markFailed(razorpayOrderId: string, reason: string, razorp
 
 /** Starts a Razorpay refund for the order's captured payment. amount=null means full refund. */
 export async function initiateRefund(orderId: string, amount: number | null, reason: string, actorId: string | null) {
+<<<<<<< HEAD
   const payment = await prisma.payment.findFirst({ where: { orderId, status: 'PAID' }, orderBy: { createdAt: 'desc' } });
   if (!payment?.razorpayPaymentId) throw badRequest('No captured payment to refund for this order');
 
@@ -120,6 +121,33 @@ export async function initiateRefund(orderId: string, amount: number | null, rea
   const processed = rp.status === 'processed';
   const refund = await prisma.$transaction(async (tx) => {
     const r = await tx.refund.create({
+=======
+  // One refund per order at a time: a lock held for the whole transaction stops two
+  // quick cancel clicks from both passing the balance check and refunding twice.
+  const refund = await prisma.$transaction(
+    async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`refund:${orderId}`}))`;
+
+      const payment = await tx.payment.findFirst({ where: { orderId, status: 'PAID' }, orderBy: { createdAt: 'desc' } });
+      if (!payment?.razorpayPaymentId) throw badRequest('No captured payment to refund for this order');
+
+      const already = await tx.refund.aggregate({
+        where: { paymentId: payment.id, status: { in: ['PENDING', 'PROCESSED'] } },
+        _sum: { amount: true },
+      });
+      const remaining = payment.amount - (already._sum.amount ?? 0);
+      const refundAmount = amount ?? remaining;
+      if (refundAmount <= 0 || refundAmount > remaining) throw conflict('Refund amount exceeds the refundable balance');
+
+      // If saving fails after this call, the refund.processed webhook records it later.
+      const rp = await razorpay().payments.refund(payment.razorpayPaymentId, {
+        amount: refundAmount,
+        notes: { orderId, reason: reason.slice(0, 200) },
+      });
+      const processed = rp.status === 'processed';
+
+      const r = await tx.refund.create({
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
       data: {
         paymentId: payment.id,
         orderId,
@@ -137,7 +165,14 @@ export async function initiateRefund(orderId: string, amount: number | null, rea
     }
     if (processed) await finalizeRefund(tx, payment.id, orderId, refundAmount === remaining);
     return r;
+<<<<<<< HEAD
   });
+=======
+    },
+    // Room for the Razorpay call inside the transaction.
+    { maxWait: 10_000, timeout: 30_000 },
+  );
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
   await broadcastOrder(orderId);
   return refund;
 }

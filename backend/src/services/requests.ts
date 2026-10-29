@@ -334,7 +334,12 @@ export async function queueInfo(shopId: string) {
   const shop = await prisma.shop.findFirst({ where: { id: shopId, status: 'APPROVED', deletedAt: null } });
   if (!shop) throw notFound('Shop not found');
   const [pending, printing, ahead, rule] = await Promise.all([
+<<<<<<< HEAD
     prisma.printOrder.count({ where: { shopId, status: 'REQUESTED' } }),
+=======
+    // Everything in line that isn't on the printer yet.
+    prisma.printOrder.count({ where: { shopId, status: { in: ['REQUESTED', 'ACCEPTED', 'PAID'] } } }),
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
     prisma.printOrder.count({ where: { shopId, status: 'PRINTING' } }),
     prisma.orderItem.findMany({
       where: { order: { shopId, status: { in: ['ACCEPTED', 'PAID', 'PRINTING'] } } },
@@ -343,8 +348,13 @@ export async function queueInfo(shopId: string) {
     prisma.pricingRule.findFirst({ where: { shopId, isActive: true }, orderBy: { updatedAt: 'desc' } }),
   ]);
   const pagesAhead = ahead.reduce((s, i) => s + i.printedPages * i.copies, 0);
+<<<<<<< HEAD
   const jobsAhead = new Set(ahead.map((i) => i.orderId)).size + pending;
   const estimatedWaitMins = Math.max(5, Math.ceil(pagesAhead / PAGES_PER_MINUTE + jobsAhead * MINUTES_PER_JOB));
+=======
+  const jobsAhead = pending + printing;
+  const estimatedWaitMins = jobsAhead === 0 ? 0 : Math.max(5, Math.ceil(pagesAhead / PAGES_PER_MINUTE + jobsAhead * MINUTES_PER_JOB));
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 
   return {
     shopId: shop.id,

@@ -8,7 +8,10 @@ import { QueuePanel } from '@/components/chat/QueuePanel';
 import { PickupPanel } from '@/components/chat/PickupPanel';
 import { PhoneStep } from '@/components/chat/PhoneStep';
 import { useMainShop } from '@/lib/mainShop';
+<<<<<<< HEAD
 import { PressHero } from '@/components/hero/PressHero';
+=======
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 import { PrinterScrollIntro } from '@/components/PrinterScrollIntro';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Reveal } from '@/components/Reveal';
@@ -33,6 +36,7 @@ export default function Home() {
     if (!params.get('view') && activeCount > 0) setParams({ view: 'mine' }, { replace: true });
   }, [mine.data, activeCount, params, setParams]);
 
+<<<<<<< HEAD
   // The home page always opens on the printer intro, even after a reload mid-page.
   useEffect(() => {
     if (!('scrollRestoration' in history)) return;
@@ -43,16 +47,23 @@ export default function Home() {
     };
   }, []);
 
+=======
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
   const reduce = useReducedMotion();
   const setView = (v: 'new' | 'mine') => setParams(v === 'mine' ? { view: 'mine' } : {}, { replace: true });
 
   return (
     <>
+<<<<<<< HEAD
     <PrinterScrollIntro />
     {view === 'new' && (
       <PressHero onStart={() => document.getElementById('order')?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })} />
     )}
     <div id="order" className={`scroll-mt-24 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-10 ${view === 'new' ? 'pt-4' : ''}`}>
+=======
+    <PrinterScrollIntro shopName={shop?.name} />
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-10">
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
       {view === 'mine' && user ? (
         <PickupPanel
           onNew={() => {
@@ -65,11 +76,16 @@ export default function Home() {
       )}
       <div className="min-w-0 lg:col-start-1 lg:row-start-1">
         <Reveal>
+<<<<<<< HEAD
           {view === 'mine' ? (
             <h1 className="display misreg mt-4 text-[2.25rem] sm:text-[2.75rem] lg:mt-0">My requests</h1>
           ) : (
             <h2 className="display mt-4 text-[2.25rem] sm:text-[2.75rem] lg:mt-0">Print something</h2>
           )}
+=======
+          {/* The shop name above is the page's h1. */}
+          <h2 className="display mt-4 text-[2.75rem] sm:text-[3.5rem] lg:mt-0">{view === 'mine' ? 'My requests' : 'Print something'}</h2>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
           <p className="mt-1 max-w-[38rem] text-[1.125rem] leading-relaxed text-muted">{view === 'mine' ? 'Track your orders and pickup codes.' : 'Upload your files. We check them, you pay, and you collect at the counter with a code.'}</p>
         </Reveal>
 

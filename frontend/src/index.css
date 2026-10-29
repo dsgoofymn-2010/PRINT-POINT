@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 /*
+<<<<<<< HEAD
   PrintPoint tokens: CMYK process ink on warm paper.
   K (ink) carries structure and text. M (magenta) is the one action on a screen.
   Y (yellow) marks what the customer picked. C (cyan) is for graphics; cyan-ink is its text-safe shade.
@@ -28,14 +29,68 @@
   --yellow: 255 212 0;       /* #ffd400, ink text on top */
   --on-yellow: 20 19 26;
   --data: 214 0 111;
+=======
+  PrintPoint tokens.
+  Page direction "Sentence is the layout" (seed 1497690328): newsprint paper, toner ink, one brass accent.
+  App style "Achromatic ledger" (seed 1499594586): ink chrome, brass only on the main data element.
+  Values are RGB triplets so Tailwind can apply opacity.
+*/
+:root {
+  --paper: 231 232 231;      /* #e7e8e7, matches the printer video */
+  --ground: 231 232 231;     /* same as the video so the intro blends in */
+  --surface: 255 255 255;
+  --raised: 249 249 247;
+  --active: 233 233 229;     /* nav pill, selected row */
+  --border: 232 232 228;
+  --rule: 241 241 238;
+  --control: 207 207 202;
+  --ink: 24 23 21;           /* #181715 toner */
+  --muted: 92 91 85;         /* #5c5b55, 6.4:1 on white */
+  --primary: 24 23 21;
+  --on-primary: 232 232 227;
+  --brass: 191 178 26;       /* #bfb21a, the action on the page */
+  --brass-ink: 24 23 21;
+  --data: 128 117 8;         /* #807508, brass deepened to 4.6:1 on white for chart marks */
+  --field: 24 23 21;
+  --field-ink: 232 232 227;
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
   --positive: 36 123 80;
   --negative: 196 36 42;
   color-scheme: light;
 }
 
+<<<<<<< HEAD
 @layer base {
   html {
     font-size: 112.5%; /* 18px base, Archivo sets larger than the old serif */
+=======
+.dark {
+  --paper: 17 17 16;
+  --ground: 10 10 9;
+  --surface: 20 20 19;
+  --raised: 30 30 28;
+  --active: 38 38 36;
+  --border: 40 40 38;
+  --rule: 30 30 28;
+  --control: 74 74 70;
+  --ink: 238 238 235;
+  --muted: 180 179 172;
+  --primary: 238 238 235;
+  --on-primary: 17 17 16;
+  --brass: 214 200 48;
+  --brass-ink: 17 17 16;
+  --data: 214 200 48;
+  --field: 232 232 227;
+  --field-ink: 24 23 21;
+  --positive: 63 192 122;
+  --negative: 229 86 111;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    font-size: 112.5%; /* 18px base, sized for IBM Plex Sans */
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
     -webkit-tap-highlight-color: transparent;
   }
   body {
@@ -43,12 +98,21 @@
     font-variant-numeric: tabular-nums;
   }
   :focus-visible {
+<<<<<<< HEAD
     outline: 2px solid rgb(var(--cyan-ink));
     outline-offset: 2px;
   }
   ::selection {
     background: rgb(var(--yellow));
     color: rgb(var(--on-yellow));
+=======
+    outline: 2px solid rgb(var(--ink));
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: rgb(var(--brass));
+    color: rgb(var(--brass-ink));
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
   }
 }
 
@@ -56,6 +120,7 @@
   .num {
     font-variant-numeric: tabular-nums;
   }
+<<<<<<< HEAD
   /* Fraunces with its soft axis up: a warm serif for headings, figures and the wordmark */
   .display {
     font-family: 'Fraunces', Georgia, serif;
@@ -84,11 +149,32 @@
     text-shadow:
       -0.018em 0.01em 0 rgb(var(--cyan) / 0.7),
       0.018em -0.006em 0 rgb(var(--magenta) / 0.65);
+=======
+  /* Condensed display type for headings, figures and the wordmark */
+  .display {
+    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 0.88;
+  }
+  /* Shop name over the printer intro: rises in once when it loads. */
+  .intro-name {
+    animation: intro-name-in 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  @keyframes intro-name-in {
+    from { opacity: 0; transform: translateY(24px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .intro-name { animation-name: intro-name-fade; }
+    @keyframes intro-name-fade { from { opacity: 0; } }
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
   }
   .page-gutter {
     padding-left: clamp(16px, 2.4vw, 32px);
     padding-right: clamp(16px, 2.4vw, 32px);
   }
+<<<<<<< HEAD
   /* Main action: a magenta block with its cyan plate showing underneath, pressed down on click. */
   .press {
     box-shadow: 3px 3px 0 rgb(var(--cyan));
@@ -114,6 +200,8 @@
     transition: none;
     transform: none;
   }
+=======
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 }
 
 @media print {

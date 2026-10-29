@@ -88,10 +88,29 @@ export const api = {
   upload: async <T>(path: string, form: FormData) => (await (await request(path, { form })).json()) as T,
   /** Asks for a short-lived signed link, then opens (preview) or saves the file. */
   openFile: async (fileId: string, mode: 'inline' | 'attachment' = 'inline') => {
+<<<<<<< HEAD
     const { url } = (await (await request(`/uploads/${fileId}/link?d=${mode}`)).json()) as { url: string };
     const full = `${import.meta.env.VITE_API_URL ?? ''}${url}`;
     if (mode === 'inline') window.open(full, '_blank', 'noopener');
     else {
+=======
+    // Open the tab during the tap itself; phones block tabs opened after an await.
+    const tab = mode === 'inline' ? window.open('about:blank', '_blank') : null;
+    let full: string;
+    try {
+      const { url } = (await (await request(`/uploads/${fileId}/link?d=${mode}`)).json()) as { url: string };
+      full = `${import.meta.env.VITE_API_URL ?? ''}${url}`;
+    } catch (e) {
+      tab?.close();
+      throw e;
+    }
+    if (mode === 'inline') {
+      if (tab) {
+        tab.opener = null;
+        tab.location.href = full;
+      } else window.location.assign(full); // popup blocked anyway: open in this tab
+    } else {
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
       const a = document.createElement('a');
       a.href = full;
       a.rel = 'noopener';
@@ -114,7 +133,27 @@ export const api = {
 };
 
 /** Upload with progress (fetch has no upload progress events). */
+<<<<<<< HEAD
 export function uploadWithProgress<T>(path: string, form: FormData, onProgress: (pct: number) => void): Promise<T> {
+=======
+export async function uploadWithProgress<T>(path: string, form: FormData, onProgress: (pct: number) => void): Promise<T> {
+  try {
+    return await uploadOnce<T>(path, form, onProgress);
+  } catch (e) {
+    // Login expired while idle: renew it once and retry, like request() does.
+    if (!(e instanceof ApiError && e.status === 401 && accessToken)) throw e;
+    if (!(await refreshSession())) {
+      accessToken = null;
+      onAuthLost?.();
+      throw e;
+    }
+    onProgress(0);
+    return uploadOnce<T>(path, form, onProgress);
+  }
+}
+
+function uploadOnce<T>(path: string, form: FormData, onProgress: (pct: number) => void): Promise<T> {
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', `${BASE}${path}`);

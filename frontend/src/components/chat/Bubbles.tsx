@@ -51,7 +51,11 @@ export function Chips<T extends string | number>({
           onClick={() => onPick(o.value)}
           className={cn(
             'min-h-[44px] rounded-control border px-4 py-2 text-left text-[1.0625rem] transition-colors disabled:cursor-not-allowed disabled:opacity-45',
+<<<<<<< HEAD
             value === o.value ? 'border-ink bg-yellow text-on-yellow shadow-[3px_3px_0_rgb(var(--ink))]' : 'border-control bg-surface text-ink hover:border-ink',
+=======
+            value === o.value ? 'border-ink bg-brass text-brass-ink' : 'border-control bg-surface text-ink hover:border-ink',
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
           )}
         >
           <span className="block font-medium">{o.label}</span>

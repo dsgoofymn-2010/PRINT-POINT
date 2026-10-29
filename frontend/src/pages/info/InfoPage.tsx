@@ -64,7 +64,11 @@ export default function InfoPage() {
   if (!p) return <NotFound />;
   return (
     <Card className="prose mx-auto max-w-2xl space-y-3">
+<<<<<<< HEAD
       <h1 className="display misreg text-[2.25rem]">{p.title}</h1>
+=======
+      <h1 className="text-2xl font-bold">{p.title}</h1>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
       <div className="space-y-3 text-ink">{p.body}</div>
     </Card>
   );

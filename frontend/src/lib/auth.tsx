@@ -4,8 +4,13 @@ import { api, refreshSession, setAccessToken, setOnAuthLost } from './api';
 import { resetRealtimeIdentity } from './realtime';
 import type { Role, User } from './types';
 
+<<<<<<< HEAD
 /** Demo site: no sign-in, everyone can switch roles. On unless VITE_SKIP_LOGIN=false. */
 export const SKIP_LOGIN = import.meta.env.VITE_SKIP_LOGIN !== 'false';
+=======
+/** Demo site: no sign-in, everyone can switch roles. Off unless VITE_SKIP_LOGIN=true. */
+export const SKIP_LOGIN = import.meta.env.VITE_SKIP_LOGIN === 'true';
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 
 interface AuthState {
   user: User | null;

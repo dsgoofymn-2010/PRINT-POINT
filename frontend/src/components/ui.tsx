@@ -3,14 +3,23 @@ import { Link } from 'react-router-dom';
 
 export const cn = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(' ');
 
+<<<<<<< HEAD
 // Ink buttons for ordinary steps; one magenta "action" per screen for the step that sends or pays.
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'action';
+=======
+// Achromatic ledger: one near-black primary per screen, a grey secondary, text tertiary.
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'brass';
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 const variants: Record<Variant, string> = {
   primary: 'bg-primary text-on-primary hover:opacity-90 active:opacity-80 disabled:opacity-40',
   secondary: 'border border-control bg-surface text-ink hover:bg-raised active:bg-active disabled:opacity-50',
   ghost: 'text-ink hover:bg-active disabled:opacity-50',
   danger: 'border border-control bg-surface text-negative hover:bg-raised disabled:opacity-50',
+<<<<<<< HEAD
   action: 'press bg-magenta font-semibold text-on-magenta disabled:opacity-50',
+=======
+  brass: 'bg-brass text-brass-ink hover:brightness-95 active:brightness-90 disabled:opacity-50',
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 };
 const sizes = { sm: 'h-8 px-3 text-[0.875rem]', md: 'h-9 px-4 text-sm', lg: 'h-11 px-5 text-[0.9375rem]' };
 const btnBase =
@@ -43,7 +52,11 @@ export function ButtonLink({ to, variant = 'secondary', className, children, siz
 }
 
 const fieldCls =
+<<<<<<< HEAD
   'w-full h-10 rounded-control border border-line bg-surface px-3 text-sm text-ink placeholder:text-muted focus:border-cyan-ink focus:outline-none focus:ring-2 focus:ring-cyan/30 disabled:bg-raised disabled:text-muted';
+=======
+  'w-full h-10 rounded-control border border-line bg-surface px-3 text-sm text-ink placeholder:text-muted focus:border-ink focus:outline-none disabled:bg-raised disabled:text-muted';
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 
 function FieldWrap({ label, hint, error, id, children }: { label?: string; hint?: string; error?: string; id: string; children: ReactNode }) {
   return (
@@ -115,7 +128,11 @@ export function Segmented<T extends string>({ label, value, onChange, options, n
             key={o.value}
             className={cn(
               'cursor-pointer rounded-[5px] px-3 py-1.5 text-sm transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ink',
+<<<<<<< HEAD
               value === o.value ? 'bg-yellow font-medium text-on-yellow' : 'text-muted hover:text-ink',
+=======
+              value === o.value ? 'bg-surface font-medium text-ink' : 'text-muted hover:text-ink',
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
             )}
           >
             <input type="radio" className="sr-only" name={name} value={o.value} checked={value === o.value} onChange={() => onChange(o.value)} />
@@ -148,8 +165,12 @@ const tones = {
   green: 'bg-[#dcfae5] text-[#04250e] dark:bg-[#172a1d] dark:text-[#3fc07a]',
   amber: 'bg-[#fffbeb] text-[#92400e] dark:bg-[#2a2410] dark:text-[#e0c060]',
   red: 'bg-[#ffedea] text-[#831c1e] dark:bg-[#2c1a20] dark:text-[#e5566f]',
+<<<<<<< HEAD
   yellow: 'bg-yellow text-on-yellow',
   magenta: 'bg-magenta text-on-magenta',
+=======
+  brass: 'bg-brass text-brass-ink',
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 };
 export function Badge({ tone = 'gray', children }: { tone?: keyof typeof tones; children: ReactNode }) {
   return <span className={cn('inline-flex h-5 flex-none items-center whitespace-nowrap rounded-chip px-1.5 text-xs font-medium', tones[tone])}>{children}</span>;
@@ -222,7 +243,11 @@ export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: { valu
           onClick={() => onChange(t.value)}
           className={cn(
             '-mb-px whitespace-nowrap border-b-2 pb-2.5 pt-1 text-sm transition-colors',
+<<<<<<< HEAD
             value === t.value ? 'border-magenta font-medium text-ink' : 'border-transparent text-muted hover:text-ink',
+=======
+            value === t.value ? 'border-ink font-medium text-ink' : 'border-transparent text-muted hover:text-ink',
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
           )}
         >
           {t.label}
@@ -253,7 +278,11 @@ export function PageTitle({ title, subtitle, action }: { title: string; subtitle
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
+<<<<<<< HEAD
         <h1 className="display text-[1.875rem] sm:text-[2.25rem]">{title}</h1>
+=======
+        <h1 className="text-[1.25rem] font-semibold leading-8 tracking-[-0.01em] sm:text-2xl">{title}</h1>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
         {subtitle && <p className="mt-1 text-[0.9375rem] text-muted">{subtitle}</p>}
       </div>
       {action && <div className="flex flex-wrap gap-2">{action}</div>}

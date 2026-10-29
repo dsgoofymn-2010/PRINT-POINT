@@ -16,6 +16,18 @@ interface DeskData {
   orders: IncomingRequest[];
 }
 
+<<<<<<< HEAD
+=======
+/** Active orders grouped by stage, in the order the counter works through them. */
+const LANES = [
+  { status: 'REQUESTED', title: 'Needs your answer', hint: 'Accept, deny or suggest another time.' },
+  { status: 'ACCEPTED', title: 'Accepted, waiting for payment', hint: 'Once paid, they move to “To print”.' },
+  { status: 'PAID', title: 'To print', hint: 'Paid and ready to start.' },
+  { status: 'PRINTING', title: 'Printing now', hint: 'Mark each one ready when it’s done.' },
+  { status: 'READY', title: 'Ready for pickup', hint: 'Ask for the customer’s 6-digit pickup code.' },
+] as const;
+
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 /** Two-tone chime with Web Audio, so no sound file is needed. */
 function chime(ctx: AudioContext) {
   [880, 1320].forEach((f, i) => {
@@ -47,7 +59,11 @@ function OwnerLogin() {
   };
   return (
     <div className="mx-auto max-w-sm py-10">
+<<<<<<< HEAD
       <h1 className="display text-[2.25rem]">Shop desk</h1>
+=======
+      <h1 className="display text-[3rem]">Shop desk</h1>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
       <p className="mb-6 text-[1.0625rem] text-muted">Sign in to accept print requests for your shop.</p>
       <form onSubmit={submit} className="space-y-4">
         <Input label="Email or mobile" autoComplete="username" value={identifier} onChange={(e) => setIdentifier(e.target.value)} className="h-11 text-[1.0625rem]" />
@@ -151,6 +167,7 @@ function Desk() {
   if (q.error) return <ErrorState error={q.error} onRetry={() => void q.refetch()} />;
   const d = q.data;
 
+<<<<<<< HEAD
   const counters = [
     { label: 'Pending', value: d.counts.pending, lead: true },
     { label: 'Accepted', value: d.counts.accepted },
@@ -158,6 +175,14 @@ function Desk() {
     { label: 'Ready', value: d.counts.ready },
     { label: 'Completed today', value: d.counts.completedToday },
   ];
+=======
+  const card = (o: IncomingRequest) => (
+    <div key={o.id} onClick={() => fresh.has(o.id) && setFresh((s) => new Set([...s].filter((x) => x !== o.id)))}>
+      <RequestCard order={o} showStatus={scope === 'done'} highlight={fresh.has(o.id)} onlinePayment={d.onlinePayment} defaultReadyMins={d.shop.estimatedPickupMins} />
+    </div>
+  );
+  const inProgress = d.counts.accepted + d.counts.printing;
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 
   return (
     <div className="space-y-6">
@@ -169,6 +194,7 @@ function Desk() {
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
+<<<<<<< HEAD
           <h1 className="text-[1.25rem] font-semibold leading-8 sm:text-2xl">Requests</h1>
           <p className="mt-1 text-[1.125rem] font-medium">
             {d.counts.pending > 0
@@ -181,6 +207,21 @@ function Desk() {
             Hours {time12(d.shop.openTime)} – {time12(d.shop.closeTime)}
             {!d.shop.withinHours && ' · outside opening hours'}
             {!d.shop.acceptingRequests && (d.shop.reopensAt ? ` · opens again ${when(d.shop.reopensAt)}` : ' · no reopening time set')}
+=======
+          <h1 className="text-[1.25rem] font-semibold leading-8 sm:text-[1.5rem]">Orders</h1>
+          <p className="mt-1 text-[1.125rem]">
+            {d.counts.pending > 0
+              ? `${d.counts.pending} new ${d.counts.pending === 1 ? 'request needs' : 'requests need'} your answer.`
+              : 'No new requests. They appear here the moment they arrive.'}
+          </p>
+          <p className="mt-1 text-[1rem] text-muted">
+            {inProgress} in progress · {d.counts.ready} ready for pickup · {d.counts.completedToday} collected today
+          </p>
+          <p className="text-[1rem] text-muted">
+            Open {time12(d.shop.openTime)} – {time12(d.shop.closeTime)}
+            {!d.shop.withinHours && ' · outside opening hours now'}
+            {!d.shop.acceptingRequests && (d.shop.reopensAt ? ` · reopens ${when(d.shop.reopensAt)}` : ' · closed until you reopen')}
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -196,20 +237,32 @@ function Desk() {
             )}
           >
             <span className={cn('h-3 w-3 rounded-full', d.shop.acceptingRequests ? 'bg-positive' : 'bg-negative')} aria-hidden="true" />
+<<<<<<< HEAD
             {d.shop.acceptingRequests ? 'Open for requests' : 'Closed to requests'}
+=======
+            {d.shop.acceptingRequests ? 'Taking orders' : 'Not taking orders'}
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
           </button>
           {!d.shop.acceptingRequests && !closing && (
             <Button size="lg" onClick={() => setClosing(true)}>{d.shop.reopensAt ? 'Change reopening time' : 'Set reopening time'}</Button>
           )}
           <Button size="lg" variant={sound ? 'ghost' : 'secondary'} onClick={sound ? () => setSound(false) : enableSound}>
+<<<<<<< HEAD
             {sound ? 'Sound on' : 'Turn on sound alerts'}
+=======
+            {sound ? 'Sound alerts on' : 'Turn on sound alerts'}
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
           </Button>
         </div>
       </div>
       {closing && (
         <div className="space-y-3 rounded-card border border-line bg-surface p-4">
           <p className="text-[1.0625rem] font-medium">When will you open again?</p>
+<<<<<<< HEAD
           <p className="text-[1rem] text-muted">Customers see this time and can book their orders for it. The shop opens itself again at that time.</p>
+=======
+          <p className="text-[1rem] text-muted">Customers see this time and can book for it. The shop reopens on its own at that time.</p>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
           <TimePicker
             label="Opens again at"
             value={reopenAt}
@@ -232,6 +285,7 @@ function Desk() {
         </div>
       )}
       {toggleOpen.error && <Alert tone="red">{toggleOpen.error.message}</Alert>}
+<<<<<<< HEAD
       {!online && poll !== false && <Alert tone="amber">Live connection lost. Reconnecting… The list still refreshes every 10 seconds.</Alert>}
 
       <dl className="grid grid-cols-2 divide-line overflow-hidden rounded-card border border-line bg-surface sm:grid-cols-5 sm:divide-x">
@@ -262,6 +316,41 @@ function Desk() {
 
       <p className="text-[0.9375rem] text-muted">
         Customer phone numbers are hidden except the last 4 digits. Files are deleted automatically after pickup, or 24 hours at most.
+=======
+      {!online && poll !== false && <Alert tone="amber">Live updates are reconnecting. Until then the list refreshes every 10 seconds.</Alert>}
+
+      <Tabs value={scope} onChange={setScope} tabs={[{ value: 'active', label: 'Today’s work' }, { value: 'done', label: 'Finished, last 7 days' }]} />
+
+      {d.orders.length === 0 ? (
+        <EmptyState
+          title={scope === 'active' ? 'No orders right now' : 'Nothing finished in the last 7 days'}
+          body={scope === 'active' ? (d.shop.isOpen ? 'New requests appear here the moment they arrive.' : 'You’re not taking orders. Switch to “Taking orders” to receive requests.') : undefined}
+        />
+      ) : scope === 'active' ? (
+        <div className="space-y-10">
+          {LANES.map((lane) => {
+            const list = d.orders.filter((o) => o.status === lane.status);
+            if (!list.length) return null;
+            return (
+              <section key={lane.status} aria-labelledby={`lane-${lane.status}`}>
+                <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <h2 id={`lane-${lane.status}`} className="text-[1.25rem] font-semibold">
+                    {lane.title} <span className="num text-muted">{list.length}</span>
+                  </h2>
+                  <p className="text-[0.9375rem] text-muted">{lane.hint}</p>
+                </div>
+                <div className="grid items-start gap-3 md:grid-cols-2 2xl:grid-cols-3">{list.map(card)}</div>
+              </section>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="grid items-start gap-3 md:grid-cols-2 2xl:grid-cols-3">{d.orders.map(card)}</div>
+      )}
+
+      <p className="text-[0.9375rem] text-muted">
+        Only the last 4 digits of customer phone numbers are shown. Files are deleted after pickup, or after 24 hours at most.
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
       </p>
     </div>
   );

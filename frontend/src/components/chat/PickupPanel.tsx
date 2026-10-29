@@ -1,7 +1,10 @@
 import { time12, STATUS_LABEL } from '@/lib/format';
 import { useMainShop } from '@/lib/mainShop';
 import { Badge } from '../ui';
+<<<<<<< HEAD
 import { Tilt } from '../Tilt';
+=======
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 import { isActive, useMyRequests } from './MyRequests';
 
 /** Beside "My requests": what a customer needs to collect, not the queue and prices. */
@@ -18,6 +21,7 @@ export function PickupPanel({ onNew }: { onNew: () => void }) {
         {codes.length ? (
           <ul className="mt-2 space-y-2">
             {codes.map((o) => (
+<<<<<<< HEAD
               <li key={o.id}>
                 <Tilt>
                   <div className="flex items-center justify-between gap-3 rounded-control border border-ink bg-surface px-3 py-2 shadow-[3px_3px_0_rgb(var(--yellow))]">
@@ -25,6 +29,11 @@ export function PickupPanel({ onNew }: { onNew: () => void }) {
                     <Badge tone={o.status === 'READY' ? 'green' : 'yellow'}>{STATUS_LABEL[o.status]}</Badge>
                   </div>
                 </Tilt>
+=======
+              <li key={o.id} className="flex items-center justify-between gap-3 rounded-control bg-surface px-3 py-2">
+                <span className="num display text-[1.75rem] leading-none tracking-[0.1em]">{o.pickupOtp}</span>
+                <Badge tone={o.status === 'READY' ? 'green' : 'brass'}>{STATUS_LABEL[o.status]}</Badge>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
               </li>
             ))}
           </ul>

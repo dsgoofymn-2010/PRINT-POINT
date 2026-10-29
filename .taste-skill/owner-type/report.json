@@ -1,0 +1,1813 @@
+{
+ "url": "http://localhost:5173/owner",
+ "at": "2026-10-27T05:47:36.824Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.43,
+    0.49,
+    0.45
+   ],
+   "motion": {
+    "elements": 1,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 1,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 1964,
+     "screens": 2.2,
+     "words": 366,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 2,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Orders",
+     "words": 1,
+     "chars": 6,
+     "lines": 1,
+     "size": 27,
+     "vw": 1.9,
+     "font": "IBM Plex Sans",
+     "weight": 600,
+     "tracking": 0,
+     "leading": 1.33,
+     "top": 36,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Orders",
+     "words": 1,
+     "lines": 1,
+     "size": 27,
+     "font": "IBM Plex Sans"
+    },
+    "headings": [
+     {
+      "text": "PRINTPOINT",
+      "words": 1,
+      "chars": 10,
+      "lines": 1,
+      "size": 29.3,
+      "vw": 2,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": 0.01,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.13,
+      "top": 23,
+      "tag": "a",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "IBM Plex Sans",
+       "share": 0.99,
+       "mono": false
+      },
+      {
+       "family": "Bebas Neue",
+       "share": 0.01,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      14,
+      16,
+      17,
+      18,
+      19,
+      20,
+      23,
+      27,
+      29
+     ],
+     "sizeCount": 10,
+     "notLoaded": [],
+     "body": {
+      "font": "IBM Plex Sans",
+      "size": 16.9,
+      "leading": 1.6,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 5.5
+     },
+     "measureChars": 133,
+     "max": {
+      "size": 29.3,
+      "vw": 2,
+      "font": "Bebas Neue",
+      "text": "PrintPoint"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.21,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#e7e8e7",
+     "bodyBgHsl": {
+      "h": 120,
+      "s": 0.02,
+      "l": 0.91
+     },
+     "dark": false,
+     "sectionBgs": [],
+     "textColors": [
+      {
+       "color": "#5c5b55",
+       "share": 0.57
+      },
+      {
+       "color": "#181715",
+       "share": 0.36
+      },
+      {
+       "color": "#e8e8e3",
+       "share": 0.06
+      },
+      {
+       "color": "#c4242a",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#ffffff",
+      "hsl": {
+       "h": 0,
+       "s": 0,
+       "l": 1
+      },
+      "fg": "#e8e8e3"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 21,
+     "inHero": 12,
+     "radius": 6,
+     "height": 41,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Requests 9",
+      "Taking orders",
+      "Turn on sound alerts",
+      "Accept",
+      "Deny"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 1,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 11,
+     "hairlineSamples": [
+      "aside.sticky.top-0 240px",
+      "div.flex.gap-5 1128px",
+      "footer.space-y-3.border-t 553px",
+      "footer.space-y-3.border-t 553px",
+      "footer.space-y-3.border-t 553px"
+     ],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 9,
+     "boxRadius": 8,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 1,
+     "fixed": true,
+     "height": 900,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "bebas neue",
+     "ibm plex sans"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 1964,
+    "margins": {
+     "left": 27,
+     "right": 54
+    },
+    "sections": [
+     {
+      "sel": "div.flex.flex-wrap",
+      "tag": "div",
+      "top": 36,
+      "height": 126,
+      "words": 27,
+      "media": 0,
+      "middle": 313,
+      "heading": {
+       "text": "Orders",
+       "size": 27,
+       "tag": "h1"
+      },
+      "left": 276,
+      "right": 36,
+      "textLeft": 276,
+      "textRight": 60,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 254,
+      "height": 436,
+      "words": 78,
+      "media": 0,
+      "middle": 122,
+      "heading": {
+       "text": "Needs your answer",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 276,
+      "right": 54,
+      "textLeft": 276,
+      "textRight": 54,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 735,
+      "height": 287,
+      "words": 41,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Accepted, waiting for payment",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 276,
+      "right": 548,
+      "textLeft": 276,
+      "textRight": 548,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 1067,
+      "height": 247,
+      "words": 62,
+      "media": 0,
+      "middle": 76,
+      "heading": {
+       "text": "To print",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 276,
+      "right": 54,
+      "textLeft": 276,
+      "textRight": 54,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 1358,
+      "height": 233,
+      "words": 36,
+      "media": 0,
+      "middle": 14,
+      "heading": {
+       "text": "Printing now",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 276,
+      "right": 625,
+      "textLeft": 276,
+      "textRight": 625,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 1636,
+      "height": 238,
+      "words": 53,
+      "media": 0,
+      "middle": 102,
+      "heading": {
+       "text": "Ready for pickup",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 276,
+      "right": 54,
+      "textLeft": 276,
+      "textRight": 54,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Orders",
+      "size": 27,
+      "top": 36,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 276,
+      "n": 7
+     }
+    ],
+    "leftBlocks": 7,
+    "bodySize": 17,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0.18,
+    "voidBox": {
+     "x": 900,
+     "y": 480,
+     "w": 540,
+     "h": 420
+    }
+   },
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": false,
+    "ground": "#e7e8e7",
+    "sidebar": {
+     "w": 240,
+     "tag": "aside",
+     "links": 6,
+     "share": 0.17
+    },
+    "topbar": null,
+    "canvas": {
+     "left": 36,
+     "right": 54
+    },
+    "hero": {
+     "text": "Orders",
+     "words": 1,
+     "chars": 6,
+     "lines": 1,
+     "size": 27,
+     "vw": 1.9,
+     "font": "IBM Plex Sans",
+     "weight": 600,
+     "tracking": 0,
+     "leading": 1.33,
+     "top": 36,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 9,
+     "firstScreen": 4,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 12,
+     "radii": [
+      [
+       8,
+       9
+      ],
+      [
+       0,
+       3
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      13,
+      14,
+      16,
+      17,
+      18,
+      19,
+      20,
+      23,
+      27,
+      29
+     ]
+    },
+    "title": {
+     "text": "Orders",
+     "size": 27,
+     "top": 36
+    },
+    "colourShare": 0
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.51,
+    0.54,
+    0.55
+   ],
+   "motion": {
+    "elements": 1,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 1,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 2216,
+     "screens": 2.2,
+     "words": 355,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 2,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Orders",
+     "words": 1,
+     "chars": 6,
+     "lines": 1,
+     "size": 27,
+     "vw": 3.5,
+     "font": "IBM Plex Sans",
+     "weight": 600,
+     "tracking": 0,
+     "leading": 1.33,
+     "top": 81,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Orders",
+     "words": 1,
+     "lines": 1,
+     "size": 27,
+     "font": "IBM Plex Sans"
+    },
+    "headings": [
+     {
+      "text": "PRINTPOINT",
+      "words": 1,
+      "chars": 10,
+      "lines": 1,
+      "size": 29.3,
+      "vw": 3.8,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": 0.01,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.19,
+      "top": 11,
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "Orders",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 27,
+      "vw": 3.5,
+      "font": "IBM Plex Sans",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.33,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.54,
+      "top": 81,
+      "tag": "h1",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "IBM Plex Sans",
+       "share": 0.99,
+       "mono": false
+      },
+      {
+       "family": "Bebas Neue",
+       "share": 0.01,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      14,
+      16,
+      17,
+      18,
+      19,
+      20,
+      23,
+      27,
+      29
+     ],
+     "sizeCount": 10,
+     "notLoaded": [],
+     "body": {
+      "font": "IBM Plex Sans",
+      "size": 16.9,
+      "leading": 1.6,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 5.5
+     },
+     "measureChars": 82,
+     "max": {
+      "size": 29.3,
+      "vw": 3.8,
+      "font": "Bebas Neue",
+      "text": "PrintPoint"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.22,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#e7e8e7",
+     "bodyBgHsl": {
+      "h": 120,
+      "s": 0.02,
+      "l": 0.91
+     },
+     "dark": false,
+     "sectionBgs": [],
+     "textColors": [
+      {
+       "color": "#5c5b55",
+       "share": 0.56
+      },
+      {
+       "color": "#181715",
+       "share": 0.37
+      },
+      {
+       "color": "#e8e8e3",
+       "share": 0.06
+      },
+      {
+       "color": "#c4242a",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#ffffff",
+      "hsl": {
+       "h": 0,
+       "s": 0,
+       "l": 1
+      },
+      "fg": "#e8e8e3"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 20,
+     "inHero": 11,
+     "radius": 6,
+     "height": 41,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Taking orders",
+      "Turn on sound alerts",
+      "Accept",
+      "Deny",
+      "Other time"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 1,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 11,
+     "hairlineSamples": [
+      "header.sticky.top-0 768px",
+      "div.flex.gap-5 696px",
+      "footer.space-y-3.border-t 337px",
+      "footer.space-y-3.border-t 337px",
+      "footer.space-y-3.border-t 337px"
+     ],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 9,
+     "boxRadius": 8,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 0,
+     "fixed": true,
+     "height": 0,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "bebas neue",
+     "ibm plex sans"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 2216,
+    "margins": {
+     "left": 36,
+     "right": 54
+    },
+    "sections": [
+     {
+      "sel": "div.flex.flex-wrap",
+      "tag": "div",
+      "top": 81,
+      "height": 194,
+      "words": 27,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Orders",
+       "size": 27,
+       "tag": "h1"
+      },
+      "left": 36,
+      "right": 315,
+      "textLeft": 36,
+      "textRight": 315,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 366,
+      "height": 463,
+      "words": 78,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Needs your answer",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 36,
+      "right": 54,
+      "textLeft": 36,
+      "textRight": 54,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 874,
+      "height": 328,
+      "words": 41,
+      "media": 0,
+      "middle": 28,
+      "heading": {
+       "text": "Accepted, waiting for payment",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 36,
+      "right": 116,
+      "textLeft": 36,
+      "textRight": 116,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 1247,
+      "height": 274,
+      "words": 62,
+      "media": 0,
+      "middle": 49,
+      "heading": {
+       "text": "To print",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 36,
+      "right": 54,
+      "textLeft": 36,
+      "textRight": 54,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 1565,
+      "height": 260,
+      "words": 36,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Printing now",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 36,
+      "right": 293,
+      "textLeft": 36,
+      "textRight": 293,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 1870,
+      "height": 238,
+      "words": 53,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Ready for pickup",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 36,
+      "right": 54,
+      "textLeft": 36,
+      "textRight": 54,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Orders",
+      "size": 27,
+      "top": 81,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 36,
+      "n": 7
+     }
+    ],
+    "leftBlocks": 7,
+    "bodySize": 17,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": false,
+    "ground": "#e7e8e7",
+    "sidebar": null,
+    "topbar": {
+     "h": 54
+    },
+    "canvas": {
+     "left": 36,
+     "right": 54
+    },
+    "hero": {
+     "text": "Orders",
+     "words": 1,
+     "chars": 6,
+     "lines": 1,
+     "size": 27,
+     "vw": 3.5,
+     "font": "IBM Plex Sans",
+     "weight": 600,
+     "tracking": 0,
+     "leading": 1.33,
+     "top": 81,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 9,
+     "firstScreen": 4,
+     "ragged": [
+      {
+       "diff": 27,
+       "top": 410
+      }
+     ],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 12,
+     "radii": [
+      [
+       8,
+       9
+      ],
+      [
+       0,
+       3
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      13,
+      14,
+      16,
+      17,
+      18,
+      19,
+      20,
+      23,
+      27,
+      29
+     ]
+    },
+    "title": {
+     "text": "Orders",
+     "size": 27,
+     "top": 81
+    },
+    "colourShare": 0.003
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 4,
+   "filled": [
+    0.57,
+    0.74,
+    0.71,
+    0.8
+   ],
+   "motion": {
+    "elements": 1,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 1,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 3091,
+     "screens": 3.7,
+     "words": 355,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 2,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Orders",
+     "words": 1,
+     "chars": 6,
+     "lines": 1,
+     "size": 23,
+     "vw": 5.8,
+     "font": "IBM Plex Sans",
+     "weight": 600,
+     "tracking": 0,
+     "leading": 1.6,
+     "top": 81,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Orders",
+     "words": 1,
+     "lines": 1,
+     "size": 22.5,
+     "font": "IBM Plex Sans"
+    },
+    "headings": [
+     {
+      "text": "PRINTPOINT",
+      "words": 1,
+      "chars": 10,
+      "lines": 1,
+      "size": 29.3,
+      "vw": 7.5,
+      "font": "Bebas Neue",
+      "weight": 400,
+      "tracking": 0.01,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.37,
+      "top": 11,
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "Orders",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 22.5,
+      "vw": 5.8,
+      "font": "IBM Plex Sans",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.6,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 81,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Needs your answer 3",
+      "words": 4,
+      "chars": 19,
+      "lines": 1,
+      "size": 22.5,
+      "vw": 5.8,
+      "font": "IBM Plex Sans",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.56,
+      "top": 446,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Accepted, waiting for payment 1",
+      "words": 5,
+      "chars": 31,
+      "lines": 1,
+      "size": 22.5,
+      "vw": 5.8,
+      "font": "IBM Plex Sans",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.87,
+      "top": 1186,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "To print 2",
+      "words": 3,
+      "chars": 10,
+      "lines": 1,
+      "size": 22.5,
+      "vw": 5.8,
+      "font": "IBM Plex Sans",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.25,
+      "top": 1587,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Printing now 1",
+      "words": 3,
+      "chars": 14,
+      "lines": 1,
+      "size": 22.5,
+      "vw": 5.8,
+      "font": "IBM Plex Sans",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.39,
+      "top": 2149,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Ready for pickup 2",
+      "words": 4,
+      "chars": 18,
+      "lines": 1,
+      "size": 22.5,
+      "vw": 5.8,
+      "font": "IBM Plex Sans",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.5,
+      "top": 2482,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 7,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 4,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "IBM Plex Sans",
+       "share": 0.99,
+       "mono": false
+      },
+      {
+       "family": "Bebas Neue",
+       "share": 0.01,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      14,
+      16,
+      17,
+      18,
+      19,
+      20,
+      23,
+      29
+     ],
+     "sizeCount": 9,
+     "notLoaded": [],
+     "body": {
+      "font": "IBM Plex Sans",
+      "size": 16.9,
+      "leading": 1.6,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 5.5
+     },
+     "measureChars": 42,
+     "max": {
+      "size": 29.3,
+      "vw": 7.5,
+      "font": "Bebas Neue",
+      "text": "PrintPoint"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.22,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#e7e8e7",
+     "bodyBgHsl": {
+      "h": 120,
+      "s": 0.02,
+      "l": 0.91
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#ffffff",
+       "top": 1258,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#5c5b55",
+       "share": 0.56
+      },
+      {
+       "color": "#181715",
+       "share": 0.37
+      },
+      {
+       "color": "#e8e8e3",
+       "share": 0.06
+      },
+      {
+       "color": "#c4242a",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#ffffff",
+      "hsl": {
+       "h": 0,
+       "s": 0,
+       "l": 1
+      },
+      "fg": "#e8e8e3"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 20,
+     "inHero": 5,
+     "radius": 6,
+     "height": 41,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Taking orders",
+      "Turn on sound alerts",
+      "Accept",
+      "Deny",
+      "Other time"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 1,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 11,
+     "hairlineSamples": [
+      "header.sticky.top-0 390px",
+      "div.flex.gap-5 354px",
+      "footer.space-y-3.border-t 350px",
+      "footer.space-y-3.border-t 350px",
+      "footer.space-y-3.border-t 350px"
+     ],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 9,
+     "boxRadius": 8,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 0,
+     "fixed": true,
+     "height": 0,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "bebas neue",
+     "ibm plex sans"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 3091,
+    "margins": {
+     "left": 18,
+     "right": 36
+    },
+    "sections": [
+     {
+      "sel": "div.flex.flex-wrap",
+      "tag": "div",
+      "top": 81,
+      "height": 274,
+      "words": 27,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Orders",
+       "size": 23,
+       "tag": "h1"
+      },
+      "left": 18,
+      "right": 63,
+      "textLeft": 18,
+      "textRight": 63,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 446,
+      "height": 695,
+      "words": 78,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Needs your answer",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 18,
+      "right": 36,
+      "textLeft": 18,
+      "textRight": 36,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 1186,
+      "height": 356,
+      "words": 41,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Accepted, waiting for payment",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 18,
+      "right": 36,
+      "textLeft": 18,
+      "textRight": 36,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 1587,
+      "height": 517,
+      "words": 62,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "To print",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 18,
+      "right": 36,
+      "textLeft": 18,
+      "textRight": 36,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 2149,
+      "height": 289,
+      "words": 36,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Printing now",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 18,
+      "right": 36,
+      "textLeft": 18,
+      "textRight": 36,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section",
+      "tag": "section",
+      "top": 2482,
+      "height": 474,
+      "words": 53,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Ready for pickup",
+       "size": 23,
+       "tag": "h2"
+      },
+      "left": 18,
+      "right": 36,
+      "textLeft": 18,
+      "textRight": 36,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Orders",
+      "size": 23,
+      "top": 81,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 18,
+      "n": 7
+     }
+    ],
+    "leftBlocks": 7,
+    "bodySize": 17,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": false,
+    "ground": "#e7e8e7",
+    "sidebar": null,
+    "topbar": {
+     "h": 54
+    },
+    "canvas": {
+     "left": 18,
+     "right": 36
+    },
+    "hero": {
+     "text": "Orders",
+     "words": 1,
+     "chars": 6,
+     "lines": 1,
+     "size": 23,
+     "vw": 5.8,
+     "font": "IBM Plex Sans",
+     "weight": 600,
+     "tracking": 0,
+     "leading": 1.6,
+     "top": 81,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 9,
+     "firstScreen": 2,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 12,
+     "radii": [
+      [
+       8,
+       9
+      ],
+      [
+       0,
+       3
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      13,
+      14,
+      16,
+      17,
+      18,
+      19,
+      20,
+      23,
+      29
+     ]
+    },
+    "title": {
+     "text": "Orders",
+     "size": 23,
+     "top": 81
+    },
+    "colourShare": 0.001
+   },
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "dev-server",
+   "width": 1440,
+   "message": "This page is served by a development server (Vite, webpack or Next in dev mode).",
+   "fix": "Run the last gate on the production build too (vite build && vite preview, next build && next start, or the built index.html): minifiers and bundlers change the CSS a visitor receives.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "below-fold",
+   "width": 1440,
+   "message": "Only 4 of 9 blocks start on the first 1440px screen.",
+   "fix": "Every block the brief names shows its header and first rows on the first desktop screen: size the headline block to its question, cap long lists with \"View all\", and put time-sensitive blocks before long tables."
+  },
+  {
+   "level": "WARN",
+   "id": "ragged-row",
+   "width": 768,
+   "message": "1 pair(s) of cards in one row end at different heights (by 27px).",
+   "fix": "Cards that share a row share a bottom edge: balance them by their content (the same number of rows, a block of similar height beside it), or stack them. In testing, ragged rows were marked down every time."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\owner-type\\desktop-fold.jpg",
+   "pages": [
+    "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\owner-type\\desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\owner-type\\tablet-fold.jpg",
+   "pages": [
+    "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\owner-type\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\owner-type\\mobile-fold.jpg",
+   "pages": [
+    "C:\\Users\\msdv2\\OneDrive\\Desktop\\XEROX\\.taste-skill\\owner-type\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

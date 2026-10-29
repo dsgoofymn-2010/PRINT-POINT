@@ -7,13 +7,21 @@ import type { Role } from '@/lib/types';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Loading, cn } from './ui';
 
+<<<<<<< HEAD
 /** The mark: a paper sheet with a magenta copy offset behind it, as it leaves the machine. */
+=======
+/** The mark: a paper sheet with a brass copy offset behind it, as it leaves the machine. */
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 export function Mark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={cn('h-6 w-6 flex-none', className)} aria-hidden="true">
       <rect width="32" height="32" fill="rgb(var(--ink))" />
       <rect x="7" y="5" width="14" height="19" fill="rgb(var(--paper))" />
+<<<<<<< HEAD
       <rect x="11" y="9" width="14" height="19" fill="rgb(var(--magenta))" />
+=======
+      <rect x="11" y="9" width="14" height="19" fill="rgb(var(--brass))" />
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
     </svg>
   );
 }
@@ -22,7 +30,11 @@ export function Wordmark({ to = '/' }: { to?: string }) {
   return (
     <Link to={to} className="flex items-center gap-2" aria-label="PrintPoint home">
       <Mark />
+<<<<<<< HEAD
       <span className="display text-[1.375rem] leading-none">PrintPoint</span>
+=======
+      <span className="display pt-0.5 text-[1.625rem] leading-none tracking-[0.01em]">PrintPoint</span>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
     </Link>
   );
 }
@@ -45,10 +57,14 @@ export function ThemeToggle({ className }: { className?: string }) {
 }
 
 const topLink = ({ isActive }: { isActive: boolean }) =>
+<<<<<<< HEAD
   cn(
     'rounded-full px-4 py-2.5 text-sm font-medium transition-colors duration-200 md:py-2',
     isActive ? 'bg-yellow text-on-yellow' : 'text-paper/75 hover:bg-paper/10 hover:text-paper',
   );
+=======
+  cn('rounded-full px-4 py-2.5 text-sm transition-colors duration-200 md:py-2', isActive ? 'bg-ink/[0.07] text-ink' : 'text-muted hover:bg-ink/5 hover:text-ink');
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 
 /** Customer screens: a plain bar over a centred column. */
 function CustomerShell() {
@@ -83,6 +99,7 @@ function CustomerShell() {
         initial={reduce ? false : { y: -24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+<<<<<<< HEAD
         // Ink bar: reads the same over the grey intro video and the paper page. Yellow focus ring for contrast on black.
         className="fixed inset-x-0 top-3 z-40 px-3 sm:top-4 sm:px-6 [&_:focus-visible]:outline-yellow"
       >
@@ -90,12 +107,23 @@ function CustomerShell() {
           className={cn(
             'mx-auto flex h-14 max-w-[1100px] items-center justify-between gap-4 rounded-full bg-ink pl-5 pr-2 text-paper transition-shadow duration-300',
             scrolled || open ? 'shadow-[0_10px_30px_rgb(20_19_26/0.22)]' : 'shadow-[0_4px_14px_rgb(20_19_26/0.12)]',
+=======
+        className="fixed inset-x-0 top-3 z-40 px-3 sm:top-4 sm:px-6"
+      >
+        <div
+          className={cn(
+            'mx-auto flex h-14 max-w-[1100px] items-center justify-between gap-4 rounded-full border pl-5 pr-2 backdrop-blur-xl backdrop-saturate-150 transition-[background-color,box-shadow,border-color] duration-300',
+            scrolled || open
+              ? 'border-white/60 bg-ground/75 shadow-[0_8px_30px_rgb(0_0_0/0.08)]'
+              : 'border-white/40 bg-ground/40 shadow-[0_2px_12px_rgb(0_0_0/0.04)]',
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
           )}
         >
           <Wordmark />
           <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
             {links}
             {!SKIP_LOGIN && (user ? (
+<<<<<<< HEAD
               <button onClick={() => void signOut()} className="ml-1 h-10 cursor-pointer rounded-full px-4 text-sm text-paper/75 transition-colors duration-200 hover:bg-paper/10 hover:text-paper">
                 Sign out {user.name.split(' ')[0]}
               </button>
@@ -104,6 +132,16 @@ function CustomerShell() {
             ))}
           </nav>
           <button onClick={() => setOpen((o) => !o)} className="h-11 cursor-pointer rounded-full px-4 text-sm font-medium text-paper transition-colors hover:bg-paper/10 md:hidden" aria-expanded={open} aria-controls="mobile-nav">
+=======
+              <button onClick={() => void signOut()} className="ml-1 h-10 cursor-pointer rounded-full px-4 text-sm text-muted transition-colors duration-200 hover:bg-ink/5 hover:text-ink">
+                Sign out {user.name.split(' ')[0]}
+              </button>
+            ) : (
+              <Link to="/login" className="ml-1 inline-flex h-10 items-center rounded-full bg-primary px-5 text-sm font-medium text-on-primary">Sign in</Link>
+            ))}
+          </nav>
+          <button onClick={() => setOpen((o) => !o)} className="h-11 cursor-pointer rounded-full px-4 text-sm font-medium transition-colors hover:bg-ink/5 md:hidden" aria-expanded={open} aria-controls="mobile-nav">
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
             {open ? 'Close' : 'Menu'}
           </button>
         </div>
@@ -115,14 +153,24 @@ function CustomerShell() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={reduce ? undefined : { opacity: 0, y: -8, scale: 0.98 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
+<<<<<<< HEAD
               className="mx-auto mt-2 flex max-w-[1100px] flex-col gap-1 rounded-3xl bg-ink p-3 text-paper shadow-[0_10px_30px_rgb(20_19_26/0.22)] md:hidden"
+=======
+              className="mx-auto mt-2 flex max-w-[1100px] flex-col gap-1 rounded-3xl border border-white/60 bg-ground/85 p-3 shadow-[0_8px_30px_rgb(0_0_0/0.1)] backdrop-blur-xl md:hidden"
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
               aria-label="Mobile"
             >
               {links}
               {!SKIP_LOGIN && (user ? (
+<<<<<<< HEAD
                 <button onClick={() => void signOut()} className="rounded-full px-4 py-2.5 text-left text-sm text-paper/75 hover:bg-paper/10 hover:text-paper">Sign out</button>
               ) : (
                 <NavLink to="/login" className="mt-1 rounded-full bg-magenta px-4 py-2.5 text-sm font-semibold text-on-magenta">Sign in</NavLink>
+=======
+                <button onClick={() => void signOut()} className="rounded-full px-4 py-2.5 text-left text-sm text-muted hover:bg-ink/5">Sign out</button>
+              ) : (
+                <NavLink to="/login" className={topLink}>Sign in</NavLink>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
               ))}
             </motion.nav>
           )}
@@ -138,7 +186,11 @@ function CustomerShell() {
 
 export function SmallFooter() {
   return (
+<<<<<<< HEAD
     <footer className="border-t border-line text-[0.875rem] text-muted">
+=======
+    <footer className="bg-surface text-[0.875rem] text-muted">
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
       <div className="mx-auto flex max-w-[1152px] flex-wrap gap-x-5 gap-y-2 px-4 py-5 sm:px-6">
         <span>PrintPoint, Chennai</span>
         <Link className="hover:text-ink" to="/about">About</Link>
@@ -259,6 +311,7 @@ function TestModeBar() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   return (
+<<<<<<< HEAD
     // Same ink pill as the top bar so it stands out over the intro video, the paper page and the 3D scene.
     <div
       role="group"
@@ -266,6 +319,10 @@ function TestModeBar() {
       className="fixed bottom-4 left-1/2 z-50 flex max-w-[calc(100vw-16px)] -translate-x-1/2 items-center gap-0.5 whitespace-nowrap rounded-full bg-ink p-1 text-[13px] text-paper sm:gap-1 sm:p-1.5 sm:text-sm shadow-[0_10px_30px_rgb(20_19_26/0.3)] ring-2 ring-yellow [&_:focus-visible]:outline-yellow"
     >
       <span className="px-2 font-semibold text-yellow sm:px-3">View as</span>
+=======
+    <div className="mx-auto mb-4 flex w-fit flex-wrap items-center gap-1 rounded-control bg-active p-1 text-xs">
+      <span className="px-2 font-medium text-muted">View as</span>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
       {TEST_ROLES.map((r) => (
         <button
           key={r.role}
@@ -273,13 +330,21 @@ function TestModeBar() {
             setError('');
             switchRole(r.role).then(() => navigate(r.home), (e: Error) => setError(e.message));
           }}
+<<<<<<< HEAD
           aria-pressed={user?.role === r.role}
           className={`min-h-[36px] rounded-full px-2.5 font-medium sm:px-3.5 transition-colors ${user?.role === r.role ? 'bg-yellow text-on-yellow' : 'text-paper/80 hover:bg-paper/10 hover:text-paper'}`}
+=======
+          className={`rounded-control px-2 py-1 ${user?.role === r.role ? 'bg-primary text-on-primary' : 'text-ink hover:bg-active'}`}
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
         >
           {r.label}
         </button>
       ))}
+<<<<<<< HEAD
       {error && <span className="px-3 text-[#ff8a9b]">{error}</span>}
+=======
+      {error && <span className="px-2 text-red-600">{error}</span>}
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
     </div>
   );
 }

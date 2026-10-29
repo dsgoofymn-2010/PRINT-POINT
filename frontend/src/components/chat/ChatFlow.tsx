@@ -38,7 +38,12 @@ export function ChatFlow() {
   const at = (s: Step) => STEPS.indexOf(step) >= STEPS.indexOf(s);
   const go = (s: Step) => setStep(s);
 
+<<<<<<< HEAD
   // Follow the conversation only after the customer acts; on first load the page must stay on the intro.
+=======
+  // Follow the conversation as it grows, but not on first load: that would jump past the intro.
+  // Compare with the last values seen, so React's double-run of effects in development can't trigger it.
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
   const seen = useRef(`${step}:${files.files.length}`);
   useEffect(() => {
     const now = `${step}:${files.files.length}`;
@@ -322,7 +327,11 @@ export function ChatFlow() {
                 {send.error && <ErrorState error={send.error} />}
                 <div className="flex flex-wrap items-center gap-3">
                   <Button
+<<<<<<< HEAD
                     variant="action"
+=======
+                    variant="brass"
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
                     size="lg"
                     className="min-h-[52px] px-6 text-[1.125rem]"
                     loading={send.isPending}

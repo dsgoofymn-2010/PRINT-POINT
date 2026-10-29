@@ -83,7 +83,11 @@ export default function Login() {
   return (
     <div className="mx-auto max-w-md">
       <Card className="p-6">
+<<<<<<< HEAD
         <h1 className="display misreg mb-2 text-[2.25rem]">{mode === 'register' ? 'Create account' : 'Sign in'}</h1>
+=======
+        <h1 className="mb-1 text-2xl font-bold">{mode === 'register' ? 'Create account' : 'Sign in'}</h1>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
         <p className="mb-5 text-sm text-muted">Follow your print requests live and collect with a code.</p>
         <Segmented
           label="Method"

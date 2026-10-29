@@ -36,7 +36,11 @@ export function FileStep({ files, onAdd, onRemove, onRetry, onPages, signedIn, l
           onDrop={drop}
           className={cn(
             'flex flex-col items-start gap-3 rounded-card border-2 border-dashed px-4 py-5 transition-colors sm:flex-row sm:items-center sm:justify-between',
+<<<<<<< HEAD
             over ? 'border-cyan-ink bg-cyan/10' : 'border-control bg-surface hover:border-cyan-ink',
+=======
+            over ? 'border-ink bg-brass/20' : 'border-control bg-surface',
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
           )}
         >
           <div>
@@ -46,7 +50,11 @@ export function FileStep({ files, onAdd, onRemove, onRetry, onPages, signedIn, l
           <button
             type="button"
             onClick={() => input.current?.click()}
+<<<<<<< HEAD
             className="min-h-[44px] whitespace-nowrap rounded-control bg-primary px-5 text-[1.0625rem] font-medium text-on-primary hover:opacity-90"
+=======
+            className="min-h-[44px] rounded-control bg-primary px-5 text-[1.0625rem] font-medium text-on-primary hover:opacity-90"
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
           >
             Choose files
           </button>

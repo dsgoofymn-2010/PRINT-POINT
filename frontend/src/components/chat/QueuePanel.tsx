@@ -5,7 +5,10 @@ import { rupees, time12, when } from '@/lib/format';
 import { usePollWhenOffline, useQueueRoom, useSocketEvent } from '@/lib/realtime';
 import type { QueueInfo } from '@/lib/types';
 import { Badge, ErrorState, cn } from '../ui';
+<<<<<<< HEAD
 import { Tilt } from '../Tilt';
+=======
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 
 export function useShopQueue(shopId: string | null) {
   const qc = useQueryClient();
@@ -20,7 +23,12 @@ export function useShopQueue(shopId: string | null) {
     queryKey: ['queue', shopId],
     queryFn: () => api.get<{ queue: QueueInfo }>(`/shops/${shopId}/queue`).then((r) => r.queue),
     enabled: Boolean(shopId),
+<<<<<<< HEAD
     refetchInterval: poll,
+=======
+    // Socket events cover order changes; the minute tick catches opening/closing time passing.
+    refetchInterval: poll || 60_000,
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
     staleTime: 5_000,
   });
 }
@@ -47,6 +55,7 @@ function Body({ q }: { q: QueueInfo }) {
       )}
       {!q.isOpen && !q.nextOpenAt && <p className="text-[1rem] text-muted">The shop hasn’t said when it opens again.</p>}
 
+<<<<<<< HEAD
       <Tilt>
         <dl className="grid grid-cols-3 divide-x divide-line rounded-card border border-ink bg-surface text-center shadow-[4px_4px_0_rgb(var(--cyan))]">
           <div className="px-2 py-3">
@@ -66,6 +75,25 @@ function Body({ q }: { q: QueueInfo }) {
 
       <div>
         <h3 className="display text-[1.25rem]">Price list</h3>
+=======
+      <dl className="grid grid-cols-3 divide-x divide-line rounded-card border border-line bg-surface text-center">
+        <div className="px-2 py-3">
+          <dt className="text-[0.875rem] text-muted">Waiting</dt>
+          <dd className="num display mt-1 text-[2.125rem] leading-none">{q.pending}</dd>
+        </div>
+        <div className="px-2 py-3">
+          <dt className="text-[0.875rem] text-muted">Printing</dt>
+          <dd className="num display mt-1 text-[2.125rem] leading-none">{q.printing}</dd>
+        </div>
+        <div className="px-2 py-3">
+          <dt className="text-[0.875rem] text-muted">Est. wait</dt>
+          <dd className="num display mt-1 text-[2.125rem] leading-none">{q.estimatedWaitMins}<span className="text-[1.125rem]">m</span></dd>
+        </div>
+      </dl>
+
+      <div>
+        <h3 className="display text-[1.5rem]">Price list</h3>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
         {q.prices ? (
           <dl className="mt-1 divide-y divide-rule text-[1rem]">
             {rate('B/W, single-sided · per page', q.prices.bwSingle)}
@@ -124,7 +152,11 @@ export function QueuePanel({ shopId }: { shopId: string | null }) {
             <span className="min-w-0 truncate">
               <span className={cn('mr-2 inline-block h-2.5 w-2.5 rounded-full', q.data.isOpen ? 'bg-positive' : 'bg-negative')} aria-hidden="true" />
               <span className="font-medium">{q.data.name}</span>
+<<<<<<< HEAD
               <span className="text-muted"> · {q.data.pending} waiting · ~{q.data.estimatedWaitMins} min</span>
+=======
+              <span className="text-muted"> · {q.data.pending} waiting{q.data.estimatedWaitMins > 0 && ` · ~${q.data.estimatedWaitMins} min`}</span>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
             </span>
           ) : (
             <span className="text-muted">Shop status & prices</span>
@@ -137,7 +169,11 @@ export function QueuePanel({ shopId }: { shopId: string | null }) {
       {/* Desktop column */}
       <aside className="hidden lg:col-start-2 lg:row-start-1 lg:block" aria-label="Shop queue">
         <div className="sticky top-24 rounded-card border border-line bg-raised p-5">
+<<<<<<< HEAD
           <h2 className="display text-[1.625rem]">{q.data?.name ?? 'PrintPoint'}</h2>
+=======
+          <h2 className="display text-[2rem]">{q.data?.name ?? 'PrintPoint'}</h2>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
           <div className="mt-3">{content}</div>
         </div>
       </aside>

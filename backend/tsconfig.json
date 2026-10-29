@@ -1,8 +1,13 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+<<<<<<< HEAD
     "module": "commonjs",
     "moduleResolution": "node",
+=======
+    "module": "node16",
+    "moduleResolution": "node16",
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
     "outDir": "dist",
     "rootDir": ".",
     "strict": true,

@@ -34,4 +34,7 @@ desktop.ini
 .vscode/*
 !.vscode/extensions.json
 .idea
+<<<<<<< HEAD
 .taste-skill/
+=======
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7

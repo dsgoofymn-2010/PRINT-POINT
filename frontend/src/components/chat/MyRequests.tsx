@@ -56,12 +56,20 @@ export function MyRequests({ onNew }: { onNew: () => void }) {
   return (
     <div className="space-y-8">
       <section className="space-y-3">
+<<<<<<< HEAD
         <h2 className="display text-[1.5rem]">Active</h2>
+=======
+        <h2 className="display text-[1.875rem]">Active</h2>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
         {active.length ? active.map((o) => <StatusCard key={o.id} order={o} />) : <p className="text-[1.0625rem] text-muted">Nothing in progress.</p>}
       </section>
       {past.length > 0 && (
         <section className="space-y-3">
+<<<<<<< HEAD
           <h2 className="display text-[1.5rem]">Past</h2>
+=======
+          <h2 className="display text-[1.875rem]">Past</h2>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
           <ul className="space-y-2">
             {past.map((o) => <PastRequest key={o.id} order={o} />)}
           </ul>

@@ -4,6 +4,10 @@ import { z } from 'zod';
 import type { OrderStatus, UploadedFile } from '@prisma/client';
 import { env } from '../config/env';
 import { ah, badRequest, forbidden, notFound } from '../lib/errors';
+<<<<<<< HEAD
+=======
+import { logger } from '../lib/logger';
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 import { prisma } from '../lib/prisma';
 import { authenticate, currentUser } from '../middleware/auth';
 import { uploadLimiter } from '../middleware/rateLimit';
@@ -54,7 +58,11 @@ uploadsRouter.post(
       const kind = detectKind(f.buffer, originalName);
       if (!kind) throw badRequest(`${originalName}: only PDF, DOCX, JPG and PNG files are allowed`);
       const key = newStorageKey(kind);
+<<<<<<< HEAD
       await storage.save(key, f.buffer);
+=======
+      await storage.save(key, f.buffer, mimeFor(kind));
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
       saved.push(
         await prisma.uploadedFile.create({
           data: {
@@ -88,11 +96,24 @@ export async function streamFile(res: Response, file: UploadedFile, disposition:
   if (file.deletedAt || !(await storage.exists(file.storageKey))) throw notFound('This file has been deleted (files are removed after pickup or 24 hours)');
   // DOCX cannot be shown in a browser tab, so it is always downloaded.
   const d = file.mimeType === 'application/pdf' || file.mimeType.startsWith('image/') ? disposition : 'attachment';
+<<<<<<< HEAD
+=======
+  // Open the stream before sending headers, so a storage failure still gets a proper error response.
+  const stream = await storage.read(file.storageKey);
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
   res.setHeader('Content-Type', file.mimeType);
   res.setHeader('Content-Disposition', `${d}; filename*=UTF-8''${encodeURIComponent(file.originalName)}`);
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Cache-Control', 'private, no-store');
+<<<<<<< HEAD
   storage.read(file.storageKey).pipe(res);
+=======
+  stream.on('error', (err) => {
+    logger.error({ err, fileId: file.id }, 'File stream failed');
+    res.destroy(err);
+  });
+  stream.pipe(res);
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
 }
 
 /** Orders in these states let the shop open the customer's files. */

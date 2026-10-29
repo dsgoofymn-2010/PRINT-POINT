@@ -12,7 +12,12 @@ const make = (windowMinutes: number, limit: number, message: string, perUser = f
     ...(perUser ? { keyGenerator: byUser } : {}),
     standardHeaders: 'draft-7',
     legacyHeaders: false,
+<<<<<<< HEAD
     skip: () => process.env.NODE_ENV === 'test',
+=======
+    // Razorpay webhooks are signature-checked and must never be throttled.
+    skip: (req) => process.env.NODE_ENV === 'test' || req.originalUrl.startsWith('/api/v1/payments/webhook'),
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
     message: { error: { code: 'RATE_LIMITED', message } },
   });
 

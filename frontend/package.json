@@ -17,13 +17,19 @@
     "react-router-dom": "6.28.0",
     "recharts": "2.13.3",
     "socket.io-client": "4.8.1",
+<<<<<<< HEAD
     "three": "^0.169.0",
+=======
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
     "zod": "3.23.8"
   },
   "devDependencies": {
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
+<<<<<<< HEAD
     "@types/three": "^0.169.0",
+=======
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
     "@vitejs/plugin-react": "4.3.3",
     "autoprefixer": "10.4.20",
     "postcss": "8.4.49",

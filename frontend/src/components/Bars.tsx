@@ -2,7 +2,11 @@ import { useState } from 'react';
 
 /**
  * Column chart by the app-screen rules: square bars on a zero baseline, 4 faint gridlines,
+<<<<<<< HEAD
  * round ticks above the maximum, no y-axis line, and the one data hue (magenta) only on the
+=======
+ * round ticks above the maximum, no y-axis line, and the one data hue (brass) only on the
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
  * highlighted bar (today). Everything else is ink.
  */
 export interface BarDatum {

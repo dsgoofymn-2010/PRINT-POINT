@@ -75,7 +75,11 @@ export function PriceSummary({ quote, options }: { quote: Quote; options: ChatOp
       </dl>
       <div className="flex items-baseline justify-between gap-4 border-t border-ink px-4 py-3">
         <span className="text-[1.125rem] font-semibold">Total</span>
+<<<<<<< HEAD
         <span className="num display text-[1.875rem] leading-none">{rupees(quote.total)}</span>
+=======
+        <span className="num display text-[2.125rem] leading-none">{rupees(quote.total)}</span>
+>>>>>>> fc060c7b2d80010a918ee9c381a985626c1701c7
       </div>
       {!quote.meetsMinimum && (
         <p className="border-t border-line px-4 py-2.5 text-[0.9375rem] text-negative">
