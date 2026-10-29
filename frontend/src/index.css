@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  PrintPoint tokens: CMYK process ink on warm paper.
+  K (ink) carries structure and text. M (magenta) is the one action on a screen.
+  Y (yellow) marks what the customer picked. C (cyan) is for graphics; cyan-ink is its text-safe shade.
+  Values are RGB triplets so Tailwind can apply opacity.
+*/
+:root {
+  --paper: 246 243 236;      /* #f6f3ec uncoated stock */
+  --ground: 246 243 236;
+  --surface: 255 255 255;
+  --raised: 251 249 244;
+  --active: 236 231 220;     /* nav pill, selected row */
+  --border: 228 222 209;
+  --rule: 238 233 223;
+  --control: 196 188 172;
+  --ink: 20 19 26;           /* #14131a process black */
+  --muted: 90 87 80;         /* #5a5750, 6.5:1 on paper */
+  --primary: 20 19 26;
+  --on-primary: 246 243 236;
+  --magenta: 214 0 111;      /* #d6006f, white text 5.1:1 */
+  --on-magenta: 255 255 255;
+  --cyan: 0 150 214;         /* #0096d6, fills and marks only */
+  --cyan-ink: 0 105 154;     /* #00699a, 6.0:1 on white for text */
+  --yellow: 255 212 0;       /* #ffd400, ink text on top */
+  --on-yellow: 20 19 26;
+  --data: 214 0 111;
+  --positive: 36 123 80;
+  --negative: 196 36 42;
+  color-scheme: light;
+}
+
+@layer base {
+  html {
+    font-size: 112.5%; /* 18px base, Archivo sets larger than the old serif */
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-ground font-sans text-base leading-6 text-ink antialiased;
+    font-variant-numeric: tabular-nums;
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--cyan-ink));
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: rgb(var(--yellow));
+    color: rgb(var(--on-yellow));
+  }
+}
+
+@layer components {
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Fraunces with its soft axis up: a warm serif for headings, figures and the wordmark */
+  .display {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 650;
+    font-optical-sizing: auto;
+    font-variation-settings: 'SOFT' 100, 'WONK' 0;
+    letter-spacing: -0.02em;
+    line-height: 0.98;
+  }
+  /* The identity motif: a slightly misregistered print, cyan and magenta plates slipping from the black. */
+  .misreg {
+    text-shadow:
+      -0.035em 0.02em 0 rgb(var(--cyan) / 0.85),
+      0.035em -0.01em 0 rgb(var(--magenta) / 0.8);
+  }
+  /* Hero headline only: Bodoni Moda, a high-contrast Didone from the press era, for an elegant first line. */
+  .hero-type {
+    font-family: 'Bodoni Moda', 'Didot', Georgia, serif;
+    font-weight: 500;
+    font-optical-sizing: auto;
+    letter-spacing: -0.015em;
+    line-height: 0.95;
+  }
+  /* Same misregistration, pulled in tight so Bodoni's hairlines stay crisp. */
+  .misreg-fine {
+    text-shadow:
+      -0.018em 0.01em 0 rgb(var(--cyan) / 0.7),
+      0.018em -0.006em 0 rgb(var(--magenta) / 0.65);
+  }
+  .page-gutter {
+    padding-left: clamp(16px, 2.4vw, 32px);
+    padding-right: clamp(16px, 2.4vw, 32px);
+  }
+  /* Main action: a magenta block with its cyan plate showing underneath, pressed down on click. */
+  .press {
+    box-shadow: 3px 3px 0 rgb(var(--cyan));
+    transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+  }
+  .press:hover:not(:disabled) {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 rgb(var(--cyan));
+  }
+  .press:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 rgb(var(--cyan));
+  }
+  .press:disabled {
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .press,
+  .press:hover:not(:disabled),
+  .press:active:not(:disabled) {
+    transition: none;
+    transform: none;
+  }
+}
+
+@media print {
+  header,
+  footer,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  main {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+}
